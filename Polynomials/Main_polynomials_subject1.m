@@ -21,8 +21,8 @@ savePolynomials = 0;
 
 pathmain = pwd;
 name_dummymotion = 'dummy_motion_gait2392.mot';
-path_dummymotion = [pathmain,'\MuscleAnalysis\dummy_motion\'];
-path_resultsMA = [pathmain,'\MuscleAnalysis\ResultsMA_subject1\'];
+path_dummymotion = [pathmain,'/MuscleAnalysis/dummy_motion/'];
+path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA_subject1/'];
 
 dummy_motion = importdata([path_dummymotion,name_dummymotion]);
 % 15 dofs (mtp locked)

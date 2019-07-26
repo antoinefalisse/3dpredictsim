@@ -55,8 +55,8 @@ for k = 1:length(ww)
     % Load results
     pathmain = pwd;
     [pathRepo,~,~] = fileparts(pathmain);
-    pathresults = [pathRepo,'\Results'];
-    load([pathresults,'\Results_prosthesis.mat']);    
+    pathresults = [pathRepo,'/Results'];
+    load([pathresults,'/Results_prosthesis.mat']);    
     % Unstructure data   
     Ts_opt_r(ww(k)).m = Results_prosthesis. ...
             (['Speed_',num2str(v_tgt_id*100)]). ...  
@@ -117,8 +117,8 @@ end
 %% Load reference data
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathReferenceData = [pathrepo,'\ExperimentalData'];
-load([pathReferenceData,'\ExperimentalData.mat'],'ExperimentalData');
+pathReferenceData = [pathrepo,'/ExperimentalData'];
+load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 
 %% Common settings for plots
 label_fontsize  = 16;
@@ -204,7 +204,7 @@ set(gca,'YTick',[L(1),0,L(2)]);
 box off;
     
 %% Plot metabolic cost of transport (COT)
-pathVariousFunctions = [pathrepo,'\VariousFunctions'];
+pathVariousFunctions = [pathrepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions)); 
 % HARD CODED: value of COT from nominal simulation
 COT_nom = 3.5464;

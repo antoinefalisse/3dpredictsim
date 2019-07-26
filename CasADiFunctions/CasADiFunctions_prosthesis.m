@@ -7,7 +7,7 @@
 import casadi.*
 
 %% Polynomial approximation
-pathpolynomial = [pathRepo,'\Polynomials'];
+pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
 muscle_spanning_info_m = muscle_spanning_joint_INFO(musi_pol,:);
 MuscleInfo_m.muscle    = MuscleInfo.muscle(musi_pol);                  
@@ -138,7 +138,7 @@ f_ArmActivationDynamics = ...
     Function('f_ArmActivationDynamics',{e_a,a_a},{dadt});
 
 %% Muscle contraction dynamics
-pathmusclemodel = [pathRepo,'\MuscleModel'];
+pathmusclemodel = [pathRepo,'/MuscleModel'];
 addpath(genpath(pathmusclemodel));
 % Function for Hill-equilibrium
 FTtilde     = SX.sym('FTtilde',NMuscle_act); % Normalized tendon forces

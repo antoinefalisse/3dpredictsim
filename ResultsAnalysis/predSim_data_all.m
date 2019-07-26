@@ -24,8 +24,8 @@ coCont      = settings(ww(k),18);   % co-contraction identifier
 % load results
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathresults = [pathrepo,'\Results'];
-load([pathresults,'\Results_all.mat']);
+pathresults = [pathrepo,'/Results'];
+load([pathresults,'/Results_all.mat']);
 v_tgt_id = round(v_tgt,2);
 
 Qs_opt(ww(k)).m = Results_all.(['Speed_',num2str(v_tgt_id*100)]). ...  

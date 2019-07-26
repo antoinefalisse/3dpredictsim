@@ -41,8 +41,8 @@ end
 %% Load reference data
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathReferenceData = [pathrepo,'\ExperimentalData'];
-load([pathReferenceData,'\ExperimentalData.mat'],'ExperimentalData');
+pathReferenceData = [pathrepo,'/ExperimentalData'];
+load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 
 %% Common settings for plots
 label_fontsize  = 16;
@@ -143,7 +143,7 @@ for i = 1:length(idx_Qs_weak)
 end
    
 %% Plot stride lengths
-pathVariousFunctions = [pathrepo,'\VariousFunctions'];
+pathVariousFunctions = [pathrepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));   
 StrideLengthref = ExperimentalData.StrideLength;
 % Post-processing for barplot

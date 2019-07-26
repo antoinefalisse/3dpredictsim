@@ -128,17 +128,29 @@ pathmain = pwd;
 % We use different external functions, since we also want to access some 
 % parameters of the model in a post-processing phase.
 [pathRepo,~,~] = fileparts(pathmain);
-pathExternalFunctions = [pathRepo,'\ExternalFunctions'];                 
+pathExternalFunctions = [pathRepo,'/ExternalFunctions'];                 
 % Loading external functions. 
 cd(pathExternalFunctions);
 setup.derivatives =  'AD'; % Algorithmic differentiation
-switch setup.derivatives
-    case {'AD'}
-        F = external('F','PredSimProsthesis.dll');   
-        if analyseResults
-            F1 = external('F','PredSimProsthesis_pp.dll');
-        end
-end                    
+if ispc    
+    switch setup.derivatives
+        case {'AD'}
+            F = external('F','PredSimProsthesis.dll');   
+            if analyseResults
+                F1 = external('F','PredSimProsthesis_pp.dll');
+            end
+    end
+elseif ismac
+    switch setup.derivatives
+        case {'AD'}
+            F = external('F','PredSimProsthesis.dylib');   
+            if analyseResults
+                F1 = external('F','PredSimProsthesis_pp.dylib');
+            end
+    end   
+else
+    disp('Platform not supported')
+end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
@@ -237,7 +249,7 @@ body_weight = body_mass*9.81;
 % polynomials to approximate the state derivatives at the collocation
 % points in each mesh interval. We use d=3 collocation points per mesh
 % interval and Radau collocation points. 
-pathCollocationScheme = [pathRepo,'\CollocationScheme'];
+pathCollocationScheme = [pathRepo,'/CollocationScheme'];
 addpath(genpath(pathCollocationScheme));
 d = 3; % degree of interpolating polynomial
 method = 'radau'; % collocation method
@@ -270,7 +282,7 @@ muscleNames_act = {'glut_med1_r','glut_med2_r','glut_med3_r',...
         'rect_fem_r','vas_med_r','vas_int_r','vas_lat_r',...
         'ercspn_r','intobl_r','extobl_r'};
 % Muscle indices for later use    
-pathmusclemodel = [pathRepo,'\MuscleModel'];
+pathmusclemodel = [pathRepo,'/MuscleModel'];
 addpath(genpath(pathmusclemodel));    
 % (1:end-3), since we do not want to count twice the back muscles
 musi = MuscleIndices(muscleNames(1:end-3));
@@ -282,12 +294,12 @@ NMuscle_act = NMuscle-NMuscle_pro;
 % Muscle-tendon parameters. Row 1: maximal isometric forces; Row 2: optimal
 % fiber lengths; Row 3: tendon slack lengths; Row 4: optimal pennation 
 % angles; Row 5: maximal contraction velocities
-load([pathmusclemodel,'\MTparameters_',subject,'.mat']);
+load([pathmusclemodel,'/MTparameters_',subject,'.mat']);
 MTparameters_m = [MTparameters(:,musi),MTparameters(:,musi_pro)];
 % Indices of the muscles actuating the different joints for later use
-pathpolynomial = [pathRepo,'\Polynomials'];
+pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
-tl = load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
+tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
 [~,mai] = MomentArmIndices(muscleNames(1:end-3),...
     tl.muscle_spanning_joint_INFO(1:end-3,:));
 % Prosthesis. For the right knee, no moment arms from the gastrocs
@@ -340,7 +352,7 @@ end
 
 %% Metabolic energy model parameters
 % We extract the specific tensions and slow twitch rations.
-pathMetabolicEnergy = [pathRepo,'\MetabolicEnergy'];
+pathMetabolicEnergy = [pathRepo,'/MetabolicEnergy'];
 addpath(genpath(pathMetabolicEnergy));
 % (1:end-3), since we do not want to count twice the back muscles
 tension = getSpecificTensions(muscleNames(1:end-3)); 
@@ -351,11 +363,11 @@ pctsts = [pctst;pctst(musi_pro)];
 
 %% CasADi functions
 % We create several CasADi functions for later use
-pathCasADiFunctions = [pathRepo,'\CasADiFunctions'];
+pathCasADiFunctions = [pathRepo,'/CasADiFunctions'];
 addpath(genpath(pathCasADiFunctions));
 % We load some variables for the polynomial approximations
-load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
-load([pathpolynomial,'\MuscleInfo_',subject,'.mat']);
+load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
+load([pathpolynomial,'/MuscleInfo_',subject,'.mat']);
 % For the polynomials, we want all independent muscles. So we do not need 
 % the muscles from both legs, since we assume bilateral symmetry, but want
 % all muscles from the back (indices 47:49).
@@ -366,13 +378,13 @@ CasADiFunctions_prosthesis
 %% Passive joint torques
 % We extract the parameters for the passive torques of the lower limbs and
 % the trunk
-pathPassiveMoments = [pathRepo,'\PassiveMoments'];
+pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
 
 %% Experimental data
 % We extract experimental data to set bounds and initial guesses if needed
-pathData = [pathRepo,'\OpenSimModel\',subject];
+pathData = [pathRepo,'/OpenSimModel/',subject];
 joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'pelvis_ty','pelvis_tz','hip_flexion_l','hip_adduction_l',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
@@ -382,23 +394,23 @@ joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'arm_flex_l','arm_add_l','arm_rot_l',...
     'arm_flex_r','arm_add_r','arm_rot_r',...
     'elbow_flex_l','elbow_flex_r'};
-pathVariousFunctions = [pathRepo,'\VariousFunctions'];
+pathVariousFunctions = [pathRepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));
 % Extract joint positions from average walking motion
 motion_walk         = 'walking';
 nametrial_walk.id   = ['average_',motion_walk,'_FGC']; 
 nametrial_walk.IK	= ['IK_',nametrial_walk.id];
-pathIK_walk         = [pathData,'\IK\',nametrial_walk.IK,'.mat'];
+pathIK_walk         = [pathData,'/IK/',nametrial_walk.IK,'.mat'];
 Qs_walk             = getIK(pathIK_walk,joints);  
 
 %% Bounds
-pathBounds = [pathRepo,'\Bounds'];
+pathBounds = [pathRepo,'/Bounds'];
 addpath(genpath(pathBounds));
 [bounds,scaling] = getBounds_prosthesis(Qs_walk,NMuscle_act,nq,jointi);
 
 %% Initial guess
 % The initial guess depends on the settings
-pathIG = [pathRepo,'\IG'];
+pathIG = [pathRepo,'/IG'];
 addpath(genpath(pathIG));
 if IGsel == 1  % Quasi-random initial guess  
     guess = getGuess_QR_prosthesis(N,nq,NMuscle_act,scaling,v_tgt,jointi);
@@ -411,7 +423,7 @@ elseif IGsel == 2 % Data-informed initial guess
 end
 % This allows visualizing the initial guess and the bounds
 if checkBoundsIG
-    pathPlots = [pathRepo,'\Plots'];
+    pathPlots = [pathRepo,'/Plots'];
     addpath(genpath(pathPlots));
     plot_BoundsVSInitialGuess_prosthesis
 end
@@ -1032,17 +1044,17 @@ if solveProblem
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
-    pathresults = [pathRepo,'\Results'];
-    if ~(exist([pathresults,'\',namescript],'dir')==7)
+    pathresults = [pathRepo,'/Results'];
+    if ~(exist([pathresults,'/',namescript],'dir')==7)
         mkdir(pathresults,namescript);
     end
-    if (exist([pathresults,'\',namescript,'\D',savename],'file')==2)
-        delete ([pathresults,'\',namescript,'\D',savename])
+    if (exist([pathresults,'/',namescript,'/D',savename],'file')==2)
+        delete ([pathresults,'/',namescript,'/D',savename])
     end 
-    diary([pathresults,'\',namescript,'\D',savename]);  
+    diary([pathresults,'/',namescript,'/D',savename]);  
     % Data-informed (full solution at closest speed) initial guess
     if IGm == 4
-        load([pathresults,'\',namescript,'\w',savename_ig]);
+        load([pathresults,'/',namescript,'/w',savename_ig]);
         w0 = w_opt; clear w_opt; 
     end
     % Solve problem
@@ -1060,9 +1072,9 @@ if solveProblem
     setup.lbw = lbw;
     setup.ubw = ubw;
     % Save results
-    save([pathresults,'\',namescript,'\w',savename],'w_opt');
-    save([pathresults,'\',namescript,'\g',savename],'g_opt');
-    save([pathresults,'\',namescript,'\s',savename],'setup');
+    save([pathresults,'/',namescript,'/w',savename],'w_opt');
+    save([pathresults,'/',namescript,'/g',savename],'g_opt');
+    save([pathresults,'/',namescript,'/s',savename],'setup');
 end
 
 %% Analyze results
@@ -1071,10 +1083,10 @@ if analyseResults
     if loadResults
         p = mfilename('fullpath');
         [~,namescript,~] = fileparts(p);
-        pathresults = [pathRepo,'\Results'];
-        load([pathresults,'\',namescript,'\w',savename]);
-        load([pathresults,'\',namescript,'\g',savename]);
-        load([pathresults,'\',namescript,'\s',savename]);
+        pathresults = [pathRepo,'/Results'];
+        load([pathresults,'/',namescript,'/w',savename]);
+        load([pathresults,'/',namescript,'/g',savename]);
+        load([pathresults,'/',namescript,'/s',savename]);
     end
     
     %% Extract results
@@ -1394,7 +1406,7 @@ if analyseResults
     q_opt_GUI_GC(:,2:end-2) = q_opt_GC;
     q_opt_GUI_GC(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
     q_opt_GUI_GC(:,1) = q_opt_GUI_GC(:,1)-q_opt_GUI_GC(1,1);
-    pathOpenSim = [pathRepo,'\OpenSim'];
+    pathOpenSim = [pathRepo,'/OpenSim'];
     addpath(genpath(pathOpenSim));
     % Create .mot file for OpenSim GUI
     if writeIKmotion  
@@ -1418,8 +1430,8 @@ if analyseResults
             q_opt_GUI_GC_2(N+1:2*N,jointi.pelvis.tx+1) + ...
             q_opt_unsc_all.deg(end,jointi.pelvis.tx);    
         JointAngle.data = q_opt_GUI_GC_2;
-        filenameJointAngles = [pathRepo,'\Results\',namescript,...
-                '\IK',savename,'.mot'];
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'.mot'];
         write_motionFile(JointAngle, filenameJointAngles)
     end
 
@@ -1530,7 +1542,7 @@ if analyseResults
     q_opt_GUI_GC_l(:,2:end-2) = q_opt_GC_l;
     q_opt_GUI_GC_l(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
     q_opt_GUI_GC_l(:,1) = q_opt_GUI_GC_l(:,1)-q_opt_GUI_GC_l(1,1);
-    pathOpenSim = [pathRepo,'\OpenSim'];
+    pathOpenSim = [pathRepo,'/OpenSim'];
     addpath(genpath(pathOpenSim));
     % Create .mot file for OpenSim GUI
     if writeIKmotion  
@@ -1554,8 +1566,8 @@ if analyseResults
             q_opt_GUI_GC_l_2(N+1:2*N,jointi.pelvis.tx+1) + ...
             q_opt_unsc_all.deg(end,jointi.pelvis.tx);            
         JointAngle.data = q_opt_GUI_GC_l_2;
-        filenameJointAngles = [pathRepo,'\Results\',namescript,...
-                '\IK',savename,'_l.mot'];
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'_l.mot'];
         write_motionFile(JointAngle, filenameJointAngles)
     end
 
@@ -1708,14 +1720,14 @@ if analyseResults
     COT_opt = e_mo_opt_tr/body_mass/dist_trav_opt_GC;   
     
     %% Optimal cost and CPU time
-    pathDiary = [pathresults,'\',namescript,'\D',savename];
+    pathDiary = [pathresults,'/',namescript,'/D',savename];
     [CPU_IPOPT,CPU_NLP,~,Cost,~,~,~,~,OptSol] = readDiary(pathDiary);
     
     %% Save results       
     if saveResults
-        if (exist([pathresults,'\',namescript,...
-                '\Results_prosthesis.mat'],'file')==2) 
-            load([pathresults,'\',namescript,'\Results_prosthesis.mat']);
+        if (exist([pathresults,'/',namescript,...
+                '/Results_prosthesis.mat'],'file')==2) 
+            load([pathresults,'/',namescript,'/Results_prosthesis.mat']);
         else
             Results_prosthesis.(['Speed_',num2str(v_tgt_id*100)]). ...  
                 (['W_MetabolicEnergyRate_',num2str(W.E)]). ...
@@ -2003,7 +2015,7 @@ if analyseResults
                 muscleNames_act{i};
         end        
         % Save data
-        save([pathresults,'\',namescript,'\Results_prosthesis.mat'],...
+        save([pathresults,'/',namescript,'/Results_prosthesis.mat'],...
             'Results_prosthesis');
     end
 end

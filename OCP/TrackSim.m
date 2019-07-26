@@ -103,15 +103,26 @@ pathmain = pwd;
 % model in the external function would require re-building the model during
 % the optimization.
 [pathRepo,~,~] = fileparts(pathmain);
-pathExternalFunctions = [pathRepo,'\ExternalFunctions'];
+pathExternalFunctions = [pathRepo,'/ExternalFunctions'];
 % Loading external functions. 
 setup.derivatives =  'AD'; % Algorithmic differentiation
-switch setup.derivatives
-    case 'AD'     
-        cd(pathExternalFunctions);
-        F1 = external('F','TrackSim_1.dll'); 
-        F2 = external('F','TrackSim_2.dll'); 
-end
+if ispc 
+    switch setup.derivatives
+        case 'AD'     
+            cd(pathExternalFunctions);
+            F1 = external('F','TrackSim_1.dll'); 
+            F2 = external('F','TrackSim_2.dll'); 
+    end
+elseif ismac
+    switch setup.derivatives
+        case 'AD'     
+            cd(pathExternalFunctions);
+            F1 = external('F','TrackSim_1.dylib'); 
+            F2 = external('F','TrackSim_2.dylib'); 
+    end
+else
+    disp('Platform not supported')
+end   
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
@@ -209,7 +220,7 @@ body_weight = body_mass*9.81;
 % polynomials to approximate the state derivatives at the collocation
 % points in each mesh interval. We use d=3 collocation points per mesh
 % interval and Radau collocation points. 
-pathCollocationScheme = [pathRepo,'\CollocationScheme'];
+pathCollocationScheme = [pathRepo,'/CollocationScheme'];
 addpath(genpath(pathCollocationScheme));
 d = 3; % degree of interpolating polynomial
 method = 'radau'; % collocation method
@@ -229,7 +240,7 @@ muscleNames = {'glut_med1_r','glut_med2_r','glut_med3_r',...
         'ext_hal_r','ercspn_r','intobl_r','extobl_r','ercspn_l',...
         'intobl_l','extobl_l'};
 % Muscle indices for later use
-pathmusclemodel = [pathRepo,'\MuscleModel'];
+pathmusclemodel = [pathRepo,'/MuscleModel'];
 addpath(genpath(pathmusclemodel));    
 % (1:end-3), since we do not want to count twice the back muscles
 musi = MuscleIndices(muscleNames(1:end-3));
@@ -238,18 +249,18 @@ NMuscle = length(muscleNames(1:end-3))*2;
 % Muscle-tendon parameters. Row 1: maximal isometric forces; Row 2: optimal
 % fiber lengths; Row 3: tendon slack lengths; Row 4: optimal pennation 
 % angles; Row 5: maximal contraction velocities
-load([pathmusclemodel,'\MTparameters_',subject,'.mat']);
+load([pathmusclemodel,'/MTparameters_',subject,'.mat']);
 MTparameters_m = [MTparameters(:,musi),MTparameters(:,musi)];
 % Indices of the muscles actuating the different joints for later use
-pathpolynomial = [pathRepo,'\Polynomials'];
+pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
-tl = load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
+tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
 [~,mai] = MomentArmIndices(muscleNames(1:end-3),...
     tl.muscle_spanning_joint_INFO(1:end-3,:));
 
 %% Metabolic energy model parameters
 % We extract the specific tensions and slow twitch rations.
-pathMetabolicEnergy = [pathRepo,'\MetabolicEnergy'];
+pathMetabolicEnergy = [pathRepo,'/MetabolicEnergy'];
 addpath(genpath(pathMetabolicEnergy));
 % (1:end-3), since we do not want to count twice the back muscles
 tension = getSpecificTensions(muscleNames(1:end-3)); 
@@ -297,13 +308,13 @@ loc.s6.y    = -0.0214476;
 
 %% CasADi functions
 % We create several CasADi functions for later use
-pathCasADiFunctions = [pathRepo,'\CasADiFunctions'];
+pathCasADiFunctions = [pathRepo,'/CasADiFunctions'];
 addpath(genpath(pathCasADiFunctions));
-pathContactModel = [pathRepo,'\Contact'];
+pathContactModel = [pathRepo,'/Contact'];
 addpath(genpath(pathContactModel));
 % We load some variables for the polynomial approximations
-load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
-load([pathpolynomial,'\MuscleInfo_',subject,'.mat']);
+load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
+load([pathpolynomial,'/MuscleInfo_',subject,'.mat']);
 % For the polynomials, we want all independent muscles. So we do not need 
 % the muscles from both legs, since we assume bilateral symmetry, but want
 % all muscles from the back (indices 47:49).
@@ -314,12 +325,12 @@ CasADiFunctions_tracking
 %% Passive joint torques
 % We extract the parameters for the passive torques of the lower limbs and
 % the trunk
-pathPassiveMoments = [pathRepo,'\PassiveMoments'];
+pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
 
 %% Experimental data
-pathData = [pathRepo,'\OpenSimModel\',subject];
+pathData = [pathRepo,'/OpenSimModel/',subject];
 joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'pelvis_ty','pelvis_tz','hip_flexion_l','hip_adduction_l',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
@@ -329,16 +340,16 @@ joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'arm_flex_l','arm_add_l','arm_rot_l',...
     'arm_flex_r','arm_add_r','arm_rot_r',...
     'elbow_flex_l','elbow_flex_r'};
-pathVariousFunctions = [pathRepo,'\VariousFunctions'];
+pathVariousFunctions = [pathRepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));
 % Extract joint kinematics
-pathIK = [pathData,'\IK\',nametrial.IK,'.mat'];
+pathIK = [pathData,'/IK/',nametrial.IK,'.mat'];
 Qs = getIK(pathIK,joints);
 % Extract ground reaction forces and moments
-pathGRF = [pathData,'\GRF\',nametrial.GRF,'.mat'];
+pathGRF = [pathData,'/GRF/',nametrial.GRF,'.mat'];
 GRF = getGRF(pathGRF);
 % Extract joint kinetics
-pathID = [pathData,'\ID\',nametrial.ID,'.mat'];
+pathID = [pathData,'/ID/',nametrial.ID,'.mat'];
 ID = getID(pathID,joints);
 % Interpolation experimental data
 time_expi.ID(1) = find(round(ID.time,4) == time_opt(1));
@@ -359,18 +370,18 @@ GRF.Mcop.allinterp = interp1(round(GRF.Mcop.all(:,1),4),...
     GRF.Mcop.all,round(interval,4));
 
 %% Bounds
-pathBounds = [pathRepo,'\Bounds'];
+pathBounds = [pathRepo,'/Bounds'];
 addpath(genpath(pathBounds));
 [bounds,scaling] = getBounds_tracking(Qs,NMuscle,nq,jointi,dev_cm,GRF);
 
 %% Initial guess
-pathIG = [pathRepo,'\IG'];
+pathIG = [pathRepo,'/IG'];
 addpath(genpath(pathIG));
 % Data-informed initial guess
 guess = getGuess_DI_tracking(Qs,nq,N,NMuscle,jointi,scaling);
 % This allows visualizing the initial guess and the bounds
 if checkBoundsIG
-    pathPlots = [pathRepo,'\Plots'];
+    pathPlots = [pathRepo,'/Plots'];
     addpath(genpath(pathPlots));
     plot_BoundsVSInitialGuess_tracking
 end
@@ -1026,14 +1037,14 @@ if solveProblem
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
-    pathresults = [pathRepo,'\Results'];
-    if ~(exist([pathresults,'\',namescript],'dir')==7)
+    pathresults = [pathRepo,'/Results'];
+    if ~(exist([pathresults,'/',namescript],'dir')==7)
         mkdir(pathresults,namescript);
     end
-    if (exist([pathresults,'\',namescript,'\D',savename],'file')==2)
-        delete ([pathresults,'\',namescript,'\D',savename])
+    if (exist([pathresults,'/',namescript,'/D',savename],'file')==2)
+        delete ([pathresults,'/',namescript,'/D',savename])
     end 
-    diary([pathresults,'\',namescript,'\D',savename]); 
+    diary([pathresults,'/',namescript,'/D',savename]); 
     % Solve problem
     sol = solver('x0', w0, 'lbx', lbw, 'ubx', ubw,...
         'lbg', lbg, 'ubg', ubg);    
@@ -1049,9 +1060,9 @@ if solveProblem
     setup.lbw = lbw;
     setup.ubw = ubw;
     % Save results and setup
-    save([pathresults,'\',namescript,'\w',savename],'w_opt');
-    save([pathresults,'\',namescript,'\g',savename],'g_opt');
-    save([pathresults,'\',namescript,'\s',savename],'setup');
+    save([pathresults,'/',namescript,'/w',savename],'w_opt');
+    save([pathresults,'/',namescript,'/g',savename],'g_opt');
+    save([pathresults,'/',namescript,'/s',savename],'setup');
 end
 
 %% Analyze results
@@ -1060,10 +1071,10 @@ if analyseResults
     if loadResults
         p = mfilename('fullpath');
         [~,namescript,~] = fileparts(p);
-        pathresults = [pathRepo,'\Results'];
-        load([pathresults,'\',namescript,'\w',savename]);
-        load([pathresults,'\',namescript,'\g',savename]);
-        load([pathresults,'\',namescript,'\s',savename]);
+        pathresults = [pathRepo,'/Results'];
+        load([pathresults,'/',namescript,'/w',savename]);
+        load([pathresults,'/',namescript,'/g',savename]);
+        load([pathresults,'/',namescript,'/s',savename]);
     end
     
     %% Extract results
@@ -1449,7 +1460,7 @@ if analyseResults
     %% Visualization in OpenSim GUI    
     % Create .mot file for OpenSim GUI
     if writeIKmotion  
-        pathOpenSim = [pathRepo,'\OpenSim'];
+        pathOpenSim = [pathRepo,'/OpenSim'];
         addpath(genpath(pathOpenSim));
         q_opt_GUI = zeros(N+1,1+nq.all+2);
         q_opt_GUI(:,1) = tgrid';
@@ -1467,20 +1478,20 @@ if analyseResults
             'elbow_flex_l','elbow_flex_r',...
             'pro_sup_l','pro_sup_r'};
         JointAngle.data = q_opt_GUI;
-        filenameJointAngles = [pathRepo,'\Results\',namescript,...
-                '\IK',savename,'.mot'];
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'.mot'];
         write_motionFile(JointAngle, filenameJointAngles)
     end   
     
     %% Optimal cost and CPU time
-    pathDiary = [pathresults,'\',namescript,'\D',savename];
+    pathDiary = [pathresults,'/',namescript,'/D',savename];
     [CPU_IPOPT,CPU_NLP,~,~,~,~,~,~,OptSol] = readDiary(pathDiary);
         
     %% Save results       
     if saveResults
-        if (exist([pathresults,'\',namescript,'\Results_tracking.mat'],...
+        if (exist([pathresults,'/',namescript,'/Results_tracking.mat'],...
             'file')==2) 
-        load([pathresults,'\',namescript,'\Results_tracking.mat']);
+        load([pathresults,'/',namescript,'/Results_tracking.mat']);
     else
         Results_tracking = struct('Qs_opt',[]);
         end
@@ -1515,7 +1526,7 @@ if analyseResults
         'loc_s6_r_x','loc_s6_r_z','radius_s1','radius_s2','radius_s3',...
         'radius_s4','radius_s5','radius_s6'};
     % Save data
-    save([pathresults,'\',namescript,'\Results_tracking.mat'],...
+    save([pathresults,'/',namescript,'/Results_tracking.mat'],...
         'Results_tracking');
     end
 end

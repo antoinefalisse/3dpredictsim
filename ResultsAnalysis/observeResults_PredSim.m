@@ -75,8 +75,8 @@ GRF_str = {'Fore-aft','Vertical','Lateral'};
 %% Load reference data
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathReferenceData = [pathrepo,'\ExperimentalData'];
-load([pathReferenceData,'\ExperimentalData.mat'],'ExperimentalData');
+pathReferenceData = [pathrepo,'/ExperimentalData'];
+load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 
 %% Common settings for plots
 label_fontsize  = 16;

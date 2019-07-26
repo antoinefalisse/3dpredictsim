@@ -424,23 +424,42 @@ pathmain = pwd;
 % We use different external functions, since we also want to access some 
 % parameters of the model in a post-processing phase.
 [pathRepo,~,~] = fileparts(pathmain);
-pathExternalFunctions = [pathRepo,'\ExternalFunctions'];
+pathExternalFunctions = [pathRepo,'/ExternalFunctions'];
 % Loading external functions. 
 cd(pathExternalFunctions);
 setup.derivatives =  'AD'; % Algorithmic differentiation
-switch setup.derivatives
-    case {'AD'}   
-        if cm == 1
-            F = external('F','PredSim.dll');   
-            if analyseResults
-                F1 = external('F','PredSim_pp.dll');
+if ispc    
+    switch setup.derivatives
+        case {'AD'}   
+            if cm == 1
+                F = external('F','PredSim.dll');   
+                if analyseResults
+                    F1 = external('F','PredSim_pp.dll');
+                end
+            elseif cm == 2
+                F = external('F','PredSim_SSCM.dll');   
+                if analyseResults
+                    F1 = external('F','PredSim_SSCM_pp.dll');
+                end
             end
-        elseif cm == 2
-            F = external('F','PredSim_SSCM.dll');   
-            if analyseResults
-                F1 = external('F','PredSim_SSCM_pp.dll');
+    end
+elseif ismac
+    switch setup.derivatives
+        case {'AD'}   
+            if cm == 1
+                F = external('F','PredSim.dylib');   
+                if analyseResults
+                    F1 = external('F','PredSim_pp.dylib');
+                end
+            elseif cm == 2
+                F = external('F','PredSim_SSCM.dylib');   
+                if analyseResults
+                    F1 = external('F','PredSim_SSCM_pp.dylib');
+                end
             end
-        end
+    end
+else
+    disp('Platform not supported')
 end
 cd(pathmain);
 % This is an example of how to call an external function with some
@@ -536,7 +555,7 @@ body_weight = body_mass*9.81;
 % polynomials to approximate the state derivatives at the collocation
 % points in each mesh interval. We use d=3 collocation points per mesh
 % interval and Radau collocation points. 
-pathCollocationScheme = [pathRepo,'\CollocationScheme'];
+pathCollocationScheme = [pathRepo,'/CollocationScheme'];
 addpath(genpath(pathCollocationScheme));
 d = 3; % degree of interpolating polynomial
 method = 'radau'; % collocation method
@@ -556,7 +575,7 @@ muscleNames = {'glut_med1_r','glut_med2_r','glut_med3_r',...
         'ext_hal_r','ercspn_r','intobl_r','extobl_r','ercspn_l',...
         'intobl_l','extobl_l'};
 % Muscle indices for later use
-pathmusclemodel = [pathRepo,'\MuscleModel'];
+pathmusclemodel = [pathRepo,'/MuscleModel'];
 addpath(genpath(pathmusclemodel)); 
 % (1:end-3), since we do not want to count twice the back muscles
 musi = MuscleIndices(muscleNames(1:end-3));
@@ -565,12 +584,12 @@ NMuscle = length(muscleNames(1:end-3))*2;
 % Muscle-tendon parameters. Row 1: maximal isometric forces; Row 2: optimal
 % fiber lengths; Row 3: tendon slack lengths; Row 4: optimal pennation 
 % angles; Row 5: maximal contraction velocities
-load([pathmusclemodel,'\MTparameters_',subject,'.mat']);
+load([pathmusclemodel,'/MTparameters_',subject,'.mat']);
 MTparameters_m = [MTparameters(:,musi),MTparameters(:,musi)];
 % Indices of the muscles actuating the different joints for later use
-pathpolynomial = [pathRepo,'\Polynomials'];
+pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
-tl = load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
+tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
 [~,mai] = MomentArmIndices(muscleNames(1:end-3),...
     tl.muscle_spanning_joint_INFO(1:end-3,:));
 
@@ -612,7 +631,7 @@ end
 
 %% Metabolic energy model parameters
 % We extract the specific tensions and slow twitch rations.
-pathMetabolicEnergy = [pathRepo,'\MetabolicEnergy'];
+pathMetabolicEnergy = [pathRepo,'/MetabolicEnergy'];
 addpath(genpath(pathMetabolicEnergy));
 % (1:end-3), since we do not want to count twice the back muscles
 tension = getSpecificTensions(muscleNames(1:end-3)); 
@@ -623,11 +642,11 @@ pctsts = [pctst;pctst];
 
 %% CasADi functions
 % We create several CasADi functions for later use
-pathCasADiFunctions = [pathRepo,'\CasADiFunctions'];
+pathCasADiFunctions = [pathRepo,'/CasADiFunctions'];
 addpath(genpath(pathCasADiFunctions));
 % We load some variables for the polynomial approximations
-load([pathpolynomial,'\muscle_spanning_joint_INFO_',subject,'.mat']);
-load([pathpolynomial,'\MuscleInfo_',subject,'.mat']);
+load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
+load([pathpolynomial,'/MuscleInfo_',subject,'.mat']);
 % For the polynomials, we want all independent muscles. So we do not need 
 % the muscles from both legs, since we assume bilateral symmetry, but want
 % all muscles from the back (indices 47:49).
@@ -638,13 +657,13 @@ CasADiFunctions_all
 %% Passive joint torques
 % We extract the parameters for the passive torques of the lower limbs and
 % the trunk
-pathPassiveMoments = [pathRepo,'\PassiveMoments'];
+pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
 
 %% Experimental data
 % We extract experimental data to set bounds and initial guesses if needed
-pathData = [pathRepo,'\OpenSimModel\',subject];
+pathData = [pathRepo,'/OpenSimModel/',subject];
 joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'pelvis_ty','pelvis_tz','hip_flexion_l','hip_adduction_l',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
@@ -653,13 +672,13 @@ joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'lumbar_bending','lumbar_rotation','arm_flex_l','arm_add_l',...
     'arm_rot_l','arm_flex_r','arm_add_r','arm_rot_r','elbow_flex_l',...
     'elbow_flex_r'};
-pathVariousFunctions = [pathRepo,'\VariousFunctions'];
+pathVariousFunctions = [pathRepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));
 % Extract joint positions from average walking motion
 motion_walk         = 'walking';
 nametrial_walk.id   = ['average_',motion_walk,'_HGC']; 
 nametrial_walk.IK   = ['IK_',nametrial_walk.id];
-pathIK_walk         = [pathData,'\IK\',nametrial_walk.IK,'.mat'];
+pathIK_walk         = [pathData,'/IK/',nametrial_walk.IK,'.mat'];
 Qs_walk             = getIK(pathIK_walk,joints);
 % Depending on the initial guess mode, we extract further experimental data
 if IGm == 2
@@ -667,13 +686,13 @@ if IGm == 2
     motion_run          = 'running';
     nametrial_run.id    = ['average_',motion_run,'_HGC'];  
     nametrial_run.IK    = ['IK_',nametrial_run.id];
-    pathIK_run          = [pathData,'\IK\',nametrial_run.IK,'.mat'];
+    pathIK_run          = [pathData,'/IK/',nametrial_run.IK,'.mat'];
     Qs_run              = getIK(pathIK_run,joints);    
 elseif IGm == 3
     % Extract joint positions from existing motion (previous results)
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
-    pathIK = [pathRepo,'\Results\',namescript,'\IK',savename_ig,'.mot'];
+    pathIK = [pathRepo,'/Results/',namescript,'/IK',savename_ig,'.mot'];
     Qs_ig = getIK(pathIK,joints);
     % When saving the results, we save a full gait cycle (2*N) so here we
     % only select 1:N to have half a gait cycle
@@ -683,7 +702,7 @@ elseif IGm == 3
 end    
 
 %% Bounds
-pathBounds = [pathRepo,'\Bounds'];
+pathBounds = [pathRepo,'/Bounds'];
 addpath(genpath(pathBounds));
 [bounds,scaling] = getBounds_all(Qs_walk,NMuscle,nq,jointi,v_tgt);
 % Simulate co-contraction by increasing the lower bound on muscle activations
@@ -697,7 +716,7 @@ end
 
 %% Initial guess
 % The initial guess depends on the settings
-pathIG = [pathRepo,'\IG'];
+pathIG = [pathRepo,'/IG'];
 addpath(genpath(pathIG));
 if IGsel == 1 % Quasi-random initial guess  
     guess = getGuess_QR(N,nq,NMuscle,scaling,v_tgt,jointi);
@@ -726,7 +745,7 @@ elseif coCont == 3
 end
 % This allows visualizing the initial guess and the bounds
 if checkBoundsIG
-    pathPlots = [pathRepo,'\Plots'];
+    pathPlots = [pathRepo,'/Plots'];
     addpath(genpath(pathPlots));
     plot_BoundsVSInitialGuess_all
 end
@@ -1465,17 +1484,17 @@ if solveProblem
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
-    pathresults = [pathRepo,'\Results'];
-    if ~(exist([pathresults,'\',namescript],'dir')==7)
+    pathresults = [pathRepo,'/Results'];
+    if ~(exist([pathresults,'/',namescript],'dir')==7)
         mkdir(pathresults,namescript);
     end
-    if (exist([pathresults,'\',namescript,'\D',savename],'file')==2)
-        delete ([pathresults,'\',namescript,'\D',savename])
+    if (exist([pathresults,'/',namescript,'/D',savename],'file')==2)
+        delete ([pathresults,'/',namescript,'/D',savename])
     end 
-    diary([pathresults,'\',namescript,'\D',savename]);  
+    diary([pathresults,'/',namescript,'/D',savename]);  
     % Data-informed (full solution at closest speed) initial guess    
     if IGm == 4    
-        load([pathresults,'\',namescript,'\w',savename_ig]);
+        load([pathresults,'/',namescript,'/w',savename_ig]);
         w0 = w_opt; 
         % From 1.43 m s-1, the bounds on some Qs and Qdots are changed to
         % allow for generation of running motions. Therefore, we need to
@@ -1582,9 +1601,9 @@ if solveProblem
     setup.lbw = lbw;
     setup.ubw = ubw;
     % Save results and setup
-    save([pathresults,'\',namescript,'\w',savename],'w_opt');
-    save([pathresults,'\',namescript,'\g',savename],'g_opt');
-    save([pathresults,'\',namescript,'\s',savename],'setup');
+    save([pathresults,'/',namescript,'/w',savename],'w_opt');
+    save([pathresults,'/',namescript,'/g',savename],'g_opt');
+    save([pathresults,'/',namescript,'/s',savename],'setup');
 end
 
 %% Analyze results
@@ -1593,10 +1612,10 @@ if analyseResults
     if loadResults
         p = mfilename('fullpath');
         [~,namescript,~] = fileparts(p);
-        pathresults = [pathRepo,'\Results'];
-        load([pathresults,'\',namescript,'\w',savename]);
-        load([pathresults,'\',namescript,'\g',savename]);
-        load([pathresults,'\',namescript,'\s',savename]);
+        pathresults = [pathRepo,'/Results'];
+        load([pathresults,'/',namescript,'/w',savename]);
+        load([pathresults,'/',namescript,'/g',savename]);
+        load([pathresults,'/',namescript,'/s',savename]);
     end  
     
     %% Extract results
@@ -2207,7 +2226,7 @@ end
     q_opt_GUI_GC(:,1) = q_opt_GUI_GC(:,1)-q_opt_GUI_GC(1,1);
     % Create .mot file for OpenSim GUI
     if writeIKmotion
-        pathOpenSim = [pathRepo,'\OpenSim'];
+        pathOpenSim = [pathRepo,'/OpenSim'];
         addpath(genpath(pathOpenSim));
         JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
         'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
@@ -2229,8 +2248,8 @@ end
             q_opt_GUI_GC_2(2*N+1:4*N,jointi.pelvis.tx+1) + ...
             2*q_opt_unsc_all.deg(end,jointi.pelvis.tx);
         JointAngle.data = q_opt_GUI_GC_2;
-        filenameJointAngles = [pathRepo,'\Results\',namescript,...
-                '\IK',savename,'.mot'];
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'.mot'];
         write_motionFile(JointAngle, filenameJointAngles)
     end
     
@@ -2528,14 +2547,14 @@ end
     COT_opt = e_mo_opt_trb/body_mass/dist_trav_opt_GC; 
     
     %% Optimal cost and CPU time
-    pathDiary = [pathresults,'\',namescript,'\D',savename];
+    pathDiary = [pathresults,'/',namescript,'/D',savename];
     [CPU_IPOPT,CPU_NLP,~,Cost,~,~,~,~,OptSol] = readDiary(pathDiary);
 
     %% Save results       
     if saveResults
-        if (exist([pathresults,'\',namescript,...
-                '\Results_all.mat'],'file')==2) 
-            load([pathresults,'\',namescript,'\Results_all.mat']);
+        if (exist([pathresults,'/',namescript,...
+                '/Results_all.mat'],'file')==2) 
+            load([pathresults,'/',namescript,'/Results_all.mat']);
         else
             Results_all.(['Speed_',num2str(v_tgt_id*100)]). ...  
                 (['W_MetabolicEnergyRate_',num2str(W.E)]). ...
@@ -2783,7 +2802,7 @@ end
                 [muscleNames{i}(1:end-2),'_r'];
         end       
         % Save data
-        save([pathresults,'\',namescript,'\Results_all.mat'],...
+        save([pathresults,'/',namescript,'/Results_all.mat'],...
             'Results_all');
     end    
 end

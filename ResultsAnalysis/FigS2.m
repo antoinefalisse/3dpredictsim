@@ -47,8 +47,8 @@ end
 %% Load reference data
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathReferenceData = [pathrepo,'\ExperimentalData'];
-load([pathReferenceData,'\ExperimentalData.mat'],'ExperimentalData');
+pathReferenceData = [pathrepo,'/ExperimentalData'];
+load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 
 %% Common settings for plots
 label_fontsize  = 16;
@@ -111,7 +111,7 @@ for i = 1:length(idx_Qs_mE)
 end       
 
 %% Plot metabolic cost of transport (COT)
-pathVariousFunctions = [pathrepo,'\VariousFunctions'];
+pathVariousFunctions = [pathrepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));
 % Reference data from Miller et al. (2014)
 COTref.mean = 3.35;
