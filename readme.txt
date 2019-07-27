@@ -4,7 +4,9 @@
                 human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
                 Thanks for citing our work in any derived publication. Feel free to reach us for any questions:
                 antoine.falisse@kuleuven.be | antoinefalisse@gmail.com | friedl.degroote@kuleuven.be. You can
-                also find this code at https://github.com/antoinefalisse/3dpredictsim.
+                also find this code at https://github.com/antoinefalisse/3dpredictsim. This code has been developed
+                on Windows using MATLAB2017b. There is no guarantee that it runs smooth on other platforms. Please
+                let us know if you run into troubles.
 
 3dpredictsim contains different folders with data and code needed to perform the predictive and tracking simulations
 as well as to reproduce all figures from the study. The best way to get started is to run OCP/PredSim_all.m and to
@@ -228,11 +230,11 @@ ExperimentalData: folder with experimental data.
         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
 Results: folder with simulation results.
-    - Results_all.mat
+    - PredSim_all/Results_all.mat
         - Structure with all results from the predictive simulations except those with the prosthesis.
-    - Results_prosthesis.mat
+    - PredSim_prosthesis/Results_prosthesis.mat
         - Structure with results from the predictive simulations with the prosthesis.
-    - Results_tracking.mat
+    - TrackSim/Results_tracking.mat
         - Structure with results from the tracking simulations.
         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   

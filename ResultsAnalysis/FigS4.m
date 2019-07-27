@@ -35,7 +35,7 @@ for k = 1:length(ww)
     pathmain = pwd;
     [pathRepo,~,~] = fileparts(pathmain);
     pathresults = [pathRepo,'/Results'];
-    load([pathresults,'/Results_tracking.mat']);    
+    load([pathresults,'/TrackSim/Results_tracking.mat']);    
     % Unstructure data   
     Qs_opt(ww(k)).m = Results_tracking.Qs_opt;
     Ts_opt(ww(k)).m = Results_tracking.Ts_opt;

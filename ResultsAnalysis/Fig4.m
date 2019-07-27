@@ -55,7 +55,7 @@ for k = 1:length(ww)
     % Load results
     pathmain = pwd;
     [pathRepo,~,~] = fileparts(pathmain);
-    pathresults = [pathRepo,'/Results'];
+    pathresults = [pathRepo,'/Results/PredSim_prosthesis'];
     load([pathresults,'/Results_prosthesis.mat']);    
     % Unstructure data   
     Ts_opt_r(ww(k)).m = Results_prosthesis. ...

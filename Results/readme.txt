@@ -1,10 +1,9 @@
-SimulationResults.mat
+﻿Results
 
-SimulationResults is a nested structure that contains the results from the various optimal control problems.
 The results are divided into:
-    - Results_all that contains all results from the predictive simulations except those with the prosthesis.
-    - Results_prosthesis that contains the results from the predictive simulations with the prosthesis.
-    - Results_tracking that contains the results from the tracking simulations.
+    - PredSim_all/Results_all.mat that contains all results from the predictive simulations except those with the prosthesis.
+    - PredSim_prosthesis/Results_prosthesis.mat that contains the results from the predictive simulations with the prosthesis.
+    - TrackSimResults_tracking.mat that contains the results from the tracking simulations.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Results_all is a nested structure with the following layers:

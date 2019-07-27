@@ -18,7 +18,7 @@ pathresults = [pathrepo,'/Results'];
 ww = 1:198;
 predSim_settings_all;
 % Load results
-load([pathresults,'/Results_all.mat']);
+load([pathresults,'/PredSim_all/Results_all.mat']);
 CPU_IPOPT_all.all   = zeros(1,length(ww));
 CPU_NLP_all.all     = zeros(1,length(ww));
 OptSol_all.all      = zeros(1,length(ww));
@@ -107,7 +107,7 @@ else
 end
 
 %% PredSim_prosthesis
-load([pathresults,'/Results_prosthesis.mat']);
+load([pathresults,'/PredSim_prosthesis/Results_prosthesis.mat']);
 % All trials
 ww = 1:2;
 settings = [        

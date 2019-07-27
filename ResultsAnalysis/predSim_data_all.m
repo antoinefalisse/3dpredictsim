@@ -24,7 +24,7 @@ coCont      = settings(ww(k),18);   % co-contraction identifier
 % load results
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathresults = [pathrepo,'/Results'];
+pathresults = [pathrepo,'/Results/PredSim_all'];
 load([pathresults,'/Results_all.mat']);
 v_tgt_id = round(v_tgt,2);
 
