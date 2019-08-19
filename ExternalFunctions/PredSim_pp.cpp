@@ -52,6 +52,50 @@ T value(const Recorder& e) { return e; }
 template<>
 double value(const Recorder& e) { return e.getValue(); }
 
+// OpenSim and Simbody use different indices for the states/controls when the
+// kinematic chain has joints up and down the origin (e.g., lumbar joint/arms
+// and legs with pelvis as origin).
+// The two following functions allow getting the indices from one reference
+// system to the other. These functions are inspired from
+// createSystemYIndexMap() in Moco.
+// getIndicesOSInSimbody() returns the indices of the OpenSim Qs in the Simbody
+// reference system. Note that we only care about the order here so we divide
+// by 2 because the states include both Qs and Qdots.
+SimTK::Array_<int> getIndicesOSInSimbody(const Model& model) {
+    auto s = model.getWorkingState();
+    const auto svNames = model.getStateVariableNames();
+    SimTK::Array_<int> idxOSInSimbody(s.getNQ());
+    s.updQ() = 0;
+    for (int iy = 0; iy < s.getNQ(); ++iy) {
+        s.updQ()[iy] = SimTK::NaN;
+        const auto svValues = model.getStateVariableValues(s);
+        for (int isv = 0; isv < svNames.size(); ++isv) {
+            if (SimTK::isNaN(svValues[isv])) {
+                s.updQ()[iy] = 0;
+                idxOSInSimbody[iy] = isv/2;
+                break;
+            }
+        }
+    }
+    return idxOSInSimbody;
+}
+// getIndicesSimbodyInOS() returns the indices of the Simbody Qs in the OpenSim
+// reference system.
+SimTK::Array_<int> getIndicesSimbodyInOS(const Model& model) {
+    auto idxOSInSimbody = getIndicesOSInSimbody(model);
+    auto s = model.getWorkingState();
+    SimTK::Array_<int> idxSimbodyInOS(s.getNQ());
+	for (int iy = 0; iy < s.getNQ(); ++iy) {
+		for (int iyy = 0; iyy < s.getNQ(); ++iyy) {
+			if (idxOSInSimbody[iyy] == iy) {
+				idxSimbodyInOS[iy] = iyy;
+				break;
+			}
+		}
+	}
+    return idxSimbodyInOS;
+}
+
 // Function F
 template<typename T>
 int F_generic(const T** arg, T** res) {
@@ -404,26 +448,9 @@ int F_generic(const T** arg, T** res) {
     QsUs[NX+2] = 1.51;
     QsUs[NX+3] = 0;
     /// Controls
-    for (int i = 0; i < 12; ++i) ua[i] = u[i];
-    /// OpenSim and Simbody have different state orders so we adjust manually
-    ua[12] = u[18]; /// 12 Simbody is 18 OpenSim
-    ua[13] = u[19]; /// 13 Simbody is 19 OpenSim
-    ua[14] = u[20]; /// 14 Simbody is 20 OpenSim
-    ua[15] = u[12]; /// 15 Simbody is 12 OpenSim
-    ua[16] = u[13]; /// 16 Simbody is 13 OpenSim
-    ua[17] = u[21]; /// 17 Simbody is 21 OpenSim
-    ua[18] = u[22]; /// 18 Simbody is 22 OpenSim
-    ua[19] = u[23]; /// 19 Simbody is 23 OpenSim
-    ua[20] = u[24]; /// 20 Simbody is 24 OpenSim
-    ua[21] = u[25]; /// 21 Simbody is 25 OpenSim
-    ua[22] = u[26]; /// 22 Simbody is 26 OpenSim
-    ua[23] = u[14]; /// 23 Simbody is 14 OpenSim
-    ua[24] = u[15]; /// 24 Simbody is 15 OpenSim
-    ua[25] = u[27]; /// 25 Simbody is 27 OpenSim
-    ua[26] = u[28]; /// 26 Simbody is 28 OpenSim
-    ua[27] = u[16]; /// 27 Simbody is 16 OpenSim
-    ua[28] = u[17]; /// 28 Simbody is 17 OpenSim
-    /// pro_sup dofs are locked so Qs and Qdots are hard coded
+    /// OpenSim and Simbody have different state orders so we need to adjust
+    auto indicesOSInSimbody = getIndicesOSInSimbody(*model);
+    for (int i = 0; i < NU; ++i) ua[i] = u[indicesOSInSimbody[i]];
     ua[29] = 0;
     ua[30] = 0;
 
@@ -537,27 +564,10 @@ int F_generic(const T** arg, T** res) {
     // Extract results
     int nc = 3;
     /// Residual forces
-    for (int i = 0; i < 12; ++i) {
-        res[0][i] = value<T>(residualMobilityForces[i]);
-    }
-     /// OpenSim and Simbody have different state orders so we adjust manually
-    res[0][12] = value<T>(residualMobilityForces[15]);
-    res[0][13] = value<T>(residualMobilityForces[16]);
-    res[0][14] = value<T>(residualMobilityForces[23]);
-    res[0][15] = value<T>(residualMobilityForces[24]);
-    res[0][16] = value<T>(residualMobilityForces[27]);
-    res[0][17] = value<T>(residualMobilityForces[28]);
-    res[0][18] = value<T>(residualMobilityForces[12]);
-    res[0][19] = value<T>(residualMobilityForces[13]);
-    res[0][20] = value<T>(residualMobilityForces[14]);
-    res[0][21] = value<T>(residualMobilityForces[17]);
-    res[0][22] = value<T>(residualMobilityForces[18]);
-    res[0][23] = value<T>(residualMobilityForces[19]);
-    res[0][24] = value<T>(residualMobilityForces[20]);
-    res[0][25] = value<T>(residualMobilityForces[21]);
-    res[0][26] = value<T>(residualMobilityForces[22]);
-    res[0][27] = value<T>(residualMobilityForces[25]);
-    res[0][28] = value<T>(residualMobilityForces[26]);
+    /// OpenSim and Simbody have different state orders so we need to adjust
+    auto indicesSimbodyInOS = getIndicesSimbodyInOS(*model);
+    for (int i = 0; i < NU; ++i) res[0][i] =
+            value<T>(residualMobilityForces[indicesSimbodyInOS[i]]);
     /// ground reaction forces
     for (int i = 0; i < nc; ++i) {
         res[0][i + ndof] = value<T>(GRF_r[1][i]);       /// GRF_r
