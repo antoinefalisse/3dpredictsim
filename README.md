@@ -1,7 +1,8 @@
-3dpredictsim:   this repository contains code and data to reproduce all results presented in:
-                Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F (2019), "Rapid predictive
-                simulations with complex musculoskeletal models suggest that diverse healthy and pathological
-                human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
+3dpredictsim
+============
+
+This repository contains code and data to reproduce all results presented in:
+Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F (2019), "Rapid predictive simulations with complex musculoskeletal models suggest that diverse healthy and pathological human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
                 Thanks for citing our work in any derived publication. Feel free to reach us for any questions:
                 antoine.falisse@kuleuven.be | antoinefalisse@gmail.com | friedl.degroote@kuleuven.be. You can
                 also find this code at https://github.com/antoinefalisse/3dpredictsim. This code has been developed
