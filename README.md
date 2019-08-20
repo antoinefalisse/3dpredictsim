@@ -25,36 +25,53 @@ Folder with scripts performing the predictive and tracking simulations.
 MuscleModel
 =========== 
 
-Folder with scripts and data describing muscle activation dynamics, muscle contraction dynamics, and arm activation dynamics.
-             This folder also contains helper functions for use when formulating the optimal control problems.
-    1. Scripts:
-        1. ArmActivationDynamics.m
-            - Function that describes the dynamics of the arms.
-        2. computeExcitationRaasch.m
-            - Function that computes muscle excitations from time derivative of muscle activations.
-        3. FiberLength_TendonForce_tendon.m
-            - Function that computes fiber lengths from muscle-tendon forces.
-        4. FiberVelocity_TendonForce_tendon.m
-            - Function that computes fiber velocities from muscle-tendon forces.
-        5. ForceEquilibrium_FtildeState_all.m
-            - Function that derives the Hill-equilibrium.
-        6. ForceEquilibrium_FtildeState_all_tendon.m
-            - Function that derives the Hill-equilibrium with tendon stiffness as parameter.
-        7. MomentArmIndices.m        
-            - Helper function that returns indices for use with the moment arms.
-        8. MuscleIndices.m
-            - Helper function that returns indices for use with the muscles. 
-    2. Data:
-        1. Faparam.mat
-            - Parameters of the muscle active force-length relationship.
-        2. Fpparam.mat
-            - Parameters of the muscle passive force-length relationship.
-        3. Fvparam.mat
-            - Parameters of the muscle force-velocity relationship.
-        4. MTparameters_subject1.mat
-            - Muscle-tendon parameters: 
-                Row 1: maximal isometric forces; Row 2: optimal fiber lengths; Row 3: tendon slack lengths; 
-                Row 4: optimal pennation angles; Row 5: maximal contraction velocities. 
+Folder with scripts and data describing muscle activation dynamics, muscle contraction dynamics, and arm activation dynamics. This folder also contains helper functions for use when formulating the optimal control problems.
+
+1. Scripts:
+
+    1. ArmActivationDynamics.m
+
+    Function that describes the dynamics of the arms.
+        
+    2. computeExcitationRaasch.m
+    
+    Function that computes muscle excitations from time derivative of muscle activations.
+        
+    3. FiberLength_TendonForce_tendon.m
+    
+    Function that computes fiber lengths from muscle-tendon forces.
+        
+    4. FiberVelocity_TendonForce_tendon.m
+    
+    Function that computes fiber velocities from muscle-tendon forces.
+        
+    5. ForceEquilibrium_FtildeState_all.m
+
+    Function that derives the Hill-equilibrium.
+        
+    6. ForceEquilibrium_FtildeState_all_tendon.m
+    
+    Function that derives the Hill-equilibrium with tendon stiffness as parameter.
+        
+    7. MomentArmIndices.m        
+    
+    Helper function that returns indices for use with the moment arms.
+        
+    8. MuscleIndices.m
+    
+    Helper function that returns indices for use with the muscles. 
+        
+2. Data:
+    1. Faparam.mat
+        - Parameters of the muscle active force-length relationship.
+    2. Fpparam.mat
+        - Parameters of the muscle passive force-length relationship.
+    3. Fvparam.mat
+        - Parameters of the muscle force-velocity relationship.
+    4. MTparameters_subject1.mat
+        - Muscle-tendon parameters: 
+            Row 1: maximal isometric forces; Row 2: optimal fiber lengths; Row 3: tendon slack lengths; 
+            Row 4: optimal pennation angles; Row 5: maximal contraction velocities. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
 Polynomials: folder with scripts and data describing muscle-tendon lengths, velocities, and moment arms using polynomial expressions
