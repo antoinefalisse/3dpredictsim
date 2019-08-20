@@ -1,4 +1,5 @@
 External Functions
+==================
 
 When solving the optimal control problems, we use external functions in which
 we perform, among other, inverse dynamics using the Simbody/OpenSim C++ API.
@@ -14,5 +15,4 @@ as well as the corresponding dlls. Only the dlls are necessary to run the proble
 
 We developed this code on Windows but provide dylibs for Mac users. We cannot
 guarantee that all will work smooth on Mac. Please report any issues: email me at
-antoine.falisse@kuleuven.be or submit an issue on GitHub:
-https://github.com/antoinefalisse/3dpredictsim
+antoine.falisse@kuleuven.be or submit an issue on GitHub.

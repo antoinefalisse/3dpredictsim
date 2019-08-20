@@ -1,4 +1,5 @@
 OCP
+===
 
 To be able to run the scripts contained in this folder, you should install
 CasADi: https://web.casadi.org/

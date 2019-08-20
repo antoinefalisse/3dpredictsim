@@ -37,7 +37,5 @@ All time-dependent data are interpolated over 100 points describing a full gait 
     
 ExperimentalData also contains data from walking trials with a prosthesis from Quesada et al. (2016):
  
-1. Quesada_2016_SuppData
-    1. ankleTorqueData
-        1. all    	
-            - ankle torques of affected (prosthesis) leg over gait cycle for six subjects (100x6)
+1. Quesada_2016_SuppData.ankleTorqueData.all    	
+    - ankle torques of affected (prosthesis) leg over gait cycle for six subjects (100x6)
