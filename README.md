@@ -1,57 +1,57 @@
 3dpredictsim
 ============
 
-This repository contains code and data to reproduce all results presented in:
-Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F (2019), "Rapid predictive simulations with complex musculoskeletal models suggest that diverse healthy and pathological human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
-                Thanks for citing our work in any derived publication. Feel free to reach us for any questions:
-                antoine.falisse@kuleuven.be | antoinefalisse@gmail.com | friedl.degroote@kuleuven.be. You can
-                also find this code at https://github.com/antoinefalisse/3dpredictsim. This code has been developed
-                on Windows using MATLAB2017b. There is no guarantee that it runs smooth on other platforms. Please
-                let us know if you run into troubles.
+This repository contains code and data to generate three-dimensional muscle-driven predictive simulations of human gaits, and to reproduce all results presented in: Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F (2019), "Rapid predictive simulations with complex musculoskeletal models suggest that diverse healthy and pathological human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
 
-3dpredictsim contains different folders with data and code needed to perform the predictive and tracking simulations
-as well as to reproduce all figures from the study. The best way to get started is to run OCP/PredSim_all.m and to
-explore the code from there (make sure you install CasADi beforehand: https://web.casadi.org/). 
+Thanks for citing our work in any derived publication. Feel free to reach us for any questions: antoine.falisse@kuleuven.be | antoinefalisse@gmail.com | friedl.degroote@kuleuven.be. This code has been developed on Windows using MATLAB2017b. There is no guarantee that it runs smooth on other platforms. Please let us know if you run into troubles.
+
+3dpredictsim contains different folders with data and code needed to perform the predictive and tracking simulations as well as to reproduce all figures from the study. The best way to get started is to run OCP/PredSim_all.m and to
+explore the code from there (make sure you install CasADi beforehand:
+[CasADi website](https://web.casadi.org/)
 
 Here, we provide a brief description of the different scripts and folders. 
+ 
+OCP (Optimal Control Problems)
+==============================
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
-OCP (Optimal Control Problems): folder with scripts performing the predictive and tracking simulations.
-    - PredSim_all.m
+Folder with scripts performing the predictive and tracking simulations.
+    1. PredSim_all.m
         - Script that formulates the predictive simulations (except those with the prosthesis).
-    - PredSim_prosthesis.m
+    2. PredSim_prosthesis.m
         - Script that formulates the predictive simulations with the prosthesis.
-    - TrackSim.m
+    3. TrackSim.m
         - Script that formulates the tracking simulation.
+  
+MuscleModel
+=========== 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
-MuscleModel: folder with scripts and data describing muscle activation dynamics, muscle contraction dynamics, and arm activation dynamics.
+Folder with scripts and data describing muscle activation dynamics, muscle contraction dynamics, and arm activation dynamics.
              This folder also contains helper functions for use when formulating the optimal control problems.
-    Scripts:
-        - ArmActivationDynamics.m
+    1. Scripts:
+        1. ArmActivationDynamics.m
             - Function that describes the dynamics of the arms.
-        - computeExcitationRaasch.m
+        2. computeExcitationRaasch.m
             - Function that computes muscle excitations from time derivative of muscle activations.
-        - FiberLength_TendonForce_tendon.m
+        3. FiberLength_TendonForce_tendon.m
             - Function that computes fiber lengths from muscle-tendon forces.
-        - FiberVelocity_TendonForce_tendon.m
+        4. FiberVelocity_TendonForce_tendon.m
             - Function that computes fiber velocities from muscle-tendon forces.
-        - ForceEquilibrium_FtildeState_all.m
+        5. ForceEquilibrium_FtildeState_all.m
             - Function that derives the Hill-equilibrium.
-        - ForceEquilibrium_FtildeState_all_tendon.m
+        6. ForceEquilibrium_FtildeState_all_tendon.m
             - Function that derives the Hill-equilibrium with tendon stiffness as parameter.
-        - MomentArmIndices.m        
+        7. MomentArmIndices.m        
             - Helper function that returns indices for use with the moment arms.
-        - MuscleIndices.m
+        8. MuscleIndices.m
             - Helper function that returns indices for use with the muscles. 
-    Data:
-        - Faparam.mat
+    2. Data:
+        1. Faparam.mat
             - Parameters of the muscle active force-length relationship.
-        - Fpparam.mat
+        2. Fpparam.mat
             - Parameters of the muscle passive force-length relationship.
-        - Fvparam.mat
+        3. Fvparam.mat
             - Parameters of the muscle force-velocity relationship.
-        - MTparameters_subject1.mat
+        4. MTparameters_subject1.mat
             - Muscle-tendon parameters: 
                 Row 1: maximal isometric forces; Row 2: optimal fiber lengths; Row 3: tendon slack lengths; 
                 Row 4: optimal pennation angles; Row 5: maximal contraction velocities. 
