@@ -11,7 +11,7 @@ The results are divided into:
     - Contains the results from the tracking simulations.
 
 Results_all is a nested structure with the following layers:
-- Speed_<speed> 
+- Speed_< speed > 
     - where speed is the prescribed gait speed
 - W_MetabolicEnergyRate_<WE> 
     - where WE is the weight on the metabolic energy rate term in the cost function
