@@ -10,7 +10,8 @@ The results are divided into:
 3. TrackSimResults_tracking.mat 
     - Contains the results from the tracking simulations.
 
-Results_all is a nested structure with the following layers:
+### Results_all is a nested structure with the following layers:
+
 - Speed_< speed > 
     - where speed is the prescribed gait speed
 - W_MetabolicEnergyRate_< WE > 
@@ -73,7 +74,7 @@ Results_all is a nested structure with the following layers:
     - GRF                                
         - headers of columns with GRF-related results (1x6)  
                                             
-Results_all contains the following results:
+### Results_all contains the following results:
 
 - Qs_opt                 
     - joint positions (2*Nx29) (° or m)
@@ -108,39 +109,39 @@ Results_all contains the following results:
 
 All results are for one full gait cycle starting at heel strike of the right leg.
 
-Results_prosthesis is a nested structure with the following layers:
+### Results_prosthesis is a nested structure with the following layers:
 
-- Speed_<speed>                          
+- Speed_< speed >                          
     - where speed is the prescribed gait speed
-- W_MetabolicEnergyRate_<WE>             
+- W_MetabolicEnergyRate_< WE >             
     - where WE is the weight on the metabolic energy rate term in the cost function
-- W_MuscleActivity_<WA>                  
+- W_MuscleActivity_< WA >                  
     - where WA is the weight on the muscle activity term in the cost function
-- W_JointAcceleration_<WJAcc>            
+- W_JointAcceleration_< WJAcc >            
     - where WJAcc is the weight on the joint acceleration term in the cost function
-- W_PassiveTorque_<WPassT>               
+- W_PassiveTorque_< WPassT >               
     - where WPassT is the weight on the passive joint torque term in the cost function
-- W_ArmExcitation_<WArmE>                
+- W_ArmExcitation_< WArmE >                
     - where WArmE is the weight on the arm excitation term in the cost function
 - Power_MetabolicEnergyRate_<pE>         
     - where pE is the power of the metabolic energy rate term in the cost function 
-- InitialGuessType_<IGT>                 
+- InitialGuessType_< IGT >                 
     - where IGT is the initial guess type: 
         - 1 quasi-random
         - 2 data-informed
-- InitialGuessMode_<IGM>                 
+- InitialGuessMode_< IGM >                 
     - where IGM is the data-informed initial guess mode: 
         - 1 walking
         - 2 running 
         - 3 partial optimal solution at closest speed
         - 4 full optimal solution at closest speed
-- InitialGuessCase_<IGC>                 
+- InitialGuessCase_< IGC >                 
     - where IGC is the index of the trial whose solution is used as initial guess (IGM=3 || IGM=4)
-- WeaknessHipActuators_<h_weak>          
+- WeaknessHipActuators_< h_weak >          
     - where h_weak is the percentage of decrease in maximal isometric force of the hip muscles
-- WeaknessAnklePlantarflexors_<pf_weak>  
+- WeaknessAnklePlantarflexors_< pf_weak >  
     - where pf_weak is the percentage of decrease in maximal isometric force of the ankle plantarflexors
-- MetabolicEnergyModel_<mE>              
+- MetabolicEnergyModel_< mE >              
     - where mE is the metabolic energy model identifier: 
         - 0 Bhargava et al. (2004)
         - 1 Umberger et al. (2003)
@@ -148,101 +149,101 @@ Results_prosthesis is a nested structure with the following layers:
         - 3 Uchida et al. (2016) 
         - 4 Umberger (2010) treating muscle lengthening heat rate as Umberger et al. (2003)
         - 5 Umberger (2010) treating negative mechanical work as Umberger et al. (2003)
-- ContactModel_<CM>
+- ContactModel_< CM >
     - where CM is the contact model identifier:
         - 1 generic
         - 2 subject-specific
-- Number_MeshIntervals_<N>
+- Number_MeshIntervals_< N >
     - where N is the number of mesh intervals
-- MaximumContractionVelocity_<vMax>      
+- MaximumContractionVelocity_< vMax >      
     - where vMax is the maximal contraction velocity identifier
         - 0 generic (10*lMopt)
         - 1 doubled (20*lMopt)
-- Stiffness_<k>                          
+- Stiffness_< k >                          
     - where k is the torsional stiffness
 - colheaders     
-    - .joints                             
+    - joints                             
         - headers of columns with joint-related results (1x29)
-    - .muscles                            
+    - muscles                            
         - headers of columns with muscle-related results (1x80)
-    - .GRF                                
+    - GRF                                
         - headers of columns with GRF-related results (1x6)  
     
-Results_prosthesis contains the following results:
+### Results_prosthesis contains the following results:
 
-- .Qs_opt_r       
+- Qs_opt_r       
     - joint positions (Nx29) (° or m) for one full gait cycle starting at heel strike of the right leg                    
-- .Qs_opt_l       
+- Qs_opt_l       
     - joint positions (Nx29) (° or m) for one full gait cycle starting at heel strike of the left leg
-- .Qdots_opt_r
+- Qdots_opt_r
     - joint velocities (Nx29) (°/s or m/s) for one full gait cycle starting at heel strike of the right leg
-- .Qdots_opt_l
+- Qdots_opt_l
     - joint velocities (Nx29) (°/s or m/s) for one full gait cycle starting at heel strike of the left leg
-- .GRFs_opt_r
+- GRFs_opt_r
     - ground reaction forces (Nx6) (% body weight) for one full gait cycle starting at heel strike of the right leg
-- .GRFs_opt_l
+- GRFs_opt_l
     - ground reaction forces (Nx6) (% body weight) for one full gait cycle starting at heel strike of the left leg
-- .Ts_op_r
+- Ts_op_r
     - joint torques (Nx29) (Nm) for one full gait cycle starting at heel strike of the right leg
-- .Ts_opt_l
+- Ts_opt_l
     - joint torques (Nx29) (Nm) for one full gait cycle starting at heel strike of the left leg
-- .Acts_opt_r
+- Acts_opt_r
     - muscle activations (Nx80) for one full gait cycle starting at heel strike of the right leg
-- .Acts_opt_l
+- Acts_opt_l
     - muscle activations (Nx80) for one full gait cycle starting at heel strike of the left leg
-- .COT_opt
+- COT_opt
     - metabolic cost of transport (J Kg-1 m-1)
-- .CPU_IPOPT
+- CPU_IPOPT
     - computational time spent in IPOPT (s)
-- .CPU_NLP
+- CPU_NLP
     - computational time spent in evaluating the NLP functions (s)
-- .Cost
+- Cost
     - optimal cost
-- .OptSol
+- OptSol
     - "1" if converged to an optimal solution
     
-Results_tracking contains the following results:
+### Results_tracking contains the following results:
 
-- .colheaders     
-    - .joints     
+- colheaders     
+    - joints     
         - headers of columns with joint-related results (1x29)
-    - .GRF
+    - GRF
         - headers of columns with GRF-related results (1x6)   
-    - .muscles
+    - muscles
         - headers of columns with muscle-related results (1x92) 
-    - .paramsCM
+    - paramsCM
         - headers of columns with parameter-related results (1x18)
             - loc: location
             - si: sphere i
             - r: right
             - x: forward direction
             - z: lateral direction
-- .Qs_opt         
+- Qs_opt         
     - joint positions (50x29) (° or m), the columns are ordered as colheaders.joints
-- .Ts_opt         
+- Ts_opt         
     - joint torques (50x29) (Nm), the columns are ordered as colheaders.joints
-- .GRFs_opt       
+- GRFs_opt       
     - ground reaction forces (50x6) (N), the columns are ordered as colheaders.GRF
-- .GRMs_opt       
+- GRMs_opt       
     - ground reaction moments (50x6) (Nm), the columns are ordered as colheaders.GRF
-- .Acts_opt       
+- Acts_opt       
     - muscle activations (50x92), the columns are ordered as colheaders.muscles 
-- .ParamsCM_opt   
+- ParamsCM_opt   
     - optimized parameters of the contact models.
-- .Qs_toTrack     
+- Qs_toTrack     
     - experimental joint positions (to track) (50x30) (rad or m): the first column is time, the next columns are ordered as colheaders.joints
-- .Ts_toTrack      
+- Ts_toTrack      
     - experimental joint torques (to track) (50x30) (Nm): the first column is time, the next columns are ordered as colheaders.joints
-- .GRFs_toTrack   
+- GRFs_toTrack   
     - experimental ground reaction forces (to track) (N) (50x7): the first column is time, the next columns are ordered as colheaders.joints
-- .GRMs_toTrack   
+- GRMs_toTrack   
     - experimental ground reaction moments (to track) (Nm) (50x7): the first column is time, the next columns are ordered as colheaders.joints    
-- .CPU_IPOPT      
+- CPU_IPOPT      
     - computational time spent in IPOPT (s)
-- .CPU_NLP        
+- CPU_NLP        
     - computational time spent in evaluating the NLP functions (s)
-- .OptSol         
+- OptSol         
     - "1" if converged to an optimal solution
-- .ParamsCM_gen   
+- ParamsCM_gen   
     - generic parameters of the contact models.
     
