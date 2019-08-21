@@ -8,7 +8,9 @@ using CasADi in MATLAB.
 
 We use custom versions of Simbody and OpenSim to enable the use of algorithmic
 differentiation through CasADi. These custom versions will be made available
-upon publication of that work (details will be described at https://simtk.org/projects/3dpredictsim). 
+upon publication of that work (details will be posted here). At this stage, it is therefore
+not possible to use a different model, since the model is built in the external function (cpp) and
+compiling that function is only possible using our custom versions of Simbody and OpenSim.
 
 In this folder, we release the source code of the external functions (cpps)
 as well as the corresponding dlls. Only the dlls are necessary to run the problems.
