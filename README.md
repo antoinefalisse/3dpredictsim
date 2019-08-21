@@ -1,18 +1,15 @@
 3dpredictsim
 ============
 
-This repository contains code and data to generate three-dimensional muscle-driven predictive simulations of human gaits, and to reproduce all results presented in: Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F (2019), "Rapid predictive simulations with complex musculoskeletal models suggest that diverse healthy and pathological human gaits can emerge from similar control strategies". Journal of the Royal Society Interface.
+This repository contains code and data to generate three-dimensional muscle-driven predictive simulations of human gaits as described in: Falisse A, Serrancoli G, Dembia C, Gillis J, Jonkers J, De Groote F. 2019 Rapid predictive simulations with complex musculoskeletal models suggest that diverse healthy and pathological human gaits can emerge from similar control strategies. Journal of the Royal Society Interface 16: 20190402. http://dx.doi.org/10.1098/rsif.2019.0402
 
 Thanks for citing our work in any derived publication. Feel free to reach us for any questions: antoine.falisse@kuleuven.be | antoinefalisse@gmail.com | friedl.degroote@kuleuven.be. This code has been developed on Windows using MATLAB2017b. There is no guarantee that it runs smooth on other platforms. Please let us know if you run into troubles.
 
-3dpredictsim contains different folders with data and code needed to perform the predictive and tracking simulations as well as to reproduce all figures from the study. The best way to get started is to run OCP/PredSim_all.m and to
-explore the code from there (make sure you install CasADi beforehand:
-[CasADi website](https://web.casadi.org/)
+3dpredictsim contains different folders with data and code needed to reproduce all results and figures from the study. The best way to get started is to run OCP/PredSim_all.m and to explore the code from there (make sure you install CasADi beforehand: [CasADi website](https://web.casadi.org/)
 
 Here, we provide a brief description of the different scripts and folders. 
  
-OCP (Optimal Control Problems)
-==============================
+### OCP (Optimal Control Problems)
 
 Folder with scripts performing the predictive and tracking simulations.
 
@@ -23,8 +20,7 @@ Folder with scripts performing the predictive and tracking simulations.
 3. TrackSim.m
     - Script that formulates the tracking simulation.
   
-MuscleModel
-=========== 
+### MuscleModel
 
 Folder with scripts and data describing muscle activation dynamics, muscle contraction dynamics, and arm activation dynamics. This folder also contains helper functions for use when formulating the optimal control problems.
 
@@ -62,11 +58,9 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
             4. Row 4: optimal pennation angles
             5. Row 5: maximal contraction velocities
 
-Polynomials
-=========== 
+### Polynomials
 
-Folder with scripts and data describing muscle-tendon lengths, velocities, and moment arms using polynomial expressions
-             of joint positions and velocities.
+Folder with scripts and data describing muscle-tendon lengths, velocities, and moment arms using polynomial expressions of joint positions and velocities.
 
 1. Scripts:
     1. Main_polynomials_subject1.m
@@ -82,8 +76,7 @@ Folder with scripts and data describing muscle-tendon lengths, velocities, and m
     2. MuscleInfo_subject1.mat
         - Structure with polynomial coefficients.
         
-MetabolicEnergy
-===============
+### MetabolicEnergy
 
 Folder with scripts describing the metabolic energy models.
 
@@ -106,16 +99,14 @@ Folder with scripts describing the metabolic energy models.
 9. getSpecificTensions.m
     - Helper function that returns the specific tension of the muscles.
     
-PassiveMoments
-==============
+### PassiveMoments
 
 Folder with the script describing the passive joint torques.
 
 1. PassiveMomentsData.m
     - Script that describes the passive joint torques.
     
-CasADiFunctions
-===============
+### CasADiFunctions
 
 Folder with scripts implementing several CasADi-based functions.
 
@@ -126,24 +117,21 @@ Folder with scripts implementing several CasADi-based functions.
 3. CasADiFunctions_tracking.m
     - Script for use in TrackSim.m.
  
-Contact
-=======
+### Contact
 
 Folder with the script describing the foot-ground contact model (for use in tracking simulation).
 
 1. HCContactModel.m
     - Function that describes the Hunt-Crossley foot-ground contact model.
   
-CollocationScheme
-=================
+### CollocationScheme
 
 Folder with the script describing the collocation scheme.
 
 1. CollocationScheme.m
     - Script that describes the collocation scheme.
   
-Bounds
-======
+### Bounds
 
 Folder with the scripts setting the bounds of the optimal control problems.
 
@@ -154,8 +142,7 @@ Folder with the scripts setting the bounds of the optimal control problems.
 3. getBounds_tracking.m
     - Script for use in TrackSim.m.
   
-IG (Initial Guesses)
-====================
+### IG (Initial Guesses)
 
 Folder with the scripts setting the initial guesses of the optimal control problems.
 
@@ -172,8 +159,7 @@ Folder with the scripts setting the initial guesses of the optimal control probl
 6. getGuess_DI_tracking.m
     - Script that describes the data-informed initial guess for the tracking simulation.
  
-Plots
-=====
+### Plots
 
 Folder with scripts plotting initial guesses versus bounds.
 
@@ -184,8 +170,7 @@ Folder with scripts plotting initial guesses versus bounds.
 3. plot_BoundsVSInitialGuess_tracking.m
     - Script for use in TrackSim.m.
   
-VariousFunctions
-================
+### VariousFunctions
 
 Folder with scripts with various purposes.
 
@@ -204,8 +189,7 @@ Folder with scripts with various purposes.
 7. SplineEval_ppuval.m
     - Script that evaluates splines.
    
-ResultsAnalysis
-===============
+### ResultsAnalysis
 
 Folder with scripts reproducing all figures of the study.
 
@@ -240,8 +224,7 @@ Folder with scripts reproducing all figures of the study.
 15. predSim_settings_all.m
     - Script that loads the settings of the optimal control problems.
    
-OpenSimModel\subject1
-=====================
+### OpenSimModel\subject1
 
 Folder with data from subject1.
     
@@ -266,16 +249,14 @@ Folder with data from subject1.
 4. subject1.osim
     - OpenSim model used in this study.
  
-ExperimentalData
-================
+### ExperimentalData
 
 Folder with experimental data.
 
 1. ExperimentalData.mat
     - Structure with experimental data: more information in the readme of that folder. 
         
-Results
-=======
+### Results
 
 Folder with simulation results.
 
@@ -286,7 +267,6 @@ Folder with simulation results.
 3. TrackSim/Results_tracking.mat
     - Structure with results from the tracking simulations.
         
-ExternalFunctions
-=================
+### ExternalFunctions
 
 Folder with external functions, more information in the readme of that folder. 
