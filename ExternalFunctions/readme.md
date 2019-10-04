@@ -6,8 +6,8 @@ The external functions are then compiled as dlls from which we create Function i
 using CasADi in MATLAB. 
 
 We use custom versions of Simbody and OpenSim to enable the use of algorithmic
-differentiation through CasADi. These custom versions will be made available
-upon publication (details will be described at https://simtk.org/projects/3dpredictsim). 
+differentiation through CasADi. Information about how to install these libraries, compile
+the cpps, and generate the dlls can be found on this page: https://github.com/antoinefalisse/opensim-core/tree/AD-recorder
 
 In this folder, we release the source code of the external functions (cpps)
 as well as the corresponding dlls. Only the dlls are necessary to run the problems.

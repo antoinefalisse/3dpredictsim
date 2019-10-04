@@ -4,7 +4,7 @@
 % Authors: Original code from Wouter Aerts, adapted by Antoine Falisse
 % Date: 12/19/2018
 %
-function [muscle_spanning_joint_INFO,MuscleInfo] =  PolynomialFit(MuscleData)
+function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit(MuscleData)
 
     %% Construct the polynomials for the moment arms and muscle length
 

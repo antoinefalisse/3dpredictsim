@@ -435,7 +435,7 @@ if solveProblem
     w0  = []; % initial guess for design variables
     lbw = []; % lower bounds for design variables
     ubw = []; % upper bounds for design variables
-    J   = 0;  % initila value of cost function
+    J   = 0;  % initial value of cost function
     g   = {}; % constraints
     lbg = []; % lower bounds for constraints
     ubg = []; % upper bounds for constraints
@@ -1027,7 +1027,7 @@ if solveProblem
     % Lower bounds smaller than upper bounds    
     assert_bw = isempty(find(lbw <= ubw == 0,1)); % Design variables
     assert_bg = isempty(find(lbg <= ubg == 0,1)); % Constraints
-    % Design varibles between -1 and 1
+    % Design variables between -1 and 1
     assert_bwl = isempty(find(lbw < -1 == 1,1));
     assert_bwu = isempty(find(1 < ubw == 1,1));   
     % Initial guess within bounds
