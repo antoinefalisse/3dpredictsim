@@ -27,7 +27,7 @@ close all;
 % and visualize the results in the OpenSim GUI.
 
 num_set = [1,1,0,1,0,1]; % This configuration solves the problem
-% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+% num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
@@ -1457,8 +1457,7 @@ if analyseResults
             Tau_pass_opt.trunk.ben,Tau_pass_opt.trunk.rot]);
     end        
     
-    %% Visualization in OpenSim GUI    
-    % Create .mot file for OpenSim GUI
+    %% Create .mot file for OpenSim GUI
     if writeIKmotion  
         pathOpenSim = [pathRepo,'/OpenSim'];
         addpath(genpath(pathOpenSim));
@@ -1477,10 +1476,23 @@ if analyseResults
             'arm_flex_r','arm_add_r','arm_rot_r',...
             'elbow_flex_l','elbow_flex_r',...
             'pro_sup_l','pro_sup_r'};
-        JointAngle.data = q_opt_GUI;
+        % Combine data joint angles and muscle activations
+        JointAngleMuscleAct.data = [q_opt_GUI,a_opt];
+        % Get muscle labels
+        muscleNamesAll = cell(1,NMuscle);
+        for i = 1:NMuscle/2
+            muscleNamesAll{i} = [muscleNames{i}(1:end-2),'_l'];
+            muscleNamesAll{i+NMuscle/2} = [muscleNames{i}(1:end-2),'_r'];
+        end  
+        % Combine labels joint angles and muscle activations
+        JointAngleMuscleAct.labels = JointAngle.labels;
+        for i = 1:NMuscle
+            JointAngleMuscleAct.labels{i+size(q_opt_GUI,2)} = ...
+                [muscleNamesAll{i},'/activation'];
+        end        
         filenameJointAngles = [pathRepo,'/Results/',namescript,...
                 '/IK',savename,'.mot'];
-        write_motionFile(JointAngle, filenameJointAngles)
+        write_motionFile(JointAngleMuscleAct, filenameJointAngles)
     end   
     
     %% Optimal cost and CPU time
