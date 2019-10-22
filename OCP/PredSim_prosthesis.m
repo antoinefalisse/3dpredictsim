@@ -27,12 +27,12 @@ close all;
 % and visualize the results in the OpenSim GUI.
 
 num_set = [1,1,0,1,0,1]; % This configuration solves the problem 
-% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+% num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
 % select which row of parameters will be used.
-idx_ww = 1:2; % Index row in matrix settings
+idx_ww = 1; % Index row in matrix settings
 
 %% Settings
 import casadi.*
@@ -1398,42 +1398,7 @@ if analyseResults
         q_opt_unsc_all.deg(end,jointi.pelvis.tx);   
     temp_q_opt_GC_pelvis_tx = q_opt_GC(1,jointi.pelvis.tx);
     q_opt_GC(:,jointi.pelvis.tx) = q_opt_GC(:,jointi.pelvis.tx)-...
-        temp_q_opt_GC_pelvis_tx;
-    % For visualization in OpenSim GUI
-    q_opt_GUI_GC = zeros(N,1+nq.all+2);
-    q_opt_GUI_GC(1:N-IC1i+1,1) = tgrid(:,IC1i:end-1)';    
-    q_opt_GUI_GC(N-IC1i+2:N,1)  = tgrid(:,1:IC1i-1)' + tgrid(end);    
-    q_opt_GUI_GC(:,2:end-2) = q_opt_GC;
-    q_opt_GUI_GC(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
-    q_opt_GUI_GC(:,1) = q_opt_GUI_GC(:,1)-q_opt_GUI_GC(1,1);
-    pathOpenSim = [pathRepo,'/OpenSim'];
-    addpath(genpath(pathOpenSim));
-    % Create .mot file for OpenSim GUI
-    if writeIKmotion  
-        JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
-            'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
-            'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
-            'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
-            'knee_angle_l','knee_angle_r','ankle_angle_l',...
-            'ankle_angle_r','subtalar_angle_l','subtalar_angle_r',...
-            'lumbar_extension','lumbar_bending','lumbar_rotation',...
-            'arm_flex_l','arm_add_l','arm_rot_l',...
-            'arm_flex_r','arm_add_r','arm_rot_r',...
-            'elbow_flex_l','elbow_flex_r',...
-            'pro_sup_l','pro_sup_r'};        
-        % Two gait cycles
-        q_opt_GUI_GC_2 = [q_opt_GUI_GC;q_opt_GUI_GC];
-        q_opt_GUI_GC_2(N+1:2*N,1) = q_opt_GUI_GC_2(N+1:2*N,1) + ...
-            q_opt_GUI_GC_2(end,1) + ...
-            q_opt_GUI_GC_2(end,1)-q_opt_GUI_GC_2(end-1,1);
-        q_opt_GUI_GC_2(N+1:2*N,jointi.pelvis.tx+1) = ...
-            q_opt_GUI_GC_2(N+1:2*N,jointi.pelvis.tx+1) + ...
-            q_opt_unsc_all.deg(end,jointi.pelvis.tx);    
-        JointAngle.data = q_opt_GUI_GC_2;
-        filenameJointAngles = [pathRepo,'/Results/',namescript,...
-                '/IK',savename,'.mot'];
-        write_motionFile(JointAngle, filenameJointAngles)
-    end
+        temp_q_opt_GC_pelvis_tx;   
 
     % Qdots
     qdot_opt_GC = zeros(N,size(q_opt,2));    
@@ -1496,6 +1461,58 @@ if analyseResults
     Tau_pass_opt_GC(1:N-IC1i+1,:) = Tau_pass_opt_all(IC1i:end,:); 
     Tau_pass_opt_GC(N-IC1i+2:N,:) = Tau_pass_opt_all(1:IC1i-1,:); 
     
+    % Create .mot file for OpenSim GUI
+    q_opt_GUI_GC = zeros(N,1+nq.all+2);
+    q_opt_GUI_GC(1:N-IC1i+1,1) = tgrid(:,IC1i:end-1)';    
+    q_opt_GUI_GC(N-IC1i+2:N,1)  = tgrid(:,1:IC1i-1)' + tgrid(end);    
+    q_opt_GUI_GC(:,2:end-2) = q_opt_GC;
+    q_opt_GUI_GC(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
+    q_opt_GUI_GC(:,1) = q_opt_GUI_GC(:,1)-q_opt_GUI_GC(1,1);
+    pathOpenSim = [pathRepo,'/OpenSim'];
+    addpath(genpath(pathOpenSim));    
+    if writeIKmotion  
+        JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
+            'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
+            'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
+            'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
+            'knee_angle_l','knee_angle_r','ankle_angle_l',...
+            'ankle_angle_r','subtalar_angle_l','subtalar_angle_r',...
+            'lumbar_extension','lumbar_bending','lumbar_rotation',...
+            'arm_flex_l','arm_add_l','arm_rot_l',...
+            'arm_flex_r','arm_add_r','arm_rot_r',...
+            'elbow_flex_l','elbow_flex_r',...
+            'pro_sup_l','pro_sup_r'};        
+        % Two gait cycles
+        q_opt_GUI_GC_2 = [q_opt_GUI_GC;q_opt_GUI_GC];
+        q_opt_GUI_GC_2(N+1:2*N,1) = q_opt_GUI_GC_2(N+1:2*N,1) + ...
+            q_opt_GUI_GC_2(end,1) + ...
+            q_opt_GUI_GC_2(end,1)-q_opt_GUI_GC_2(end-1,1);
+        q_opt_GUI_GC_2(N+1:2*N,jointi.pelvis.tx+1) = ...
+            q_opt_GUI_GC_2(N+1:2*N,jointi.pelvis.tx+1) + ...
+            q_opt_unsc_all.deg(end,jointi.pelvis.tx);    
+        % Muscle activations (to have muscles turning red when activated).
+        Acts_opt_GUI = [a_opt_GC;a_opt_GC];
+        % Combine data joint angles and muscle activations
+        JointAngleMuscleAct.data = [q_opt_GUI_GC_2,Acts_opt_GUI];
+        % Get muscle labels
+        muscleNamesAll = cell(1,NMuscle-NMuscle_pro);
+        for i = 1:NMuscle/2
+             muscleNamesAll{i} = [muscleNames{i}(1:end-2),'_l'];
+        end 
+        for i = 1:NMuscle/2-NMuscle_pro
+            muscleNamesAll{i+NMuscle/2} = muscleNames_act{i};
+        end        
+        % Combine labels joint angles and muscle activations
+        JointAngleMuscleAct.labels = JointAngle.labels;
+        for i = 1:NMuscle-NMuscle_pro
+            JointAngleMuscleAct.labels{i+size(q_opt_GUI_GC_2,2)} = ...
+                [muscleNamesAll{i},'/activation'];
+        end
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'.mot'];
+        write_motionFile(JointAngleMuscleAct, filenameJointAngles)
+    end
+    
     %% Reconstruct full gait cycle: starting with left heel strike
     if exist('HS1_l','var')
         clear HS1_l
@@ -1534,42 +1551,7 @@ if analyseResults
         q_opt_unsc_all.deg(end,jointi.pelvis.tx);    
     temp_q_opt_GC_l_pelvis_tx = q_opt_GC_l(1,jointi.pelvis.tx);
     q_opt_GC_l(:,jointi.pelvis.tx) = q_opt_GC_l(:,jointi.pelvis.tx)-...
-        temp_q_opt_GC_l_pelvis_tx;
-    % For visualization in OpenSim GUI
-    q_opt_GUI_GC_l = zeros(N,1+nq.all+2);
-    q_opt_GUI_GC_l(1:N-IC1i_l+1,1) = tgrid(:,IC1i_l:end-1)';    
-    q_opt_GUI_GC_l(N-IC1i_l+2:N,1)  = tgrid(:,1:IC1i_l-1)' + tgrid(end);    
-    q_opt_GUI_GC_l(:,2:end-2) = q_opt_GC_l;
-    q_opt_GUI_GC_l(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
-    q_opt_GUI_GC_l(:,1) = q_opt_GUI_GC_l(:,1)-q_opt_GUI_GC_l(1,1);
-    pathOpenSim = [pathRepo,'/OpenSim'];
-    addpath(genpath(pathOpenSim));
-    % Create .mot file for OpenSim GUI
-    if writeIKmotion  
-        JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
-            'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
-            'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
-            'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
-            'knee_angle_l','knee_angle_r','ankle_angle_l',...
-            'ankle_angle_r','subtalar_angle_l','subtalar_angle_r',...
-            'lumbar_extension','lumbar_bending','lumbar_rotation',...
-            'arm_flex_l','arm_add_l','arm_rot_l',...
-            'arm_flex_r','arm_add_r','arm_rot_r',...
-            'elbow_flex_l','elbow_flex_r',...
-            'pro_sup_l','pro_sup_r'};
-        % Two gait cycles
-        q_opt_GUI_GC_l_2 = [q_opt_GUI_GC_l;q_opt_GUI_GC_l];
-        q_opt_GUI_GC_l_2(N+1:2*N,1) = q_opt_GUI_GC_l_2(N+1:2*N,1) + ...
-            q_opt_GUI_GC_l_2(end,1) + ...
-            q_opt_GUI_GC_l_2(end,1)-q_opt_GUI_GC_l_2(end-1,1);
-        q_opt_GUI_GC_l_2(N+1:2*N,jointi.pelvis.tx+1) = ...
-            q_opt_GUI_GC_l_2(N+1:2*N,jointi.pelvis.tx+1) + ...
-            q_opt_unsc_all.deg(end,jointi.pelvis.tx);            
-        JointAngle.data = q_opt_GUI_GC_l_2;
-        filenameJointAngles = [pathRepo,'/Results/',namescript,...
-                '/IK',savename,'_l.mot'];
-        write_motionFile(JointAngle, filenameJointAngles)
-    end
+        temp_q_opt_GC_l_pelvis_tx;    
 
     % Qdots
     qdot_opt_GC_l = zeros(N,size(q_opt,2));    
@@ -1631,6 +1613,58 @@ if analyseResults
     Tau_pass_opt_GC_l = zeros(N,13);
     Tau_pass_opt_GC_l(1:N-IC1i_l+1,:) = Tau_pass_opt_all(IC1i_l:end,:); 
     Tau_pass_opt_GC_l(N-IC1i_l+2:N,:) = Tau_pass_opt_all(1:IC1i_l-1,:); 
+    
+    % Create .mot file for OpenSim GUI
+    q_opt_GUI_GC_l = zeros(N,1+nq.all+2);
+    q_opt_GUI_GC_l(1:N-IC1i_l+1,1) = tgrid(:,IC1i_l:end-1)';    
+    q_opt_GUI_GC_l(N-IC1i_l+2:N,1)  = tgrid(:,1:IC1i_l-1)' + tgrid(end);    
+    q_opt_GUI_GC_l(:,2:end-2) = q_opt_GC_l;
+    q_opt_GUI_GC_l(:,end-1:end) = 1.51*180/pi*ones(N,2); % pro_sup (locked)
+    q_opt_GUI_GC_l(:,1) = q_opt_GUI_GC_l(:,1)-q_opt_GUI_GC_l(1,1);
+    pathOpenSim = [pathRepo,'/OpenSim'];
+    addpath(genpath(pathOpenSim));       
+    if writeIKmotion  
+        JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
+            'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
+            'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
+            'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
+            'knee_angle_l','knee_angle_r','ankle_angle_l',...
+            'ankle_angle_r','subtalar_angle_l','subtalar_angle_r',...
+            'lumbar_extension','lumbar_bending','lumbar_rotation',...
+            'arm_flex_l','arm_add_l','arm_rot_l',...
+            'arm_flex_r','arm_add_r','arm_rot_r',...
+            'elbow_flex_l','elbow_flex_r',...
+            'pro_sup_l','pro_sup_r'};
+        % Two gait cycles
+        q_opt_GUI_GC_l_2 = [q_opt_GUI_GC_l;q_opt_GUI_GC_l];
+        q_opt_GUI_GC_l_2(N+1:2*N,1) = q_opt_GUI_GC_l_2(N+1:2*N,1) + ...
+            q_opt_GUI_GC_l_2(end,1) + ...
+            q_opt_GUI_GC_l_2(end,1)-q_opt_GUI_GC_l_2(end-1,1);
+        q_opt_GUI_GC_l_2(N+1:2*N,jointi.pelvis.tx+1) = ...
+            q_opt_GUI_GC_l_2(N+1:2*N,jointi.pelvis.tx+1) + ...
+            q_opt_unsc_all.deg(end,jointi.pelvis.tx);   
+        % Muscle activations (to have muscles turning red when activated).
+        Acts_opt_l_GUI = [a_opt_GC_l;a_opt_GC_l];
+        % Combine data joint angles and muscle activations
+        JointAngleMuscleAct_l.data = [q_opt_GUI_GC_l_2,Acts_opt_l_GUI];
+        % Get muscle labels
+        muscleNamesAll = cell(1,NMuscle-NMuscle_pro);
+        for i = 1:NMuscle/2
+             muscleNamesAll{i} = [muscleNames{i}(1:end-2),'_l'];
+        end 
+        for i = 1:NMuscle/2-NMuscle_pro
+            muscleNamesAll{i+NMuscle/2} = muscleNames_act{i};
+        end        
+        % Combine labels joint angles and muscle activations
+        JointAngleMuscleAct_l.labels = JointAngle.labels;
+        for i = 1:NMuscle-NMuscle_pro
+            JointAngleMuscleAct_l.labels{i+size(q_opt_GUI_GC_2,2)} = ...
+                [muscleNamesAll{i},'/activation'];
+        end
+        filenameJointAngles = [pathRepo,'/Results/',namescript,...
+                '/IK',savename,'_l.mot'];
+        write_motionFile(JointAngleMuscleAct_l, filenameJointAngles)
+    end
         
     %% Metabolic cost of transport
     q_opt_GC_rad = q_opt_GC;
