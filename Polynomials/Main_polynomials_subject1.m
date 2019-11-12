@@ -20,7 +20,7 @@ savePolynomials = 0;
 %% Extract time and angles from dummy motion
 
 pathmain = pwd;
-name_dummymotion = 'dummy_motion_gait2392.mot';
+name_dummymotion = 'dummy_motion.mot';
 path_dummymotion = [pathmain,'/MuscleAnalysis/dummy_motion/'];
 path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA_subject1/'];
 
@@ -48,9 +48,9 @@ if saveQdot
     qdot = zeros(size(q));
     qdot = r.*(pi/180);
     dummy_qdot = qdot;
-    save([path_dummymotion,'dummy_qdot_2392.mat'],'dummy_qdot');
+    save([path_dummymotion,'dummy_qdot.mat'],'dummy_qdot');
 end
-load([path_dummymotion,'dummy_qdot_2392.mat']);
+load([path_dummymotion,'dummy_qdot.mat']);
 qdot = dummy_qdot(:,:);
 
 %% Import data
