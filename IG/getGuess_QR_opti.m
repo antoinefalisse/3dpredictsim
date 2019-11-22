@@ -49,7 +49,7 @@ guess.dFTtilde = 0.01*ones(N,NMuscle);
 guess.a_a = 0.1*ones(N,nq.arms);
 guess.e_a = 0.1*ones(N,nq.arms);
 
-%% Add last mest point to state variables
+%% Add last mesh point to state variables
 % Lower limbs and trunk
 % Qs and Qdots are inverted after a half gait cycle BUT 
 % Pelvis: pelvis tilt and pelvis ty should be equal, pelvis
@@ -107,6 +107,9 @@ guess.dFTtilde  = (guess.dFTtilde)./repmat(scaling.dFTtilde,N,...
 
 %% Collocation points
     guess.a_col = zeros(d*N,NMuscle);
+    guess.FTtilde_col = zeros(d*N,NMuscle);
+    guess.QsQdots_col = zeros(d*N,2*nq.all);
+    guess.a_a_col = zeros(d*N,nq.arms);
 for k=1:N
     guess.a_col((k-1)*d+1:k*d,:) = repmat(guess.a(1,:),d,1); 
     guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(1,:),d,1);

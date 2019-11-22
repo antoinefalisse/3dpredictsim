@@ -1202,10 +1202,14 @@ if solveProblem
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Add equality constraints (next interval starts with end values of 
         % states from previous interval)
-        opti.subject_to(a(:,k+1)== ak_colloc*D);
-        opti.subject_to(FTtilde(:,k+1) == FTtildek_colloc*D);
-        opti.subject_to(X(:,k+1) == Xk_colloc*D);
-        opti.subject_to(a_a(:,k+1) == a_ak_colloc*D);          
+        ak_end = ak_colloc*D;
+        FTtildek_end = FTtildek_colloc*D;
+        Xk_end = Xk_colloc*D;
+        a_ak_end = a_ak_colloc*D;
+        opti.subject_to(a(:,k+1) == ak_end);
+        opti.subject_to(FTtilde(:,k+1) == FTtildek_end);
+        opti.subject_to(X(:,k+1) == Xk_end);
+        opti.subject_to(a_a(:,k+1) == a_ak_end);          
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Additional path constraints
@@ -1235,19 +1239,28 @@ if solveProblem
         2*jointi.pelvis.tz-1:2*jointi.pelvis.tz,...
         2*jointi.trunk.ben-1:2*jointi.trunk.ben,...
         2*jointi.trunk.rot-1:2*jointi.trunk.rot];
+    % This is a slightly different formulation as compared to the original
+    % simulation, and this results in a lower number of nnz in the equality
+    % constraint Jacobian. The commented two lines below result in the same
+    % number of nnz.
     opti.subject_to(X(QsInvA,end) - X(QsInvB,1) == 0);
-    opti.subject_to(X(orderQsOpp,end) + X(orderQsOpp,1) == 0);       
+    opti.subject_to(X(orderQsOpp,end) + X(orderQsOpp,1) == 0);   
+    % opti.subject_to(Xk_end(QsInvA) - X(QsInvB,1) == 0);
+    % opti.subject_to(Xk_end(orderQsOpp) + X(orderQsOpp,1) == 0);
     % Muscle activations
     orderMusInv = [NMuscle/2+1:NMuscle,1:NMuscle/2];
     opti.subject_to(a(:,end) - a(orderMusInv,1) == 0);
+    % opti.subject_to(ak_end - a(orderMusInv,1) == 0);
     % Muscle-tendon forces
     opti.subject_to(FTtilde(:,end) - FTtilde(orderMusInv,1) == 0);
+    % opti.subject_to(FTtildek_end - FTtilde(orderMusInv,1) == 0);
     % Arm activations
     orderArmInv = [jointi.sh_flex.r:jointi.sh_rot.r,...
     jointi.sh_flex.l:jointi.sh_rot.l,...
     jointi.elb.r:jointi.elb.r,...
     jointi.elb.l:jointi.elb.l]-jointi.sh_flex.l+1;
     opti.subject_to(a_a(:,end) - a_a(orderArmInv,1) == 0);
+    % opti.subject_to(a_ak_end - a_a(orderArmInv,1) == 0);
     % Average speed
     vel_aver_tot = dist_trav_tot/tf; 
     opti.subject_to(vel_aver_tot - v_tgt == 0)  
@@ -1258,7 +1271,6 @@ if solveProblem
     options.ipopt.mu_strategy      = 'adaptive';
     options.ipopt.max_iter = 10000;
     options.ipopt.tol = 1*10^(-tol_ipopt);
-    opti.solver('ipopt', options);    
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
@@ -1365,43 +1377,36 @@ if solveProblem
 %         end
 %         clear w_opt;
     end
-    % Solve problem
-    sol = opti.solve(); 
-    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     result = solve_NLPSOL(opti,options);
-
-    
+    % Solve problem
+    % Opti does not use bounds on variables but constraints. This function
+    % adjusts for that.
+    [w_opt,stats] = solve_NLPSOL(opti,options);    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     diary off
     % Extract results 
-    w_opt.tf_opt = sol.value(tf);
-    w_opt.a_opt = sol.value(a)';
-    w_opt.a_col_opt = sol.value(a_col)';
-    w_opt.FTtilde_opt = sol.value(FTtilde)';
-    w_opt.FTtilde_col_opt = sol.value(FTtilde_col)';
-    w_opt.X_opt = sol.value(X)';
-    w_opt.X_col_opt = sol.value(X_col)';
-    w_opt.a_a_opt = sol.value(a_a)';
-    w_opt.a_a_col_opt = sol.value(a_a_col)';
-    w_opt.vA_opt = sol.value(vA)';
-    w_opt.dFTtilde_opt = sol.value(dFTtilde)';
-    w_opt.qdotdot_opt = sol.value(A)';
-    w_opt.e_a_opt = sol.value(e_a)';
-    g_opt = sol.value(opti.g);
+%     w_opt.tf_opt = sol.value(tf);
+%     w_opt.a_opt = sol.value(a)';
+%     w_opt.a_col_opt = sol.value(a_col)';
+%     w_opt.FTtilde_opt = sol.value(FTtilde)';
+%     w_opt.FTtilde_col_opt = sol.value(FTtilde_col)';
+%     w_opt.X_opt = sol.value(X)';
+%     w_opt.X_col_opt = sol.value(X_col)';
+%     w_opt.a_a_opt = sol.value(a_a)';
+%     w_opt.a_a_col_opt = sol.value(a_a_col)';
+%     w_opt.vA_opt = sol.value(vA)';
+%     w_opt.dFTtilde_opt = sol.value(dFTtilde)';
+%     w_opt.qdotdot_opt = sol.value(A)';
+%     w_opt.e_a_opt = sol.value(e_a)';
+%     g_opt = sol.value(opti.g);
     % Create setup
     setup.tolerance.ipopt = tol_ipopt;
     setup.bounds = bounds;
     setup.scaling = scaling;
     setup.guess = guess;
-%     setup.lbw = lbw;
-%     setup.ubw = ubw;
     % Extract stats
-    stats = sol.stats();
     % Save results and set    
     save([pathresults,'/',namescript,'/w',savename],'w_opt');
-%     save([pathresults,'/',namescript,'/g',savename],'g_opt');
-%     save([pathresults,'/',namescript,'/s',savename],'setup');
     save([pathresults,'/',namescript,'/stats',savename],'stats');
 end
 
@@ -1414,20 +1419,34 @@ if analyseResults
         pathresults = [pathRepo,'/Results'];
         load([pathresults,'/',namescript,'/w',savename]);
         load([pathresults,'/',namescript,'/stats',savename]);
-    end 
-    tf_opt = w_opt.tf_opt;
-    a_opt = w_opt.a_opt;
-    a_col_opt = w_opt.a_col_opt;
-    FTtilde_opt = w_opt.FTtilde_opt;
-    FTtilde_col_opt = w_opt.FTtilde_col_opt;
-    X_opt = w_opt.X_opt;
-    X_col_opt = w_opt.X_col_opt;
-    a_a_opt = w_opt.a_a_opt;
-    a_a_col_opt = w_opt.a_a_col_opt;
-    vA_opt = w_opt.vA_opt;
-    dFTtilde_opt = w_opt.dFTtilde_opt;
-    qdotdot_opt = w_opt.qdotdot_opt;
-    e_a_opt = w_opt.e_a_opt;
+    end     
+    NParameters = 1;    
+    tf_opt = w_opt(1:NParameters);
+    starti = NParameters+1;
+    a_opt = reshape(w_opt(starti:starti+NMuscle*(N+1)-1),NMuscle,N+1)';
+    starti = starti + NMuscle*(N+1);
+    a_col_opt = reshape(w_opt(starti:starti+NMuscle*(d*N)-1),NMuscle,d*N)';
+    starti = starti + NMuscle*(d*N);
+    FTtilde_opt = reshape(w_opt(starti:starti+NMuscle*(N+1)-1),NMuscle,N+1)';
+    starti = starti + NMuscle*(N+1);
+    FTtilde_col_opt = reshape(w_opt(starti:starti+NMuscle*(d*N)-1),NMuscle,d*N)';
+    starti = starti + NMuscle*(d*N);
+    X_opt = reshape(w_opt(starti:starti+2*nq.all*(N+1)-1),2*nq.all,N+1)';
+    starti = starti + 2*nq.all*(N+1);
+    X_col_opt = reshape(w_opt(starti:starti+2*nq.all*(d*N)-1),2*nq.all,d*N)';
+    starti = starti + 2*nq.all*(d*N);
+    a_a_opt = reshape(w_opt(starti:starti+nq.arms*(N+1)-1),nq.arms,N+1)';
+    starti = starti + nq.arms*(N+1);
+    a_a_col_opt = reshape(w_opt(starti:starti+nq.arms*(d*N)-1),nq.arms,d*N)';
+    starti = starti + nq.arms*(d*N);
+    vA_opt = reshape(w_opt(starti:starti+NMuscle*N-1),NMuscle,N)';
+    starti = starti + NMuscle*N;
+    dFTtilde_opt = reshape(w_opt(starti:starti+NMuscle*N-1),NMuscle,N)';
+    starti = starti + NMuscle*N;
+    qdotdot_opt = reshape(w_opt(starti:starti+nq.all*N-1),nq.all,N)';
+    starti = starti + nq.all*N;
+    e_a_opt = reshape(w_opt(starti:starti+nq.arms*N-1),nq.arms,N)';
+    starti = starti + nq.arms*N;
     % Combine results at mesh and collocation points
     a_mesh_col_opt=zeros(N*(d+1)+1,NMuscle);
     a_mesh_col_opt(1:(d+1):end,:)= a_opt;

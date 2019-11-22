@@ -8,7 +8,7 @@
 % Date: 12/19/2018
 % 
 function guess = getGuess_DI_opti(Qs,nq,N,time_IC,NMuscle,jointi,scaling,...
-    v_tgt)
+    v_tgt,d)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
 Qs_spline.data = zeros(size(Qs.allfilt));
@@ -216,7 +216,7 @@ if isempty(idx_speed)
 end
 guess.tf = all_tf(idx_speed);
 
-%% Add last mest point to state variables
+%% Add last mesh point to state variables
 % Lower limbs and trunk
 % Qs and Qdots are inverted after a half gait cycle BUT 
 % Pelvis: pelvis tilt and pelvis ty should be equal, pelvis
@@ -272,4 +272,15 @@ guess.vA        = (guess.vA)./repmat(scaling.vA,N,size(guess.vA,2));
 guess.dFTtilde  = (guess.dFTtilde)./repmat(scaling.dFTtilde,N,...
     size(guess.dFTtilde,2));
 
+%% Collocation points
+    guess.a_col = zeros(d*N,NMuscle);
+    guess.FTtilde_col = zeros(d*N,NMuscle);
+    guess.QsQdots_col = zeros(d*N,2*nq.all);
+    guess.a_a_col = zeros(d*N,nq.arms);
+for k=1:N
+    guess.a_col((k-1)*d+1:k*d,:) = repmat(guess.a(1,:),d,1); 
+    guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(1,:),d,1);
+    guess.QsQdots_col((k-1)*d+1:k*d,:) = repmat(guess.QsQdots(1,:),d,1);
+    guess.a_a_col((k-1)*d+1:k*d,:) = repmat(guess.a_a(1,:),d,1);
+end
 end
