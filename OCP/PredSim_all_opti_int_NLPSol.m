@@ -880,20 +880,20 @@ if solveProblem
                 Xkj_nsc(jointi.trunk.ben*2,j+1),...
                 Xkj_nsc(jointi.trunk.rot*2,j+1)];  
             [lMTj_l,vMTj_l,MAj_l] =  f_lMT_vMT_dM(qinj_l,qdotinj_l);    
-            MA.hip_flex.l   =  MAj_l(mai(1).mus.l',1);
-            MA.hip_add.l    =  MAj_l(mai(2).mus.l',2);
-            MA.hip_rot.l    =  MAj_l(mai(3).mus.l',3);
-            MA.knee.l       =  MAj_l(mai(4).mus.l',4);
-            MA.ankle.l      =  MAj_l(mai(5).mus.l',5);  
-            MA.subt.l       =  MAj_l(mai(6).mus.l',6); 
+            MAj.hip_flex.l   =  MAj_l(mai(1).mus.l',1);
+            MAj.hip_add.l    =  MAj_l(mai(2).mus.l',2);
+            MAj.hip_rot.l    =  MAj_l(mai(3).mus.l',3);
+            MAj.knee.l       =  MAj_l(mai(4).mus.l',4);
+            MAj.ankle.l      =  MAj_l(mai(5).mus.l',5);  
+            MAj.subt.l       =  MAj_l(mai(6).mus.l',6); 
             % For the back muscles, we want left and right together: left
             % first, right second. In MuscleInfo, we first have the right
             % muscles (44:46) and then the left muscles (47:49). Since the back
             % muscles only depend on back dofs, we do not care if we extract
             % them "from the left or right leg" so here we just picked left.
-            MA.trunk_ext    =  MAj_l([47:49,mai(7).mus.l]',7);
-            MA.trunk_ben    =  MAj_l([47:49,mai(8).mus.l]',8);
-            MA.trunk_rot    =  MAj_l([47:49,mai(9).mus.l]',9);
+            MAj.trunk_ext    =  MAj_l([47:49,mai(7).mus.l]',7);
+            MAj.trunk_ben    =  MAj_l([47:49,mai(8).mus.l]',8);
+            MAj.trunk_rot    =  MAj_l([47:49,mai(9).mus.l]',9);
             % Right leg
             qinj_r = [Xkj_nsc(jointi.hip_flex.r*2-1,j+1),...
                 Xkj_nsc(jointi.hip_add.r*2-1,j+1),...
@@ -915,12 +915,12 @@ if solveProblem
                 Xkj_nsc(jointi.trunk.rot*2,j+1)];      
             [lMTj_r,vMTj_r,MAj_r] = f_lMT_vMT_dM(qinj_r,qdotinj_r);
             % Here we take the indices from left since the vector is 1:49
-            MA.hip_flex.r   =  MAj_r(mai(1).mus.l',1);
-            MA.hip_add.r    =  MAj_r(mai(2).mus.l',2);
-            MA.hip_rot.r    =  MAj_r(mai(3).mus.l',3);
-            MA.knee.r       =  MAj_r(mai(4).mus.l',4);
-            MA.ankle.r      =  MAj_r(mai(5).mus.l',5);
-            MA.subt.r       =  MAj_r(mai(6).mus.l',6);
+            MAj.hip_flex.r   =  MAj_r(mai(1).mus.l',1);
+            MAj.hip_add.r    =  MAj_r(mai(2).mus.l',2);
+            MAj.hip_rot.r    =  MAj_r(mai(3).mus.l',3);
+            MAj.knee.r       =  MAj_r(mai(4).mus.l',4);
+            MAj.ankle.r      =  MAj_r(mai(5).mus.l',5);
+            MAj.subt.r       =  MAj_r(mai(6).mus.l',6);
             % Both legs
             % In MuscleInfo, we first have the right back muscles (44:46) and 
             % then the left back muscles (47:49). Here we re-organize so that
@@ -1104,90 +1104,90 @@ if solveProblem
             end
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Call external function (run inverse dynamics)
-            [Tkj] = F([Xkj_nsc(:,j+1);Aj_nsc(:,j)]);  
+            [Tj] = F([Xkj_nsc(:,j+1);Aj_nsc(:,j)]);  
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Add path constraints
             % Null pelvis residuals
-            opti.subject_to(Tkj(ground_pelvisi,1) == 0);
+            opti.subject_to(Tj(ground_pelvisi,1) == 0);
             % Muscle-driven joint torques for the lower limbs and the trunk
             % Hip flexion, left
             Ft_hip_flex_l   = FTj(mai(1).mus.l',1);
-            T_hip_flex_l    = f_T27(MA.hip_flex.l,Ft_hip_flex_l);
-            opti.subject_to(Tkj(jointi.hip_flex.l,1)-(T_hip_flex_l + ...
+            T_hip_flex_l    = f_T27(MAj.hip_flex.l,Ft_hip_flex_l);
+            opti.subject_to(Tj(jointi.hip_flex.l,1)-(T_hip_flex_l + ...
                 Tau_passj.hip.flex.l - 0.1*Xkj_nsc(jointi.hip_flex.l*2,j+1)) == 0);
             % Hip flexion, right
             Ft_hip_flex_r   = FTj(mai(1).mus.r',1);
-            T_hip_flex_r    = f_T27(MA.hip_flex.r,Ft_hip_flex_r);
-            opti.subject_to(Tkj(jointi.hip_flex.r,1)-(T_hip_flex_r + ...
+            T_hip_flex_r    = f_T27(MAj.hip_flex.r,Ft_hip_flex_r);
+            opti.subject_to(Tj(jointi.hip_flex.r,1)-(T_hip_flex_r + ...
                 Tau_passj.hip.flex.r - 0.1*Xkj_nsc(jointi.hip_flex.r*2,j+1)) == 0);
             % Hip adduction, left
             Ft_hip_add_l    = FTj(mai(2).mus.l',1);
-            T_hip_add_l     = f_T27(MA.hip_add.l,Ft_hip_add_l);
-            opti.subject_to(Tkj(jointi.hip_add.l,1)-(T_hip_add_l + ...
+            T_hip_add_l     = f_T27(MAj.hip_add.l,Ft_hip_add_l);
+            opti.subject_to(Tj(jointi.hip_add.l,1)-(T_hip_add_l + ...
                 Tau_passj.hip.add.l - 0.1*Xkj_nsc(jointi.hip_add.l*2,j+1)) == 0);
             % Hip adduction, right
             Ft_hip_add_r    = FTj(mai(2).mus.r',1);
-            T_hip_add_r     = f_T27(MA.hip_add.r,Ft_hip_add_r);
-            opti.subject_to(Tkj(jointi.hip_add.r,1)-(T_hip_add_r + ...
+            T_hip_add_r     = f_T27(MAj.hip_add.r,Ft_hip_add_r);
+            opti.subject_to(Tj(jointi.hip_add.r,1)-(T_hip_add_r + ...
                 Tau_passj.hip.add.r - 0.1*Xkj_nsc(jointi.hip_add.r*2,j+1)) == 0);
             % Hip rotation, left
             Ft_hip_rot_l    = FTj(mai(3).mus.l',1);
-            T_hip_rot_l     = f_T27(MA.hip_rot.l,Ft_hip_rot_l);
-            opti.subject_to(Tkj(jointi.hip_rot.l,1)-(T_hip_rot_l + ...
+            T_hip_rot_l     = f_T27(MAj.hip_rot.l,Ft_hip_rot_l);
+            opti.subject_to(Tj(jointi.hip_rot.l,1)-(T_hip_rot_l + ...
                 Tau_passj.hip.rot.l - 0.1*Xkj_nsc(jointi.hip_rot.l*2,j+1)) == 0);
             % Hip rotation, right
             Ft_hip_rot_r    = FTj(mai(3).mus.r',1);
-            T_hip_rot_r     = f_T27(MA.hip_rot.r,Ft_hip_rot_r);
-            opti.subject_to(Tkj(jointi.hip_rot.r,1)-(T_hip_rot_r + ...
+            T_hip_rot_r     = f_T27(MAj.hip_rot.r,Ft_hip_rot_r);
+            opti.subject_to(Tj(jointi.hip_rot.r,1)-(T_hip_rot_r + ...
                 Tau_passj.hip.rot.r - 0.1*Xkj_nsc(jointi.hip_rot.r*2,j+1)) == 0);
             % Knee, left
             Ft_knee_l       = FTj(mai(4).mus.l',1);
-            T_knee_l        = f_T13(MA.knee.l,Ft_knee_l);
-            opti.subject_to(Tkj(jointi.knee.l,1)-(T_knee_l + ...
+            T_knee_l        = f_T13(MAj.knee.l,Ft_knee_l);
+            opti.subject_to(Tj(jointi.knee.l,1)-(T_knee_l + ...
                 Tau_passj.knee.l - 0.1*Xkj_nsc(jointi.knee.l*2,j+1)) == 0);   
             % Knee, right
             Ft_knee_r       = FTj(mai(4).mus.r',1);
-            T_knee_r        = f_T13(MA.knee.r,Ft_knee_r);
-            opti.subject_to(Tkj(jointi.knee.r,1)-(T_knee_r + ...
+            T_knee_r        = f_T13(MAj.knee.r,Ft_knee_r);
+            opti.subject_to(Tj(jointi.knee.r,1)-(T_knee_r + ...
                 Tau_passj.knee.r - 0.1*Xkj_nsc(jointi.knee.r*2,j+1)) == 0);
             % Ankle, left
             Ft_ankle_l      = FTj(mai(5).mus.l',1);
-            T_ankle_l       = f_T12(MA.ankle.l,Ft_ankle_l);
-            opti.subject_to(Tkj(jointi.ankle.l,1)-(T_ankle_l + ...
+            T_ankle_l       = f_T12(MAj.ankle.l,Ft_ankle_l);
+            opti.subject_to(Tj(jointi.ankle.l,1)-(T_ankle_l + ...
                 Tau_passj.ankle.l - 0.1*Xkj_nsc(jointi.ankle.l*2,j+1)) == 0);
             % Ankle, right
             Ft_ankle_r      = FTj(mai(5).mus.r',1);
-            T_ankle_r       = f_T12(MA.ankle.r,Ft_ankle_r);
-            opti.subject_to(Tkj(jointi.ankle.r,1)-(T_ankle_r + ...
+            T_ankle_r       = f_T12(MAj.ankle.r,Ft_ankle_r);
+            opti.subject_to(Tj(jointi.ankle.r,1)-(T_ankle_r + ...
                 Tau_passj.ankle.r - 0.1*Xkj_nsc(jointi.ankle.r*2,j+1)) == 0);
             % Subtalar, left
             Ft_subt_l       = FTj(mai(6).mus.l',1);
-            T_subt_l        = f_T12(MA.subt.l,Ft_subt_l);
-            opti.subject_to(Tkj(jointi.subt.l,1)-(T_subt_l + ...
+            T_subt_l        = f_T12(MAj.subt.l,Ft_subt_l);
+            opti.subject_to(Tj(jointi.subt.l,1)-(T_subt_l + ...
                 Tau_passj.subt.l - 0.1*Xkj_nsc(jointi.subt.l*2,j+1)) == 0);   
             % Subtalar, right
             Ft_subt_r       = FTj(mai(6).mus.r',1);
-            T_subt_r        = f_T12(MA.subt.r,Ft_subt_r);
-            opti.subject_to(Tkj(jointi.subt.r,1)-(T_subt_r + ...
+            T_subt_r        = f_T12(MAj.subt.r,Ft_subt_r);
+            opti.subject_to(Tj(jointi.subt.r,1)-(T_subt_r + ...
                 Tau_passj.subt.r - 0.1*Xkj_nsc(jointi.subt.r*2,j+1)) == 0);
             % Lumbar extension
             Ft_trunk_ext    = FTj([mai(7).mus.l,mai(7).mus.r]',1);
-            T_trunk_ext     = f_T6(MA.trunk_ext,Ft_trunk_ext);
-            opti.subject_to(Tkj(jointi.trunk.ext,1)-(T_trunk_ext + ...
+            T_trunk_ext     = f_T6(MAj.trunk_ext,Ft_trunk_ext);
+            opti.subject_to(Tj(jointi.trunk.ext,1)-(T_trunk_ext + ...
                 Tau_passj.trunk.ext - 0.1*Xkj_nsc(jointi.trunk.ext*2,j+1)) == 0);
             % Lumbar bending
             Ft_trunk_ben    = FTj([mai(8).mus.l,mai(8).mus.r]',1);
-            T_trunk_ben     = f_T6(MA.trunk_ben,Ft_trunk_ben);
-            opti.subject_to(Tkj(jointi.trunk.ben,1)-(T_trunk_ben + ...
+            T_trunk_ben     = f_T6(MAj.trunk_ben,Ft_trunk_ben);
+            opti.subject_to(Tj(jointi.trunk.ben,1)-(T_trunk_ben + ...
                 Tau_passj.trunk.ben - 0.1*Xkj_nsc(jointi.trunk.ben*2,j+1)) == 0);
             % Lumbar rotation
             Ft_trunk_rot    = FTj([mai(9).mus.l,mai(9).mus.r]',1);
-            T_trunk_rot     = f_T6(MA.trunk_rot,Ft_trunk_rot);
-            opti.subject_to(Tkj(jointi.trunk.rot,1)-(T_trunk_rot + ...
+            T_trunk_rot     = f_T6(MAj.trunk_rot,Ft_trunk_rot);
+            opti.subject_to(Tj(jointi.trunk.rot,1)-(T_trunk_rot + ...
                 Tau_passj.trunk.rot - 0.1*Xkj_nsc(jointi.trunk.rot*2,j+1)) == 0);
             % Torque-driven joint torques for the arms
             % Arms
-            opti.subject_to(Tkj(armsi,1)/scaling.ArmTau - a_akj(:,j+1) + ...
+            opti.subject_to(Tj(armsi,1)/scaling.ArmTau - a_akj(:,j+1) + ...
                 0.1/scaling.ArmTau*Xkj_nsc(armsi*2,j+1) == 0);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Activation dynamics (implicit formulation)            
@@ -1202,14 +1202,14 @@ if solveProblem
             % Constraints to prevent parts of the skeleton to penetrate each
             % other.
             % Origins calcaneus (transv plane) at minimum 9 cm from each other.
-            opti.subject_to(0.0081 < f_Jnn2(Tkj(calcOr.r,1) - Tkj(calcOr.l,1)) < 4);  
+            opti.subject_to(0.0081 < f_Jnn2(Tj(calcOr.r,1) - Tj(calcOr.l,1)) < 4);  
             % Constraint to prevent the arms to penetrate the skeleton       
             % Origins femurs and ipsilateral hands (transv plane) at minimum 
             % 18 cm from each other.
-            opti.subject_to(0.0324 < f_Jnn2(Tkj(femurOr.r,1) - Tkj(handOr.r,1)) < 4);
-            opti.subject_to(0.0324 < f_Jnn2(Tkj(femurOr.l,1) - Tkj(handOr.l,1)) < 4);
+            opti.subject_to(0.0324 < f_Jnn2(Tj(femurOr.r,1) - Tj(handOr.r,1)) < 4);
+            opti.subject_to(0.0324 < f_Jnn2(Tj(femurOr.l,1) - Tj(handOr.l,1)) < 4);
             % Origins tibia (transv plane) at minimum 11 cm from each other.   
-            opti.subject_to(0.0121 < f_Jnn2(Tkj(tibiaOr.r,1) - Tkj(tibiaOr.l,1)) < 4);     
+            opti.subject_to(0.0121 < f_Jnn2(Tj(tibiaOr.r,1) - Tj(tibiaOr.l,1)) < 4);     
         end % End loop over collocation points
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Add equality constraints (next interval starts with end values of 
@@ -1270,7 +1270,6 @@ if solveProblem
     options.ipopt.mu_strategy      = 'adaptive';
     options.ipopt.max_iter = 10000;
     options.ipopt.tol = 1*10^(-tol_ipopt);
-    opti.solver('ipopt', options);    
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);
@@ -1377,30 +1376,32 @@ if solveProblem
 %         end
 %         clear w_opt;
     end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Solve problem
-    sol = opti.solve(); 
+    % Opti does not use bounds on variables but constraints. This function
+    % adjusts for that.
+    [w_opt,stats] = solve_NLPSOL(opti,options);    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     diary off
     % Extract results 
-    w_opt.tf_opt = sol.value(tf);
-    w_opt.a_opt = sol.value(a)';
-    w_opt.a_col_opt = sol.value(a_col)';
-    w_opt.FTtilde_opt = sol.value(FTtilde)';
-    w_opt.FTtilde_col_opt = sol.value(FTtilde_col)';
-    w_opt.X_opt = sol.value(X)';
-    w_opt.X_col_opt = sol.value(X_col)';
-    w_opt.a_a_opt = sol.value(a_a)';
-    w_opt.a_a_col_opt = sol.value(a_a_col)';
-    w_opt.vA_opt = sol.value(vA)';
-    w_opt.dFTtilde_opt = sol.value(dFTtilde)';
-    w_opt.qdotdot_opt = sol.value(A)';
-    w_opt.e_a_opt = sol.value(e_a)';
+%     w_opt.tf_opt = sol.value(tf);
+%     w_opt.a_opt = sol.value(a)';
+%     w_opt.a_col_opt = sol.value(a_col)';
+%     w_opt.FTtilde_opt = sol.value(FTtilde)';
+%     w_opt.FTtilde_col_opt = sol.value(FTtilde_col)';
+%     w_opt.X_opt = sol.value(X)';
+%     w_opt.X_col_opt = sol.value(X_col)';
+%     w_opt.a_a_opt = sol.value(a_a)';
+%     w_opt.a_a_col_opt = sol.value(a_a_col)';
+%     w_opt.vA_opt = sol.value(vA)';
+%     w_opt.dFTtilde_opt = sol.value(dFTtilde)';
+%     w_opt.qdotdot_opt = sol.value(A)';
+%     w_opt.e_a_opt = sol.value(e_a)';
     % Create setup
     setup.tolerance.ipopt = tol_ipopt;
     setup.bounds = bounds;
     setup.scaling = scaling;
     setup.guess = guess;
-    % Extract stats
-    stats = sol.stats();
     % Save results and set    
     save([pathresults,'/',namescript,'/w',savename],'w_opt');
     save([pathresults,'/',namescript,'/stats',savename],'stats');
