@@ -24,8 +24,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-% num_set = [1,0,0,1,0,1,0]; % This configuration solves the problem
-num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
+num_set = [1,0,0,1,0,1,0]; % This configuration solves the problem
+% num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -763,9 +763,9 @@ if solveProblem
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define static parameters
     % Final time
-    tf = opti.variable();
-    opti.subject_to(bounds.tf.lower < tf < bounds.tf.upper);
-    opti.set_initial(tf, guess.tf);
+    tf = opti.variable(1,N);
+    opti.subject_to(bounds.tf.lower*ones(1,N) < tf < bounds.tf.upper*ones(1,N));
+    opti.set_initial(tf, guess.tf*ones(1,N));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define states 
     % Muscle activations at mesh points
@@ -834,14 +834,18 @@ if solveProblem
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Provide expression for the distance traveled
     dist_trav_tot = X_nsc((2*jointi.pelvis.tx-1),end) - ...
-        X_nsc((2*jointi.pelvis.tx-1),1); 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-    % Time step
-    h = tf/N; 
+        X_nsc((2*jointi.pelvis.tx-1),1);  
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     J = 0; % Initialize cost function
     % Loop over mesh points
     for k=1:N
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+        % Time step
+        h = tf(1,k)/N;
+        if k ~= N
+            % Add equality constraints (final time is constant)
+            opti.subject_to(tf(1,k+1) == tf(1,k));
+        end        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Variables within current mesh interval
         % States      
@@ -1263,7 +1267,7 @@ if solveProblem
     jointi.elb.l:jointi.elb.l]-jointi.sh_flex.l+1;
     opti.subject_to(a_a(:,end) - a_a(orderArmInv,1) == 0);
     % Average speed
-    vel_aver_tot = dist_trav_tot/tf; 
+    vel_aver_tot = dist_trav_tot/tf(1,1); 
     opti.subject_to(vel_aver_tot - v_tgt == 0)  
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%            
     % Create NLP solver
@@ -1419,8 +1423,9 @@ if analyseResults
         load([pathresults,'/',namescript,'/w',savename]);
         load([pathresults,'/',namescript,'/stats',savename]);
     end 
-    NParameters = 1;    
-    tf_opt = w_opt(1:NParameters);
+    NParameters = N;    
+    tf_opt_all = w_opt(1:NParameters);
+    tf_opt = tf_opt_all(1);
     starti = NParameters+1;
     a_opt = reshape(w_opt(starti:starti+NMuscle*(N+1)-1),NMuscle,N+1)';
     starti = starti + NMuscle*(N+1);
