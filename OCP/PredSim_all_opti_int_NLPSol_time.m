@@ -844,7 +844,7 @@ if solveProblem
         h = tf(1,k)/N;
         if k ~= N
             % Add equality constraints (final time is constant)
-            opti.subject_to(tf(1,k+1) == tf(1,k));
+            opti.subject_to(tf(1,k+1) - tf(1,k) == 0);
         end        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Variables within current mesh interval
