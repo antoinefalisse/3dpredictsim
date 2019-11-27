@@ -1391,8 +1391,8 @@ if solveProblem
     w_opt.a_a_opt = sol.value(a_a)';
     w_opt.a_a_col_opt = sol.value(a_a_col)';
     w_opt.vA_opt = sol.value(vA)';
-    w_opt.dFTtilde_opt = sol.value(dFTtilde)';
-    w_opt.qdotdot_opt = sol.value(A)';
+    w_opt.dFTtilde_opt = sol.value(dFTtilde_col)';
+    w_opt.qdotdot_opt = sol.value(A_col)';
     w_opt.e_a_opt = sol.value(e_a)';
     % Create setup
     setup.tolerance.ipopt = tol_ipopt;

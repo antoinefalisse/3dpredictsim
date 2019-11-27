@@ -194,8 +194,6 @@ guess.Qdotdots_all.data(:,jointi.elb.r) = Qdotdots_spline.data(:,strcmp(Qs.colhe
 guess.Qdotdots = interp1(round(Qs_time,4),guess.Qdotdots_all.data,...
     round(interval,4));
 
-%% Add last mest point
-
 %% Muscle variables
 guess.a = 0.1*ones(N,NMuscle);
 guess.vA = 0.01*ones(N,NMuscle);
@@ -280,11 +278,11 @@ guess.dFTtilde  = (guess.dFTtilde)./repmat(scaling.dFTtilde,N,...
     guess.dFTtilde_col = zeros(d*N,NMuscle);
     guess.Qdotdots_col = zeros(d*N,nq.all);
 for k=1:N
-    guess.a_col((k-1)*d+1:k*d,:) = repmat(guess.a(1,:),d,1); 
-    guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(1,:),d,1);
-    guess.QsQdots_col((k-1)*d+1:k*d,:) = repmat(guess.QsQdots(1,:),d,1);
-    guess.a_a_col((k-1)*d+1:k*d,:) = repmat(guess.a_a(1,:),d,1);
-    guess.dFTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.dFTtilde(1,:),d,1);
-    guess.Qdotdots_col((k-1)*d+1:k*d,:) = repmat(guess.Qdotdots(1,:),d,1);
+    guess.a_col((k-1)*d+1:k*d,:) = repmat(guess.a(k,:),d,1); 
+    guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(k,:),d,1);
+    guess.QsQdots_col((k-1)*d+1:k*d,:) = repmat(guess.QsQdots(k,:),d,1);
+    guess.a_a_col((k-1)*d+1:k*d,:) = repmat(guess.a_a(k,:),d,1);
+    guess.dFTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.dFTtilde(k,:),d,1);
+    guess.Qdotdots_col((k-1)*d+1:k*d,:) = repmat(guess.Qdotdots(k,:),d,1);
 end
 end
