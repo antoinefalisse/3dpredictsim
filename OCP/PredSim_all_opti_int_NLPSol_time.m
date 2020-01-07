@@ -1276,6 +1276,7 @@ if solveProblem
     options.ipopt.mu_strategy      = 'adaptive';
     options.ipopt.max_iter = 10000;
     options.ipopt.tol = 1*10^(-tol_ipopt);
+    options.ipopt.linear_solver = 'ma97';
     % Create and save diary
     p = mfilename('fullpath');
     [~,namescript,~] = fileparts(p);

@@ -24,8 +24,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,1,0,1,0,1,0]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
+% num_set = [1,1,0,1,0,1,0]; % This configuration solves the problem
+num_set = [0,1,1,0,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -2088,6 +2088,18 @@ if decomposeCost
     assertCost = J_optf - 1/(dist_trav_opt)*(E_costf+A_costf+Arm_costf+...
         Qdotdot_costf+Pass_costf+vA_costf+dFTtilde_costf+...
         QdotdotArm_costf);
+    contributionCost.absoluteValues = 1/(dist_trav_opt)*[E_costf,A_costf,...
+        Arm_costf,Qdotdot_costf,Pass_costf,vA_costf,dFTtilde_costf,...
+        QdotdotArm_costf];
+    contributionCost.relativeValues = 1/(dist_trav_opt)*[E_costf,A_costf,...
+        Arm_costf,Qdotdot_costf,Pass_costf,vA_costf,dFTtilde_costf,...
+        QdotdotArm_costf]./J_optf*100;
+    contributionCost.relativeValuesRound2 = ...
+        round(contributionCost.relativeValues,2);
+    contributionCost.labels = {'metabolicEnergy','muscleActivation',...
+        'armExcitation','jointAccelerations','passiveTorques','dadt','dFdt',...
+        'armAccelerations'};
+    
 end 
 
     %% Reconstruct full gait cycle
