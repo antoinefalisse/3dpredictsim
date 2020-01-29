@@ -24,8 +24,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-% num_set = [1,0,0,1,0,1,0]; % This configuration solves the problem
-num_set = [0,1,1,0,0,0,1]; % This configuration analyzes the results
+num_set = [1,0,0,1,0,1,0]; % This configuration solves the problem
+% num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -1316,7 +1316,7 @@ if solveProblem
     opti.minimize(J);
     options.ipopt.hessian_approximation = 'limited-memory';
     options.ipopt.mu_strategy      = 'adaptive';
-    options.ipopt.max_iter = 2;
+    options.ipopt.max_iter = 10000;
     options.ipopt.tol = 1*10^(-tol_ipopt);
 %     opti.solver('ipopt', options);  
     % Create and save diary
