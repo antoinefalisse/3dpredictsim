@@ -14,15 +14,15 @@ clc
 
 %% User inputs
 runPolynomialfit = 1;
-saveQdot = 1;
-savePolynomials = 1;
+saveQdot = 0;
+savePolynomials = 0;
 
 %% Extract time and angles from dummy motion
 subject = 'subject1_mtp';
 pathmain = pwd;
 name_dummymotion = 'dummy_motion_mtp.mot';
 path_dummymotion = [pathmain,'/MuscleAnalysis/dummy_motion/'];
-path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA_',subject,'/'];
+path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA/ResultsMA_',subject,'/'];
 
 dummy_motion = importdata([path_dummymotion,name_dummymotion]);
 % 15 dofs (mtp locked)
@@ -34,8 +34,8 @@ q = dummy_motion.data(:,order_Qs).*(pi/180);
 
 % Generate random numbers between -1000 and 1000 (°/s) 
 if saveQdot
-    a = -1000;
-    b = 1000;
+    a = -10;
+    b = 60;
     r1 = (b-a).*rand(size(q,1),1) + a;
     r2 = (b-a).*rand(size(q,1),1) + a;
     r3 = (b-a).*rand(size(q,1),1) + a;
@@ -80,7 +80,7 @@ MA.trunk.ben = importdata([path_resultsMA,'subject01_MuscleAnalysis_MomentArm_lu
 MA.trunk.rot = importdata([path_resultsMA,'subject01_MuscleAnalysis_MomentArm_lumbar_rotation.sto']);
 
 %% Organize MuscleData
-if runPolynomialfit
+% if runPolynomialfit
     MuscleData.dof_names = dummy_motion.colheaders(order_Qs); 
     muscleNames = {'glut_med1_r','glut_med2_r','glut_med3_r',...
         'glut_min1_r','glut_min2_r','glut_min3_r','semimem_r',...
@@ -109,14 +109,14 @@ if runPolynomialfit
     end
     MuscleData.q = q;
     MuscleData.qdot = qdot;
-end
+% end
 
 %% Call PolynomialFit
 if runPolynomialfit
     [muscle_spanning_joint_INFO,MuscleInfo] = ...
         PolynomialFit(MuscleData);
     if savePolynomials
-        save(['MuscleData_',subject],'MuscleData')
+%         save(['MuscleData_',subject],'MuscleData')
         save(['muscle_spanning_joint_INFO_',subject],'muscle_spanning_joint_INFO')
         save(['MuscleInfo_',subject],'MuscleInfo')
     end
@@ -149,7 +149,7 @@ end
 f_lMT_vMT_dM = Function('f_lMT_vMT_dM',{qin,qdotin},{lMT,vMT,dM});
 
 %% Check results
-load(['MuscleData_',subject])
+% load(['MuscleData_',subject])
 lMT_out_r = zeros(size(q,1),NMuscle);
 vMT_out_r = zeros(size(q,1),NMuscle);
 dM_out_r = zeros(size(q,1),NMuscle,q_leg_trunk);
