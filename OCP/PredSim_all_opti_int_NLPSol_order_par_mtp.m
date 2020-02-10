@@ -435,6 +435,7 @@ if ispc
         case {'AD'}   
             if cm == 1
                 F = external('F','PredSim.dll');   
+                F2 = external('F','PredSim_mtp.dll'); 
                 if analyseResults
                     F1 = external('F','PredSim_pp.dll');
                 end
@@ -466,8 +467,14 @@ end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
-% vec1 = -ones(87,1);
-% res1 = full(F(vec1));
+vec1 = -5*ones(87,1);
+res1 = full(F(vec1));
+vec2 = -5*ones(93,1);
+vec2(19*2-1:20*2) = 0;
+vec2(31*2+19) = 0;
+res2 = full(F2(vec2));
+
+
 % res2 = full(F1(vec1));
 
 %% Indices external function
