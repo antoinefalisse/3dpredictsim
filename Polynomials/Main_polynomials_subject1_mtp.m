@@ -20,7 +20,7 @@ savePolynomials = 1;
 %% Extract time and angles from dummy motion
 subject = 'subject1_mtp';
 pathmain = pwd;
-name_dummymotion = 'dummy_motion.mot';
+name_dummymotion = 'dummy_motion_mtp.mot';
 path_dummymotion = [pathmain,'/MuscleAnalysis/dummy_motion/'];
 path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA_',subject,'/'];
 
