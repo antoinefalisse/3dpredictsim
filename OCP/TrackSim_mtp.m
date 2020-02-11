@@ -202,6 +202,7 @@ residualsi          = jointi.pelvis.tilt:jointi.elb.r; % all
 ground_pelvisi      = jointi.pelvis.tilt:jointi.pelvis.tz; % ground-pelvis
 trunki              = jointi.trunk.ext:jointi.trunk.rot; % trunk
 armsi               = jointi.sh_flex.l:jointi.elb.r; % arms
+mtpi                = jointi.mtp.l:jointi.mtp.r; % mtp
 residuals_acti      = jointi.hip_flex.l:jointi.elb.r; % all but gr-pelvis
 residual_bptyi      = [jointi.pelvis.tilt:jointi.pelvis.tx,...
     jointi.pelvis.tz:jointi.elb.r]; % all but pelvis_ty
@@ -211,6 +212,7 @@ nq.abs              = length(ground_pelvisi); % ground-pelvis
 nq.act              = nq.all-nq.abs;% all but ground-pelvis
 nq.trunk            = length(trunki); % trunk
 nq.arms             = length(armsi); % arms
+nq.mtp              = length(mtpi); % mtp
 nq.leg              = 10; % #joints needed for polynomials
 Qsi                 = 1:2:2*nq.all; % indices Qs only
 % Second, GRFs
@@ -351,6 +353,7 @@ joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
     'knee_angle_l','knee_angle_r','ankle_angle_l','ankle_angle_r',...
     'subtalar_angle_l','subtalar_angle_r',...
+    'mtp_angle_l','mtp_angle_r', ...
     'lumbar_extension','lumbar_bending','lumbar_rotation',...
     'arm_flex_l','arm_add_l','arm_rot_l',...
     'arm_flex_r','arm_add_r','arm_rot_r',...
@@ -387,18 +390,18 @@ GRF.Mcop.allinterp = interp1(round(GRF.Mcop.all(:,1),4),...
 %% Bounds
 pathBounds = [pathRepo,'/Bounds'];
 addpath(genpath(pathBounds));
-[bounds,scaling] = getBounds_tracking(Qs,NMuscle,nq,jointi,dev_cm,GRF);
+[bounds,scaling] = getBounds_tracking_mtp(Qs,NMuscle,nq,jointi,dev_cm,GRF);
 
 %% Initial guess
 pathIG = [pathRepo,'/IG'];
 addpath(genpath(pathIG));
 % Data-informed initial guess
-guess = getGuess_DI_tracking(Qs,nq,N,NMuscle,jointi,scaling);
+guess = getGuess_DI_tracking_mtp(Qs,nq,N,NMuscle,jointi,scaling);
 % This allows visualizing the initial guess and the bounds
 if checkBoundsIG
     pathPlots = [pathRepo,'/Plots'];
     addpath(genpath(pathPlots));
-    plot_BoundsVSInitialGuess_tracking
+    plot_BoundsVSInitialGuess_tracking_mtp
 end
 
 %% Formulate the NLP
