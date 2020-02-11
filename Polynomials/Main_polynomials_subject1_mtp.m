@@ -15,7 +15,7 @@ clc
 %% User inputs
 runPolynomialfit = 1;
 saveQdot = 0;
-savePolynomials = 0;
+savePolynomials = 1;
 
 %% Extract time and angles from dummy motion
 subject = 'subject1_mtp';
@@ -34,8 +34,8 @@ q = dummy_motion.data(:,order_Qs).*(pi/180);
 
 % Generate random numbers between -1000 and 1000 (°/s) 
 if saveQdot
-    a = -10;
-    b = 60;
+    a = -1000;
+    b = 1000;
     r1 = (b-a).*rand(size(q,1),1) + a;
     r2 = (b-a).*rand(size(q,1),1) + a;
     r3 = (b-a).*rand(size(q,1),1) + a;
@@ -114,7 +114,7 @@ MA.trunk.rot = importdata([path_resultsMA,'subject01_MuscleAnalysis_MomentArm_lu
 %% Call PolynomialFit
 if runPolynomialfit
     [muscle_spanning_joint_INFO,MuscleInfo] = ...
-        PolynomialFit(MuscleData);
+        PolynomialFit_mtp(MuscleData);
     if savePolynomials
 %         save(['MuscleData_',subject],'MuscleData')
         save(['muscle_spanning_joint_INFO_',subject],'muscle_spanning_joint_INFO')
