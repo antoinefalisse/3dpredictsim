@@ -26,7 +26,7 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,1,0,1,0,1]; % This configuration solves the problem
+num_set = [1,0,0,0,0,0]; % This configuration solves the problem
 % num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
@@ -337,7 +337,7 @@ load([pathpolynomial,'/MuscleInfo_',subject,'.mat']);
 % all muscles from the back (indices 47:49).
 musi_pol = [musi,47,48,49];
 NMuscle_pol = NMuscle/2+3;
-CasADiFunctions_tracking
+CasADiFunctions_tracking_mtp
 
 %% Passive joint torques
 % We extract the parameters for the passive torques of the lower limbs and
@@ -447,12 +447,19 @@ if solveProblem
     w               = [w {a_a0}];
     lbw             = [lbw; bounds.a_a.lower'];
     ubw             = [ubw; bounds.a_a.upper'];
-    w0              = [w0;  guess.a_a(1,:)'];          
+    w0              = [w0;  guess.a_a(1,:)'];  
+    % Mtp activations
+    a_mtp0          = MX.sym('a_mtp0',nq.mtp);
+    w               = [w {a_mtp0}];
+    lbw             = [lbw; bounds.a_mtp.lower'];
+    ubw             = [ubw; bounds.a_mtp.upper'];
+    w0              = [w0;  guess.a_mtp(1,:)'];  
     % "Lift" initial conditions
     ak          = a0;
     FTtildek    = FTtilde0;
     Xk          = X0;
-    a_ak        = a_a0;     
+    a_ak        = a_a0;
+    a_mtpk      = a_mtp0;
     % Time step
     h = (time_opt(2)-time_opt(1))/N;
     % Loop over mesh points
@@ -482,6 +489,12 @@ if solveProblem
         lbw                 = [lbw; bounds.e_a.lower'];
         ubw                 = [ubw; bounds.e_a.upper'];
         w0                  = [w0; guess.e_a(k+1,:)'];
+        % Mtp excitations
+        e_mtpk              = MX.sym(['e_mtp_' num2str(k)], nq.mtp);
+        w                   = [w {e_mtpk}];
+        lbw                 = [lbw; bounds.e_mtp.lower'];
+        ubw                 = [ubw; bounds.e_mtp.upper'];
+        w0                  = [w0; guess.e_mtp(k+1,:)'];
         % Define states at collocation points    
         % Muscle activations
         akj = {};
@@ -514,11 +527,20 @@ if solveProblem
         % Arm activations
         a_akj = {};
         for j=1:d
-            a_akj{j}= MX.sym(['	a_a_' num2str(k) '_' num2str(j)], nq.arms);
+            a_akj{j}= MX.sym(['a_a_' num2str(k) '_' num2str(j)], nq.arms);
             w       = {w{:}, a_akj{j}};
             lbw     = [lbw; bounds.a_a.lower'];
             ubw     = [ubw; bounds.a_a.upper'];
             w0      = [w0;  guess.a_a(k+1,:)'];
+        end   
+        % Mtp activations
+        a_mtpkj = {};
+        for j=1:d
+            a_mtpkj{j}= MX.sym(['a_mtp_' num2str(k) '_' num2str(j)], nq.mtp);
+            w       = {w{:}, a_mtpkj{j}};
+            lbw     = [lbw; bounds.a_mtp.lower'];
+            ubw     = [ubw; bounds.a_mtp.upper'];
+            w0      = [w0;  guess.a_mtp(k+1,:)'];
         end   
         % Unscale variables for later use
         Xk_nsc          = Xk.*scaling.QsQdots';
@@ -644,6 +666,7 @@ if solveProblem
             Xk_nsc(jointi.knee.l*2-1,1), ...
             Xk_nsc(jointi.ankle.l*2-1,1),...
             Xk_nsc(jointi.subt.l*2-1,1),...
+            Xk_nsc(jointi.mtp.l*2-1,1),...
             Xk_nsc(jointi.trunk.ext*2-1,1),...
             Xk_nsc(jointi.trunk.ben*2-1,1),...
             Xk_nsc(jointi.trunk.rot*2-1,1)];  
@@ -653,6 +676,7 @@ if solveProblem
             Xk_nsc(jointi.knee.l*2,1),...
             Xk_nsc(jointi.ankle.l*2,1),...
             Xk_nsc(jointi.subt.l*2,1),...
+            Xk_nsc(jointi.mtp.l*2,1),...
             Xk_nsc(jointi.trunk.ext*2,1),...
             Xk_nsc(jointi.trunk.ben*2,1),...
             Xk_nsc(jointi.trunk.rot*2,1)];  
@@ -668,9 +692,9 @@ if solveProblem
         % muscles (44:46) and then the left muscles (47:49). Since the back
         % muscles only depend on back dofs, we do not care if we extract
         % them "from the left or right leg" so here we just picked left.
-        MA.trunk_ext    =  MA_l([47:49,mai(7).mus.l]',7);
-        MA.trunk_ben    =  MA_l([47:49,mai(8).mus.l]',8);
-        MA.trunk_rot    =  MA_l([47:49,mai(9).mus.l]',9);
+        MA.trunk_ext    =  MA_l([47:49,mai(8).mus.l]',7);
+        MA.trunk_ben    =  MA_l([47:49,mai(9).mus.l]',8);
+        MA.trunk_rot    =  MA_l([47:49,mai(10).mus.l]',9);
         % Right leg
         qin_r = [Xk_nsc(jointi.hip_flex.r*2-1,1),...
             Xk_nsc(jointi.hip_add.r*2-1,1),...
@@ -678,6 +702,7 @@ if solveProblem
             Xk_nsc(jointi.knee.r*2-1,1),...
             Xk_nsc(jointi.ankle.r*2-1,1),...
             Xk_nsc(jointi.subt.r*2-1,1),...
+            Xk_nsc(jointi.mtp.r*2-1,1),...
             Xk_nsc(jointi.trunk.ext*2-1,1),...
             Xk_nsc(jointi.trunk.ben*2-1,1),...
             Xk_nsc(jointi.trunk.rot*2-1,1)];  
@@ -687,6 +712,7 @@ if solveProblem
             Xk_nsc(jointi.knee.r*2,1),...
             Xk_nsc(jointi.ankle.r*2,1),...
             Xk_nsc(jointi.subt.r*2,1),...
+            Xk_nsc(jointi.mtp.r*2,1),...
             Xk_nsc(jointi.trunk.ext*2,1),...
             Xk_nsc(jointi.trunk.ben*2,1),...
             Xk_nsc(jointi.trunk.rot*2,1)];      
@@ -753,30 +779,68 @@ if solveProblem
             Xk_nsc(jointi.trunk.ben*2,1));
         Tau_passk.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
             theta.pass.trunk.rot,Xk_nsc(jointi.trunk.rot*2-1,1),...
-            Xk_nsc(jointi.trunk.rot*2,1));        
-        Tau_passk_all = [Tau_passk.hip.flex.l,Tau_passk.hip.flex.r,...
-            Tau_passk.hip.add.l,Tau_passk.hip.add.r,...
-            Tau_passk.hip.rot.l,Tau_passk.hip.rot.r,...
-            Tau_passk.knee.l,Tau_passk.knee.r,Tau_passk.ankle.l,...
-            Tau_passk.ankle.r,Tau_passk.subt.l,Tau_passk.subt.r,...
-            Tau_passk.trunk.ext,Tau_passk.trunk.ben,...
-            Tau_passk.trunk.rot]';
+            Xk_nsc(jointi.trunk.rot*2,1));
+        
+        stiffnessArm = 0;
+        dampingArm = 0.1;
+        Tau_passk.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_flex.l*2-1,1), Xk_nsc(jointi.sh_flex.l*2,1));
+        Tau_passk.sh_add.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_add.l*2-1,1), Xk_nsc(jointi.sh_add.l*2,1));
+        Tau_passk.sh_rot.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_rot.l*2-1,1), Xk_nsc(jointi.sh_rot.l*2,1));
+        Tau_passk.sh_flex.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_flex.r*2-1,1), Xk_nsc(jointi.sh_flex.r*2,1));
+        Tau_passk.sh_add.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_add.r*2-1,1), Xk_nsc(jointi.sh_add.r*2,1));
+        Tau_passk.sh_rot.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.sh_rot.r*2-1,1), Xk_nsc(jointi.sh_rot.r*2,1));
+        Tau_passk.elb.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.elb.l*2-1,1), Xk_nsc(jointi.elb.l*2,1));
+        Tau_passk.elb.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_nsc(jointi.elb.r*2-1,1), Xk_nsc(jointi.elb.r*2,1));
+        
+        Tau_passk.arm = [Tau_passk.sh_flex.l; Tau_passk.sh_add.l; ...
+            Tau_passk.sh_rot.l; Tau_passk.sh_flex.r; Tau_passk.sh_add.r; ...
+            Tau_passk.sh_rot.r; Tau_passk.elb.l; Tau_passk.elb.r];
+        
+        stiffnessMtp = 1.5/(pi/180);
+        dampingMtp = 0.5;
+        Tau_passk.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Xk_nsc(jointi.mtp.l*2-1,1), Xk_nsc(jointi.mtp.l*2,1));
+        Tau_passk.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Xk_nsc(jointi.mtp.r*2-1,1), Xk_nsc(jointi.mtp.r*2,1));  
+        
+        Tau_passk.mtp.all = [Tau_passk.mtp.l; Tau_passk.mtp.r];
+        
+%         Tau_passk_all = [Tau_passk.hip.flex.l,Tau_passk.hip.flex.r,...
+%             Tau_passk.hip.add.l,Tau_passk.hip.add.r,...
+%             Tau_passk.hip.rot.l,Tau_passk.hip.rot.r,...
+%             Tau_passk.knee.l,Tau_passk.knee.r,Tau_passk.ankle.l,...
+%             Tau_passk.ankle.r,Tau_passk.subt.l,Tau_passk.subt.r,...
+%             Tau_passk.trunk.ext,Tau_passk.trunk.ben,...
+%             Tau_passk.trunk.rot,Tau_passk.mtp.l,Tau_passk.mtp.r,...
+%             Tau_passk.sh_flex.l, Tau_passk.sh_add.l, Tau_passk.sh_rot.l, ...
+%             Tau_passk.sh_flex.r, Tau_passk.sh_add.r, Tau_passk.sh_rot.r]';
         % Loop over collocation points
         Xk_nsc_end          = D(1)*Xk_nsc;
         FTtildek_nsc_end    = D(1)*FTtildek_nsc;
         ak_end              = D(1)*ak;
         a_ak_end            = D(1)*a_ak;
+        a_mtpk_end          = D(1)*a_mtpk;
         for j=1:d
             % Expression for the state derivatives at the collocation point
             xp_nsc          = C(1,j+1)*Xk_nsc;
             FTtildep_nsc    = C(1,j+1)*FTtildek_nsc;
             ap              = C(1,j+1)*ak;
             a_ap            = C(1,j+1)*a_ak;
+            a_mtpp          = C(1,j+1)*a_mtpk;
             for r=1:d
                 xp_nsc       = xp_nsc + C(r+1,j+1)*Xkj_nsc{r};
                 FTtildep_nsc = FTtildep_nsc + C(r+1,j+1)*FTtildekj_nsc{r};
                 ap           = ap + C(r+1,j+1)*akj{r};
                 a_ap         = a_ap + C(r+1,j+1)*a_akj{r};
+                a_mtpp       = a_mtpp + C(r+1,j+1)*a_mtpkj{r};
             end 
             % Append collocation equations
             % Dynamic constraints are scaled using the same scale
@@ -806,7 +870,8 @@ if solveProblem
                 Xkj_nsc{j}(46); Ak_nsc(23); Xkj_nsc{j}(48); Ak_nsc(24); ...
                 Xkj_nsc{j}(50); Ak_nsc(25); Xkj_nsc{j}(52); Ak_nsc(26); ...
                 Xkj_nsc{j}(54); Ak_nsc(27); Xkj_nsc{j}(56); Ak_nsc(28); ...
-                Xkj_nsc{j}(58); Ak_nsc(29);];
+                Xkj_nsc{j}(58); Ak_nsc(29); Xkj_nsc{j}(60); Ak_nsc(30); ...
+                Xkj_nsc{j}(62); Ak_nsc(31)];
             g       = {g{:}, (h*xj_nsc - xp_nsc)./(scaling.QsQdots')};
             lbg     = [lbg; zeros(2*nq.all,1)];
             ubg     = [ubg; zeros(2*nq.all,1)];   
@@ -815,31 +880,37 @@ if solveProblem
             g       = {g{:}, (h*dadt - a_ap)./scaling.a_a};
             lbg     = [lbg; zeros(nq.arms,1)];
             ubg     = [ubg; zeros(nq.arms,1)]; 
+            % Mtp activation dynamics (explicit formulation)
+            da_mtpdt    = f_MtpActivationDynamics(e_mtpk,a_mtpkj{j});
+            g           = {g{:}, (h*da_mtpdt - a_mtpp)./scaling.a_mtp};
+            lbg         = [lbg; zeros(nq.mtp,1)];
+            ubg         = [ubg; zeros(nq.mtp,1)]; 
+            
             % Add contribution to the end state
             Xk_nsc_end = Xk_nsc_end + D(j+1)*Xkj_nsc{j};
             FTtildek_nsc_end = FTtildek_nsc_end + D(j+1)*FTtildekj_nsc{j};
             ak_end = ak_end + D(j+1)*akj{j};  
-            a_ak_end = a_ak_end + D(j+1)*a_akj{j};    
+            a_ak_end = a_ak_end + D(j+1)*a_akj{j};   
+            a_mtpk_end = a_mtpk_end + D(j+1)*a_mtpkj{j}; 
             % Add contribution to quadrature function
             J = J + ...
-                W.Qs*B(j+1)*(f_J28(Xk(Qsi(residual_bptyi),1)-...
+                W.Qs*B(j+1)*(f_J30(Xk(Qsi(residual_bptyi),1)-...
                     Qs.allinterpfilt(k+1,residual_bptyi+1)'... 
                     ./scaling.Qs(residual_bptyi)'))*h +...
                 W.GRF*B(j+1)*(f_J6((Tk(GRFi.all,1)./scaling.GRF')-...
                     GRF.val.allinterp(k+1,2:end)'./scaling.GRF'))*h +...
                 W.GRM*B(j+1)*(f_J6((Tk(GRMi.all,1)./scaling.GRM')-...
                     GRF.MorGF.allinterp(k+1,2:end)'./scaling.GRM'))*h +...
-                W.ID_act*B(j+1)*(f_J23((Tk(residuals_acti,1)./scaling.T(1)')-...
+                W.ID_act*B(j+1)*(f_J25((Tk(residuals_acti,1)./scaling.T(1)')-...
                     ID.allinterp(k+1,2+nq.abs:end)'./scaling.T(1)))*h +...
                 W.a*B(j+1)*(f_J92(akj{j}))*h + ...
-                W.u*B(j+1)*(f_J29(Ak))*h +...
+                W.u*B(j+1)*(f_J31(Ak))*h +...
                 W.u*B(j+1)*(f_J92(vAk))*h +...
                 W.u*B(j+1)*(f_J92(dFTtildek))*h;
         end                              
         % Add path constraints
         % Pelvis residuals (same as from inverse dynamics)
-        g   = {g{:},(ID.allinterp(k+1,2:7)' - ...
-            Tk(ground_pelvisi,1))./scaling.T(1)};
+        g   = {g{:}, Tk(ground_pelvisi,1)};
         lbg = [lbg; zeros(nq.abs,1)];
         ubg = [ubg; zeros(nq.abs,1)];    
         % Muscle-driven joint torques for the lower limbs and the trunk
@@ -928,21 +999,21 @@ if solveProblem
         lbg             = [lbg; 0];
         ubg             = [ubg; 0];
         % Lumbar extension
-        Ft_trunk_ext    = FTk([mai(7).mus.l,mai(7).mus.r]',1);
+        Ft_trunk_ext    = FTk([mai(8).mus.l,mai(8).mus.r]',1);
         T_trunk_ext     = f_T6(MA.trunk_ext,Ft_trunk_ext);
         g               = {g{:},Tk(jointi.trunk.ext,1) - ...
             (T_trunk_ext + Tau_passk.trunk.ext)};
         lbg             = [lbg; 0];
         ubg             = [ubg; 0];
         % Lumbar bending
-        Ft_trunk_ben    = FTk([mai(8).mus.l,mai(8).mus.r]',1);
+        Ft_trunk_ben    = FTk([mai(9).mus.l,mai(9).mus.r]',1);
         T_trunk_ben     = f_T6(MA.trunk_ben,Ft_trunk_ben);
         g               = {g{:},Tk(jointi.trunk.ben,1) - ...
             (T_trunk_ben + Tau_passk.trunk.ben)};
         lbg             = [lbg; 0];
         ubg             = [ubg; 0];
         % Lumbar rotation
-        Ft_trunk_rot    = FTk([mai(9).mus.l,mai(9).mus.r]',1);
+        Ft_trunk_rot    = FTk([mai(10).mus.l,mai(10).mus.r]',1);
         T_trunk_rot     = f_T6(MA.trunk_rot,Ft_trunk_rot);
         g               = {g{:},Tk(jointi.trunk.rot,1) - ...
             (T_trunk_rot + Tau_passk.trunk.rot)};
@@ -950,9 +1021,15 @@ if solveProblem
         ubg             = [ubg; 0];
         % Torque-driven joint torques for the arms
         % Arms
-        g               = {g{:},Tk(armsi,1)/scaling.ArmTau - a_ak};
+        g               = {g{:},Tk(armsi,1)/scaling.ArmTau - ...
+            (a_ak + Tau_passk.arm/scaling.ArmTau)};
         lbg             = [lbg; zeros(nq.arms,1)];
-        ubg             = [ubg; zeros(nq.arms,1)];
+        ubg             = [ubg; zeros(nq.arms,1)];        
+        % Torque-driven joint torques for the mtps
+        g               = {g{:},Tk(mtpi,1)/scaling.MtpTau - ...
+            (a_mtpk + Tau_passk.mtp.all/scaling.MtpTau)};
+        lbg             = [lbg; zeros(nq.mtp,1)];
+        ubg             = [ubg; zeros(nq.mtp,1)];            
         % Activation dynamics (implicit formulation)
         tact = 0.015;
         tdeact = 0.06;
@@ -996,6 +1073,12 @@ if solveProblem
             lbw             = [lbw; bounds.a_a.lower'];
             ubw             = [ubw; bounds.a_a.upper'];
             w0              = [w0;  guess.a_a(k+2,:)'];
+            % Mtp activations
+            a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
+            w               = {w{:}, a_mtpk};
+            lbw             = [lbw; bounds.a_mtp.lower'];
+            ubw             = [ubw; bounds.a_mtp.upper'];
+            w0              = [w0;  guess.a_mtp(k+2,:)'];
         else
             % Muscle activations
             ak              = MX.sym(['a_' num2str(k+1)], NMuscle);
@@ -1021,6 +1104,12 @@ if solveProblem
             lbw             = [lbw; bounds.a_a.lower'];
             ubw             = [ubw; bounds.a_a.upper'];
             w0              = [w0;  guess.a_a(end,:)'];
+            % Mtp activations
+            a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
+            w               = {w{:}, a_mtpk};
+            lbw             = [lbw; bounds.a_mtp.lower'];
+            ubw             = [ubw; bounds.a_mtp.upper'];
+            w0              = [w0;  guess.a_mtp(end,:)'];
         end
         % Rescale variables to impose equality constraints
         Xk_end = (Xk_nsc_end)./scaling.QsQdots';
@@ -1028,9 +1117,9 @@ if solveProblem
         % Add equality constraints (next interval starts with end values of 
         % states from previous interval)
         g   = {g{:}, Xk_end-Xk, FTtildek_end-FTtildek, ...
-            ak_end-ak, a_ak_end-a_ak};
-        lbg = [lbg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms,1)];
-        ubg = [ubg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms,1)];    
+            ak_end-ak, a_ak_end-a_ak, a_mtpk_end-a_mtpk};
+        lbg = [lbg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];
+        ubg = [ubg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];    
 
     end   
     
