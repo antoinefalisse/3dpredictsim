@@ -692,9 +692,9 @@ if solveProblem
         % muscles (44:46) and then the left muscles (47:49). Since the back
         % muscles only depend on back dofs, we do not care if we extract
         % them "from the left or right leg" so here we just picked left.
-        MA.trunk_ext    =  MA_l([47:49,mai(8).mus.l]',7);
-        MA.trunk_ben    =  MA_l([47:49,mai(9).mus.l]',8);
-        MA.trunk_rot    =  MA_l([47:49,mai(10).mus.l]',9);
+        MA.trunk_ext    =  MA_l([47:49,mai(8).mus.l]',8);
+        MA.trunk_ben    =  MA_l([47:49,mai(9).mus.l]',9);
+        MA.trunk_rot    =  MA_l([47:49,mai(10).mus.l]',10);
         % Right leg
         qin_r = [Xk_nsc(jointi.hip_flex.r*2-1,1),...
             Xk_nsc(jointi.hip_add.r*2-1,1),...
