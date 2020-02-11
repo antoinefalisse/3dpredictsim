@@ -36,7 +36,8 @@ idx_ww = 1; % Index row in matrix settings
 
 %% Settings
 import casadi.*
-subject = 'subject1';
+subjectData = 'subject1';
+subject = 'subject1_mtp';
 
 solveProblem    = num_set(1); % set to 1 to solve problem
 analyseResults  = num_set(2); % set to 1 to analyze results
@@ -73,12 +74,12 @@ tol_ipopt   = settings(ww,9);  % NLP error tolerance: 1*10^(-settings(9))
 % Fixed parameter
 W.u = 0.001;
 % Identifiers for experimental data
-nametrial.id    = 'gait_1'; % Experimental walking trial to track
+nametrial.id    = 'gait_1_mtp'; % Experimental walking trial to track
 nametrial.ID    = ['ID_',nametrial.id];
 nametrial.GRF   = ['GRF_',nametrial.id];
 nametrial.IK    = ['IK_',nametrial.id];
 switch nametrial.id
-    case 'gait_1'
+    case 'gait_1_mtp'
         time_opt = [3.45,4.25];
 end  
 % The filename used to save the results depends on the settings 
@@ -110,8 +111,10 @@ if ispc
     switch setup.derivatives
         case 'AD'     
             cd(pathExternalFunctions);
-            F1 = external('F','TrackSim_1.dll'); 
-            F2 = external('F','TrackSim_2.dll'); 
+            F1 = external('F','TrackSim_mtp_1.dll'); 
+            F2 = external('F','TrackSim_mtp_2.dll'); 
+            F3 = external('F','TrackSim_1.dll'); 
+            F4 = external('F','TrackSim_2.dll'); 
     end
 elseif ismac
     switch setup.derivatives
@@ -126,8 +129,18 @@ end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
+% vec1 = -ones(58,1);
+% res1 = full(F3(vec1));
+% vec2 = -ones(62,1);
+% vec2([19*2-1:20*2]) = 0;
+% res2 = full(F1(vec2));
+% max(abs(res1)-abs(res2))
 % vec1 = -ones(141,1);
-% res1 = full(F2(vec1));
+% res1 = full(F4(vec1));
+% vec2 = -ones(147,1);
+% vec2([19*2-1:20*2, 31*2+19:31*2+20]) = 0;
+% res2 = full(F2(vec2));
+% max(abs(res1)-abs(res2([1:18,21:end])))
 
 %% Indices external function
 % External function: F1
@@ -171,17 +184,19 @@ jointi.ankle.l      = 15;
 jointi.ankle.r      = 16;
 jointi.subt.l       = 17;
 jointi.subt.r       = 18;
-jointi.trunk.ext    = 19;
-jointi.trunk.ben    = 20;
-jointi.trunk.rot    = 21;
-jointi.sh_flex.l    = 22;
-jointi.sh_add.l     = 23;
-jointi.sh_rot.l     = 24;
-jointi.sh_flex.r    = 25;
-jointi.sh_add.r     = 26;
-jointi.sh_rot.r     = 27;
-jointi.elb.l        = 28;
-jointi.elb.r        = 29;
+jointi.mtp.l        = 19;
+jointi.mtp.r        = 20;
+jointi.trunk.ext    = 21;
+jointi.trunk.ben    = 22;
+jointi.trunk.rot    = 23;
+jointi.sh_flex.l    = 24;
+jointi.sh_add.l     = 25;
+jointi.sh_rot.l     = 26;
+jointi.sh_flex.r    = 27;
+jointi.sh_add.r     = 28;
+jointi.sh_rot.r     = 29;
+jointi.elb.l        = 30;
+jointi.elb.r        = 31;
 % Vectors of indices for later use
 residualsi          = jointi.pelvis.tilt:jointi.elb.r; % all 
 ground_pelvisi      = jointi.pelvis.tilt:jointi.pelvis.tz; % ground-pelvis
@@ -196,16 +211,16 @@ nq.abs              = length(ground_pelvisi); % ground-pelvis
 nq.act              = nq.all-nq.abs;% all but ground-pelvis
 nq.trunk            = length(trunki); % trunk
 nq.arms             = length(armsi); % arms
-nq.leg              = 9; % #joints needed for polynomials
+nq.leg              = 10; % #joints needed for polynomials
 Qsi                 = 1:2:2*nq.all; % indices Qs only
 % Second, GRFs
-GRFi.r              = 30:32;
-GRFi.l              = 33:35;
+GRFi.r              = 32:34;
+GRFi.l              = 35:37;
 GRFi.all            = [GRFi.r,GRFi.l];
 nGRF                = length(GRFi.all);
 % Third, GRMs
-GRMi.r              = 36:38;
-GRMi.l              = 39:41;
+GRMi.r              = 38:40;
+GRMi.l              = 41:43;
 GRMi.all            = [GRMi.r,GRMi.l];
 nGRM                = length(GRMi.all);
 % Number contact model parameters
@@ -330,7 +345,7 @@ addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
 
 %% Experimental data
-pathData = [pathRepo,'/OpenSimModel/',subject];
+pathData = [pathRepo,'/OpenSimModel/',subjectData];
 joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'pelvis_ty','pelvis_tz','hip_flexion_l','hip_adduction_l',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
