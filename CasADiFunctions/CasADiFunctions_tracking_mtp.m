@@ -67,14 +67,14 @@ for i=1:length(etemp25)
 end
 Jtemp25 = Jtemp25/25;
 f_J25 = Function('f_J25',{etemp25},{Jtemp25});
-% Function for 24 elements
-etemp24 = SX.sym('etemp24',24);
-Jtemp24 = 0;
-for i=1:length(etemp24)
-    Jtemp24 = Jtemp24 + etemp24(i).^2;
+% Function for 23 elements
+etemp23 = SX.sym('etemp23',23);
+Jtemp23 = 0;
+for i=1:length(etemp23)
+    Jtemp23 = Jtemp23 + etemp23(i).^2;
 end
-Jtemp24 = Jtemp24/24;
-f_J24 = Function('f_J24',{etemp24},{Jtemp24});
+Jtemp23 = Jtemp23/23;
+f_J23 = Function('f_J23',{etemp23},{Jtemp23});
 % Function for 31 elements
 etemp31 = SX.sym('etemp31',31);
 Jtemp31 = 0;
