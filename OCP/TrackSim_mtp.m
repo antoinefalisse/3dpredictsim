@@ -56,7 +56,7 @@ writeIKmotion   = num_set(6); % set to 1 to write .mot file
 % settings(7): allowed deviation from generic radii
 % settings(8): number of mesh intervals
 % settings(9): NLP error tolerance: 1*10^(-settings(9)).
-settings = [10,1,1,10,1,25,50,50,4];
+settings = [10,1,1,10,1,50,100,50,4];
 
 %% Select settings
 for www = 1:length(idx_ww)
@@ -1689,6 +1689,7 @@ if analyseResults
     Results_tracking.GRMs_toTrack = GRF.MorGF.allinterp; 
     Results_tracking.ParamsCM_gen = ...
         full(f_nsc18(guess.params,scaling.params.v,scaling.params.r));
+    Results_tracking.dev_cm = dev_cm;
     Results_tracking.CPU_IPOPT = CPU_IPOPT;
     Results_tracking.CPU_NLP = CPU_NLP;
     Results_tracking.OptSol = OptSol;
