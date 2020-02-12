@@ -74,13 +74,15 @@ tol_ipopt   = settings(ww,9);  % NLP error tolerance: 1*10^(-settings(9))
 % Fixed parameter
 W.u = 0.001;
 % Identifiers for experimental data
-nametrial.id    = 'gait_1_mtp'; % Experimental walking trial to track
+nametrial.id    = 'gait_14_mtp'; % Experimental walking trial to track
 nametrial.ID    = ['ID_',nametrial.id];
 nametrial.GRF   = ['GRF_',nametrial.id];
 nametrial.IK    = ['IK_',nametrial.id];
 switch nametrial.id
-    case 'gait_1_mtp'
+    case 'gait_14_mtp'
         time_opt = [3.73,4.25];
+    case 'gait_15_mtp'
+        time_opt = [2.66,3.2];
 end  
 % The filename used to save the results depends on the settings 
 savename = ['_c',num2str(ww),'_id_',nametrial.id,'_N',num2str(N),...
