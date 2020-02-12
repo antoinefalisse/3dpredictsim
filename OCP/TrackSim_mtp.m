@@ -26,8 +26,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,0,0,0,0,0]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
+num_set = [1,1,0,1,0,1]; % This configuration solves the problem
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
@@ -345,6 +345,11 @@ CasADiFunctions_tracking_mtp
 pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
+
+stiffnessArm = 0;
+dampingArm = 0.1;
+stiffnessMtp = 1.5/(pi/180);
+dampingMtp = 0.5;
 
 %% Experimental data
 pathData = [pathRepo,'/OpenSimModel/',subjectData];
@@ -781,8 +786,7 @@ if solveProblem
             theta.pass.trunk.rot,Xk_nsc(jointi.trunk.rot*2-1,1),...
             Xk_nsc(jointi.trunk.rot*2,1));
         
-        stiffnessArm = 0;
-        dampingArm = 0.1;
+        
         Tau_passk.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
             Xk_nsc(jointi.sh_flex.l*2-1,1), Xk_nsc(jointi.sh_flex.l*2,1));
         Tau_passk.sh_add.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
@@ -802,10 +806,8 @@ if solveProblem
         
         Tau_passk.arm = [Tau_passk.sh_flex.l; Tau_passk.sh_add.l; ...
             Tau_passk.sh_rot.l; Tau_passk.sh_flex.r; Tau_passk.sh_add.r; ...
-            Tau_passk.sh_rot.r; Tau_passk.elb.l; Tau_passk.elb.r];
+            Tau_passk.sh_rot.r; Tau_passk.elb.l; Tau_passk.elb.r];       
         
-        stiffnessMtp = 1.5/(pi/180);
-        dampingMtp = 0.5;
         Tau_passk.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
             Xk_nsc(jointi.mtp.l*2-1,1), Xk_nsc(jointi.mtp.l*2,1));
         Tau_passk.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
@@ -1187,8 +1189,8 @@ if analyseResults
     %% Extract results
     % All optimized design variables are saved in a single column vector      
     % Number of design variables    
-    NControls = NMuscle+NMuscle+nq.all+nq.arms;
-    NStates = NMuscle+NMuscle+2*nq.all+nq.arms;
+    NControls = NMuscle+NMuscle+nq.all+nq.arms+nq.mtp;
+    NStates = NMuscle+NMuscle+2*nq.all+nq.arms+nq.mtp;
     NParameters = np;
     % In the loop
     Nwl = NControls+d*NStates+NStates;
@@ -1198,7 +1200,7 @@ if analyseResults
     Nwm = NParameters+NStates+NControls;
     % Here we extract the results and re-organize them for analysis  
     % Static parameters
-    paramsCM_opt    = w_opt(1:NParameters);  
+    paramsCM_opt = w_opt(1:NParameters);  
     % Mesh points
     % Muscle activations and muscle-tendon forces
     a_opt = zeros(N+1,NMuscle);
@@ -1221,26 +1223,34 @@ if analyseResults
     for i = 1:nq.arms
         a_a_opt(:,i) = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+i:Nwl:Nw);
     end
+    % Mtp activations
+    a_mtp_opt = zeros(N+1,nq.mtp);
+    for i = 1:nq.mtp
+        a_mtp_opt(:,i) = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+...
+            nq.arms+i:Nwl:Nw);
+    end
     % Time derivative of muscle activations and muscle-tendon forces
     vA_opt = zeros(N,NMuscle);
     dFTtilde_opt = zeros(N,NMuscle);
     for i = 1:NMuscle
-        vA_opt(:,i)         = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+...
-            nq.arms+i:Nwl:Nw);
-        dFTtilde_opt(:,i)   = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+...
-            nq.arms+NMuscle+i:Nwl:Nw);
+        vA_opt(:,i)         = w_opt(NParameters+NStates+i:Nwl:Nw);
+        dFTtilde_opt(:,i)   = w_opt(NParameters+NStates+i:Nwl:Nw);
     end
     % Time derivative of joint velocities
     qdotdot_opt = zeros(N,nq.all);
     for i = 1:nq.all
-        qdotdot_opt(:,i)    = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+...
-            nq.arms+NMuscle+NMuscle+i:Nwl:Nw);
+        qdotdot_opt(:,i) = w_opt(NParameters+NStates+2*NMuscle+i:Nwl:Nw);
     end
     % Arm excitations
     e_a_opt = zeros(N,nq.arms);
     for i = 1:nq.arms
-        e_a_opt(:,i)       = w_opt(NParameters+NMuscle+NMuscle+2*nq.all+...
-            nq.arms+NMuscle+NMuscle+nq.all+i:Nwl:Nw); 
+        e_a_opt(:,i) = w_opt(NParameters+NStates+2*NMuscle+nq.all+i:Nwl:Nw); 
+    end 
+    % Mtp excitations
+    e_mtp_opt = zeros(N,nq.mtp);
+    for i = 1:nq.arms
+        e_mtp_opt(:,i) = w_opt(NParameters+NStates+2*NMuscle+nq.all+...
+            nq.arms+i:Nwl:Nw); 
     end    
     % Collocation points
     % Muscle activations
@@ -1296,6 +1306,17 @@ if analyseResults
         a_a_opt_ext(4:(d+1):end,nmusi) = w_opt(Nwm+d*NMuscle+...
             d*NMuscle+d*2*nq.all+nq.arms+nq.arms+nmusi:Nwl:Nw);
     end
+    % Mtp activations
+    a_mtp_opt_ext=zeros(N*(d+1)+1,nq.mtp);
+    a_mtp_opt_ext(1:(d+1):end,:)= a_mtp_opt;
+    for nmusi=1:nq.mtp
+        a_mtp_opt_ext(2:(d+1):end,nmusi) = w_opt(Nwm+d*NMuscle+...
+            d*NMuscle+d*2*nq.all+nq.arms+nmusi:Nwl:Nw);
+        a_mtp_opt_ext(3:(d+1):end,nmusi) = w_opt(Nwm+d*NMuscle+...
+            d*NMuscle+d*2*nq.all+nq.arms+nq.mtp+nmusi:Nwl:Nw);
+        a_mtp_opt_ext(4:(d+1):end,nmusi) = w_opt(Nwm+d*NMuscle+...
+            d*NMuscle+d*2*nq.all+nq.arms+nq.mtp+nq.mtp+nmusi:Nwl:Nw);
+    end
     
     %% Unscale results
     % Parameters
@@ -1333,6 +1354,9 @@ if analyseResults
     % Arm activations
     a_a_opt_unsc = a_a_opt(1:end-1,:).*repmat(...
         scaling.a_a,size(a_a_opt(1:end-1,:),1),size(a_a_opt,2));
+    % Mtp activations
+    a_mtp_opt_unsc = a_mtp_opt(1:end-1,:).*repmat(...
+        scaling.a_mtp,size(a_mtp_opt(1:end-1,:),1),size(a_mtp_opt,2));
     % Controls at mesh points
     % Time derivative of Qdots
     qdotdot_opt_unsc.rad = ...
@@ -1354,6 +1378,9 @@ if analyseResults
     % Arm excitations
     e_a_opt_unsc = e_a_opt.*repmat(scaling.e_a,size(e_a_opt,1),...
         size(e_a_opt,2));
+    % Mtp excitations
+    e_mtp_opt_unsc = e_mtp_opt.*repmat(scaling.e_mtp,size(e_mtp_opt,1),...
+        size(e_mtp_opt,2));
     
     %% Time grid    
     % Mesh points
@@ -1504,10 +1531,10 @@ if analyseResults
     GRM_opt_unsc    = out2_res_opt(:,GRMi.all);
     % assertArmTmax should be 0
     assertArmTmax = max(max(abs(out2_res_opt(:,armsi)-(a_a_opt_unsc)*...
-        scaling.ArmTau)));   
+        scaling.ArmTau + dampingArm*qdot_opt_unsc.rad(:,armsi))));   
    
     %% Passive joint torques at optimal solution
-    Tau_pass_opt_all = zeros(N,15);
+    Tau_pass_opt_all = zeros(N,nq.act);
     for i = 1:N    
         Tau_pass_opt.hip.flex.l    = f_PassiveMoments(k_pass.hip.flex,...
             theta.pass.hip.flex,Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2-1),...
@@ -1553,15 +1580,53 @@ if analyseResults
             Xk_Qs_Qdots_opt(i,jointi.trunk.ben*2));
         Tau_pass_opt.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
             theta.pass.trunk.rot,Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2-1),...
-            Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2));        
+            Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2));       
+        
+        Tau_pass_opt.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_flex.l*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_flex.l*2));
+        Tau_pass_opt.sh_add.l = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_add.l*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_add.l*2));
+        Tau_pass_opt.sh_rot.l = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_rot.l*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_rot.l*2));
+        Tau_pass_opt.sh_flex.r = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_flex.r*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_flex.r*2));
+        Tau_pass_opt.sh_add.r = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_add.r*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_add.r*2));
+        Tau_pass_opt.sh_rot.r = f_passiveTATorques(stiffnessArm, dampingArm,...
+            Xk_Qs_Qdots_opt(i,jointi.sh_rot.r*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.sh_rot.r*2));
+        Tau_pass_opt.elb.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_Qs_Qdots_opt(i,jointi.elb.l*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.elb.l*2));
+        Tau_pass_opt.elb.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Xk_Qs_Qdots_opt(i,jointi.elb.r*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.elb.r*2));
+        
+        Tau_pass_opt.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Xk_Qs_Qdots_opt(i,jointi.mtp.l*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.mtp.l*2));
+        Tau_pass_opt.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Xk_Qs_Qdots_opt(i,jointi.mtp.r*2-1), ...
+            Xk_Qs_Qdots_opt(i,jointi.mtp.r*2));  
+        
         Tau_pass_opt_all(i,:) = full([Tau_pass_opt.hip.flex.l,...
             Tau_pass_opt.hip.add.l,Tau_pass_opt.hip.rot.l,...             
             Tau_pass_opt.hip.flex.r,Tau_pass_opt.hip.add.r,...
             Tau_pass_opt.hip.rot.r,Tau_pass_opt.knee.l,...
             Tau_pass_opt.knee.r,Tau_pass_opt.ankle.l,...
             Tau_pass_opt.ankle.r,Tau_pass_opt.subt.l,...
-            Tau_pass_opt.subt.r,Tau_pass_opt.trunk.ext,...
-            Tau_pass_opt.trunk.ben,Tau_pass_opt.trunk.rot]);
+            Tau_pass_opt.subt.r,Tau_pass_opt.mtp.l,...
+            Tau_pass_opt.mtp.r,Tau_pass_opt.trunk.ext,...
+            Tau_pass_opt.trunk.ben,Tau_pass_opt.trunk.rot,...
+            Tau_pass_opt.sh_flex.l,Tau_pass_opt.sh_add.l,...
+            Tau_pass_opt.sh_rot.l,Tau_pass_opt.sh_flex.r,...
+            Tau_pass_opt.sh_add.r,Tau_pass_opt.sh_rot.r,...
+            Tau_pass_opt.elb.l,Tau_pass_opt.elb.r]);
     end        
     
     %% Create .mot file for OpenSim GUI
@@ -1578,6 +1643,7 @@ if analyseResults
             'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
             'knee_angle_l','knee_angle_r','ankle_angle_l',...
             'ankle_angle_r','subtalar_angle_l','subtalar_angle_r',...
+            'mtp_angle_l','mtp_angle_r', ...
             'lumbar_extension','lumbar_bending','lumbar_rotation',...
             'arm_flex_l','arm_add_l','arm_rot_l',...
             'arm_flex_r','arm_add_r','arm_rot_r',...
@@ -1620,6 +1686,7 @@ if analyseResults
     Results_tracking.Ts_opt = Tauk_out;
     Results_tracking.GRFs_opt = GRF_opt_unsc;
     Results_tracking.GRMs_opt = GRM_opt_unsc; 
+    Results_tracking.passT = Tau_pass_opt_all;
     Results_tracking.ParamsCM_opt = full(paramsCM_opt_nsc);     
     Results_tracking.Qs_toTrack = Qs.allinterpfilt;
     Results_tracking.Ts_toTrack = ID.allinterp;
