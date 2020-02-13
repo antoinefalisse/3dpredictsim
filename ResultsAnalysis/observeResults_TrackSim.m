@@ -14,12 +14,12 @@ idx_ww  = 1;
 subject = 'subject1';
 body_mass = 62;
 body_weight = body_mass*9.81;
-settings = [10,1,1,10,1,50,100,50,4];
+settings = [10,1,1,10,1,50,100,50,4,6];
 settings_trials(1).ww = {'14','15'};
 setup.derivatives = 'AD';
 showtrackplotsonly = 0;
 showlegend = 0;
-writeModel = 0;
+writeModel = 1;
 
 %% Load results
 % Pre-allocation structures
@@ -57,8 +57,7 @@ for www = 1:length(idx_ww)
         ParamsCM_opt(ww).ww(p).p = Results_tracking(ww).ww(p).ParamsCM_opt;
         ParamsCM_gen(ww).ww(p).p = Results_tracking(ww).ww(p).ParamsCM_gen;
         dev_cm(ww).ww(p).p  = Results_tracking(ww).ww(p).dev_cm; 
-    end    
-       
+    end       
 end
 
 %% Common settings for plots
@@ -249,19 +248,28 @@ end
 for k = 1:length(idx_ww)
     p = 1;
     ww = idx_ww(k);    
-    id_case = strjoin(trials(ww).ww,'-');   
-    figure()
-    if length(ParamsCM_opt(ww).ww(p).p) == 12
-        subplot(1,2,1)
-        scatter(1:8,ParamsCM_opt(ww).ww(p).p(1:8),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
-        scatter(1:8,ParamsCM_gen(ww).ww(p).p(1:8),'k','linewidth',2);
-        l = legend('Optimal','Generic');
-        set(l,'Fontsize',16);
-        subplot(1,2,2)
-        scatter(1:4,ParamsCM_opt(ww).ww(p).p(9:12),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
-        scatter(1:4,ParamsCM_gen(ww).ww(p).p(9:12),'k','linewidth',2);       
-        l = legend('Optimal','Generic');
-        set(l,'Fontsize',16);
+    figure() 
+    cs = length(ParamsCM_opt(ww).ww(p).p)/3;
+    subplot(1,2,1)
+    scatter(1:2*cs,ParamsCM_opt(ww).ww(p).p(1:2*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
+    scatter(1:2*cs,ParamsCM_gen(ww).ww(p).p(1:2*cs),'k','linewidth',2);        
+    params_bounds_upper = ParamsCM_gen(ww).ww(p).p(1:2*cs) + dev_cm(ww).ww(p).p.loc/1000;
+    params_bounds_lower = ParamsCM_gen(ww).ww(p).p(1:2*cs) - dev_cm(ww).ww(p).p.loc/1000;
+    scatter(1:2*cs,params_bounds_upper,'b','linewidth',2);
+    scatter(1:2*cs,params_bounds_lower,'r','linewidth',2);
+    l = legend('Optimal','Generic');
+    set(l,'Fontsize',16);
+    subplot(1,2,2)
+    scatter(1:cs,ParamsCM_opt(ww).ww(p).p(2*cs+1:3*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
+    scatter(1:cs,ParamsCM_gen(ww).ww(p).p(2*cs+1:3*cs),'k','linewidth',2);    
+    radii = 0.032*ones(1,cs);
+    params_bounds_upper = radii + dev_cm(ww).ww(p).p.rad/100*radii; 
+    params_bounds_lower = radii - dev_cm(ww).ww(p).p.rad/100*radii;
+    scatter(1:cs,params_bounds_upper,'b','linewidth',2);
+    scatter(1:cs,params_bounds_lower,'r','linewidth',2);
+    l = legend('Optimal','Generic');
+    set(l,'Fontsize',16);
+    if length(ParamsCM_opt(ww).ww(p).p) == 15        
         if writeModel
             pathVariousFunctions = [pathRepo,'\VariousFunctions'];
             addpath(genpath(pathVariousFunctions));    
@@ -275,38 +283,36 @@ for k = 1:length(idx_ww)
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(3) = ParamsCM_opt(ww).ww(p).p(6);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(1) = ParamsCM_opt(ww).ww(p).p(7);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(3) = ParamsCM_opt(ww).ww(p).p(8);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(1) = ParamsCM_opt(ww).ww(p).p(1);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(3) = -ParamsCM_opt(ww).ww(p).p(2);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(1) = ParamsCM_opt(ww).ww(p).p(3);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(3) = -ParamsCM_opt(ww).ww(p).p(4);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(1) = ParamsCM_opt(ww).ww(p).p(5);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(3) = -ParamsCM_opt(ww).ww(p).p(6);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(1) = ParamsCM_opt(ww).ww(p).p(7);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(3) = -ParamsCM_opt(ww).ww(p).p(8);
-            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_scaled_contact_opt_',num2str(settings(ww(k),6)),'cs_','devL',num2str(settings(ww(k),7)),'_devS',num2str(settings(ww(k),8)),'_',nametrial.id,'.osim'];
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(1) = ParamsCM_opt(ww).ww(p).p(9);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(3) = ParamsCM_opt(ww).ww(p).p(10);  
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(1) = ParamsCM_opt(ww).ww(p).p(1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(3) = -ParamsCM_opt(ww).ww(p).p(2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(1) = ParamsCM_opt(ww).ww(p).p(3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(3) = -ParamsCM_opt(ww).ww(p).p(4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(1) = ParamsCM_opt(ww).ww(p).p(5);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(3) = -ParamsCM_opt(ww).ww(p).p(6);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(1) = ParamsCM_opt(ww).ww(p).p(7);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(3) = -ParamsCM_opt(ww).ww(p).p(8);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(1) = ParamsCM_opt(ww).ww(p).p(9);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(3) = -ParamsCM_opt(ww).ww(p).p(10);        
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).radius = ParamsCM_opt(ww).ww(p).p(2*cs+1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).radius = ParamsCM_opt(ww).ww(p).p(2*cs+2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).radius = ParamsCM_opt(ww).ww(p).p(2*cs+3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).radius = ParamsCM_opt(ww).ww(p).p(2*cs+4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).radius = ParamsCM_opt(ww).ww(p).p(2*cs+5);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).radius = ParamsCM_opt(ww).ww(p).p(2*cs+1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).radius = ParamsCM_opt(ww).ww(p).p(2*cs+2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(2*cs+3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(2*cs+4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(2*cs+5);              
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6) = [];
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12-1) = []; % -1 cause we already removed one
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(6) = [];
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(12-1) = []; % -1 cause we already removed one
+            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_c',num2str(ww),'.osim'];
             xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
-        end     
+        end
     elseif length(ParamsCM_opt(ww).ww(p).p) == 18
-        nCS = 6;
-        subplot(1,2,1)
-        scatter(1:12,ParamsCM_opt(ww).ww(p).p(1:12),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
-        scatter(1:12,ParamsCM_gen(ww).ww(p).p(1:12),'k','linewidth',2);        
-        params_bounds_upper = ParamsCM_gen(ww).ww(p).p(1:12) + dev_cm(ww).ww(p).p.loc/1000;
-        params_bounds_lower = ParamsCM_gen(ww).ww(p).p(1:12) - dev_cm(ww).ww(p).p.loc/1000;
-        scatter(1:12,params_bounds_upper,'b','linewidth',2);
-        scatter(1:12,params_bounds_lower,'r','linewidth',2);
-        l = legend('Optimal','Generic');
-        set(l,'Fontsize',16);
-        subplot(1,2,2)
-        scatter(1:6,ParamsCM_opt(ww).ww(p).p(13:18),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
-        scatter(1:6,ParamsCM_gen(ww).ww(p).p(13:18),'k','linewidth',2);    
-        radii = 0.032*ones(1,6);
-        params_bounds_upper = radii + dev_cm(ww).ww(p).p.rad/100*radii; 
-        params_bounds_lower = radii - dev_cm(ww).ww(p).p.rad/100*radii;
-        scatter(1:6,params_bounds_upper,'b','linewidth',2);
-        scatter(1:6,params_bounds_lower,'r','linewidth',2);
-        l = legend('Optimal','Generic');
-        set(l,'Fontsize',16);
         if writeModel
             pathVariousFunctions = [pathRepo,'\VariousFunctions'];
             addpath(genpath(pathVariousFunctions));    
@@ -353,4 +359,3 @@ for k = 1:length(idx_ww)
         end
     end
 end
-

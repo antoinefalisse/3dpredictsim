@@ -7,7 +7,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 % 
-function guess = getGuess_DI_tracking_mtp(Qs,nq,N,NMuscle,jointi,scaling)
+function guess = getGuess_DI_tracking_mtp(Qs,nq,N,NMuscle,jointi,scaling,cs)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
 Qs_spline.data = zeros(size(Qs.allinterpfilt));
@@ -209,16 +209,24 @@ guess.e_mtp = 0.1*ones(N,nq.mtp);
 
 %% Parameters contact model
 % Original values
-B_locSphere_s1_r    = [0.00190115788407966, -0.00382630379623308];
+B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
+guess.params = B_locSphere_s1_r;
 B_locSphere_s2_r    = [0.148386399942063, -0.028713422052654];
-B_locSphere_s3_r    = [0.133001170607051, 0.0516362473449566];
-B_locSphere_s4_r    = [0.06, -0.0187603084619177];    
-B_locSphere_s5_r    = [0.0662346661991635, 0.0263641606741698];
-B_locSphere_s6_r    = [0.045, 0.0618569567549652];
-IG_rad              = 0.032*ones(1,6); 
-guess.params = [B_locSphere_s1_r,B_locSphere_s2_r,...
-    B_locSphere_s3_r,B_locSphere_s4_r,B_locSphere_s5_r,B_locSphere_s6_r,...
-    IG_rad];
+guess.params = [guess.params,B_locSphere_s2_r];
+B_locSphere_s3_r = [0.133001170607051, 0.0516362473449566];
+guess.params = [guess.params,B_locSphere_s3_r];
+B_locSphere_s4_r = [0.06, -0.0187603084619177];    
+guess.params = [guess.params,B_locSphere_s4_r];
+if cs == 5|| cs == 6
+    B_locSphere_s5_r = [0.0662346661991635, 0.0263641606741698];
+    guess.params = [guess.params,B_locSphere_s5_r];
+    if cs == 6
+        B_locSphere_s6_r = [0.045, 0.0618569567549652];
+        guess.params = [guess.params,B_locSphere_s6_r];
+    end
+end
+IG_rad = 0.032*ones(1,cs);
+guess.params = [guess.params,IG_rad];
 
 %% Scaling
 guess.QsQdots   = guess.QsQdots./repmat(scaling.QsQdots,N,1);

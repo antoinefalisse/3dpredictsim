@@ -184,11 +184,11 @@ f_passiveTATorques = Function('f_passiveTATorques',{stiff,damp,qin,qdotin}, ...
     {passTATorques});
 
 %% Unscaling
-x_bar18      = SX.sym('x_bar18_SX',18,1); 
-sc_v18       = SX.sym('sc_v18_SX',18,1);
-sc_r18       = SX.sym('sc_r18',18,1);
-x18          = (x_bar18 - sc_r18)./sc_v18;
-f_nsc18      = Function('f_nsc18',{x_bar18,sc_v18,sc_r18},{x18});
+x_barnp      = SX.sym('x_barnp_SX',np,1); 
+sc_vnp       = SX.sym('sc_vnp_SX',np,1);
+sc_rnp       = SX.sym('sc_rnp',np,1);
+xnp          = (x_barnp - sc_rnp)./sc_vnp;
+f_nscnp      = Function('f_nscnp',{x_barnp,sc_vnp,sc_rnp},{xnp});
 
 %% Contact forces
 stiffnessSX         = SX.sym('stiffnessSX',1);

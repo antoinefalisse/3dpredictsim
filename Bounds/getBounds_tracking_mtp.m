@@ -7,7 +7,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 %
-function [bounds,scaling] = getBounds_tracking_mtp(Qs,NMuscle,nq,jointi,dev_cm,GRF)
+function [bounds,scaling] = getBounds_tracking_mtp(Qs,NMuscle,nq,jointi,dev_cm,GRF,cs)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
 Qs_spline.data = zeros(size(Qs.allfilt));
@@ -402,15 +402,23 @@ bounds.e_mtp.upper = ones(1,nq.mtp);
 
 %% Parameters contact model
 % Original values
-B_locSphere_s1_r    = [0.00190115788407966, -0.00382630379623308];
-B_locSphere_s2_r    = [0.148386399942063, -0.028713422052654];
-B_locSphere_s3_r    = [0.133001170607051, 0.0516362473449566];
-B_locSphere_s4_r    = [0.06, -0.0187603084619177];    
-B_locSphere_s5_r    = [0.0662346661991635, 0.0263641606741698];
-B_locSphere_s6_r    = [0.045, 0.0618569567549652];
-radii               = 0.032*ones(1,6);
-params_loc_IG = [B_locSphere_s1_r,B_locSphere_s2_r,...
-    B_locSphere_s3_r,B_locSphere_s4_r,B_locSphere_s5_r,B_locSphere_s6_r];
+B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
+params_loc_IG = B_locSphere_s1_r;
+B_locSphere_s2_r = [0.148386399942063, -0.028713422052654];
+params_loc_IG = [params_loc_IG, B_locSphere_s2_r];
+B_locSphere_s3_r = [0.133001170607051, 0.0516362473449566];
+params_loc_IG = [params_loc_IG, B_locSphere_s3_r];
+B_locSphere_s4_r = [0.06, -0.0187603084619177];    
+params_loc_IG = [params_loc_IG, B_locSphere_s4_r];
+if cs == 5 || cs == 6
+    B_locSphere_s5_r = [0.0662346661991635, 0.0263641606741698];
+    params_loc_IG = [params_loc_IG, B_locSphere_s5_r];
+    if cs == 6
+        B_locSphere_s6_r = [0.045, 0.0618569567549652];
+        params_loc_IG = [params_loc_IG, B_locSphere_s6_r];
+    end
+end
+radii = 0.032*ones(1,cs);
 % Allowed deviations
 params_loc_IG_upper = params_loc_IG + dev_cm.loc/1000;
 params_loc_IG_lower = params_loc_IG - dev_cm.loc/1000;
