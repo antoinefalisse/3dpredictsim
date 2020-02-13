@@ -92,10 +92,7 @@ for p = 1:length(trials)
 end
 id_case = strjoin(trials,'-');
 % The filename used to save the results depends on the settings 
-savename = ['_c',num2str(ww),'_id_',id_case,'_N',num2str(N),...
-    '_T',num2str(tol_ipopt),'_Q',num2str(W.Qs),'_F',num2str(W.GRF),...
-    '_M',num2str(W.GRM),'_A',num2str(W.a),'_devL',num2str(dev_cm.loc),...
-    '_devR',num2str(dev_cm.rad),'_ID',num2str(W.ID_act)];
+savename = ['_c',num2str(ww)];
 
 %% Load external functions
 % The external function performs inverse dynamics through the

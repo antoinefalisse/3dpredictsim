@@ -348,7 +348,7 @@ for k = 1:length(idx_ww)
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(16);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(17);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).radius = ParamsCM_opt(ww).ww(p).p(18);                   
-            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_contact_opt_',id_case,'_devL',num2str(settings(ww(k),7)),'_devS',num2str(settings(ww(k),8)),'.osim'];
+            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_c',num2str(ww),'.osim'];
             xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
         end
     end
