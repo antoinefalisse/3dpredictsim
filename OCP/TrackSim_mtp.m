@@ -26,13 +26,13 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,0,0,1,0,1]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,0]; % This configuration analyzes the results
+num_set = [1,1,0,1,0,1]; % This configuration solves the problem
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
 % select which row of parameters will be used.
-idx_ww = 2; % Index row in matrix settings
+idx_ww = 1; % Index row in matrix settings
 
 %% Settings
 import casadi.*
@@ -57,10 +57,8 @@ writeIKmotion   = num_set(6); % set to 1 to write .mot file
 % settings(8): number of mesh intervals
 % settings(9): NLP error tolerance: 1*10^(-settings(9)).
 settings = [...
-    10,1,1,10,1,50,100,50,4,6; ...
-    10,1,1,10,1,50,100,50,4,5];
-settings_trials(1).ww = {'14','15'};
-settings_trials(2).ww = {'14'};
+    10,1,1,10,1,50,100,50,4,5]; 
+settings_trials(1).ww = {'14'};
 
 %% Select settings
 for www = 1:length(idx_ww)
@@ -975,6 +973,8 @@ if solveProblem
                     W.ID_act*B(j+1)*(f_J23((Tk(residuals_act_bmtpi,1)./scaling(p).p.T(1)')-...
                         ID(p).p.allinterp(k+1,residuals_act_bmtpi+1)'./scaling(p).p.T(1)))*h +...
                     W.a*B(j+1)*(f_J92(akj{j}))*h + ...
+                    W.a*B(j+1)*(f_J2(e_mtpk{j}))*h + ...
+                    W.a*B(j+1)*(f_J8(e_ak{j}))*h + ...
                     W.u*B(j+1)*(f_J31(Ak))*h +...
                     W.u*B(j+1)*(f_J92(vAk))*h +...
                     W.u*B(j+1)*(f_J92(dFTtildek))*h;
@@ -1796,7 +1796,7 @@ if analyseResults
         Results_tracking(ww).ww(p).GRMs_toTrack = GRF(p).p.MorGF.allinterp; 
     
         Results_tracking(ww).ww(p).ParamsCM_opt = full(paramsCM_opt_nsc); 
-        Results_tracking(ww).ww(p).ParamsCM_gen = full(f_nsc18(guess(1).p.params,...
+        Results_tracking(ww).ww(p).ParamsCM_gen = full(f_nscnp(guess(1).p.params,...
             scaling(1).p.params.v,scaling(1).p.params.r));
         Results_tracking(ww).ww(p).dev_cm = dev_cm;
         Results_tracking(ww).ww(p).stats = stats;

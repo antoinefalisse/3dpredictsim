@@ -9,13 +9,31 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = 1; 
+idx_ww  = 7; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;
 body_weight = body_mass*9.81;
-settings = [10,1,1,10,1,50,100,50,4,6];
+settings = [10,1,1,10,1,50,100,50,4,6; ...
+    10,1,1,10,1,50,100,50,4,5; ...
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5;
+    10,1,1,10,1,50,100,50,4,5];
 settings_trials(1).ww = {'14','15'};
+settings_trials(2).ww = {'14'};
+settings_trials(3).ww = {'14'};
+settings_trials(4).ww = {'14'};
+settings_trials(5).ww = {'14'};
+settings_trials(6).ww = {'14'};
+settings_trials(7).ww = {'14'};
+settings_trials(8).ww = {'14'};
+settings_trials(9).ww = {'14'};
+settings_trials(10).ww = {'14'};
 setup.derivatives = 'AD';
 showtrackplotsonly = 0;
 showlegend = 0;

@@ -83,6 +83,22 @@ for i=1:length(etemp31)
 end
 Jtemp31 = Jtemp31/31;
 f_J31 = Function('f_J31',{etemp31},{Jtemp31});
+% Function for 2 elements
+etemp2 = SX.sym('etemp2',2);
+Jtemp2 = 0;
+for i=1:length(etemp2)
+    Jtemp2 = Jtemp2 + etemp2(i).^2;
+end
+Jtemp2 = Jtemp2/2;
+f_J2 = Function('f_J2',{etemp2},{Jtemp2});
+% Function for 8 elements
+etemp8 = SX.sym('etemp8',8);
+Jtemp8 = 0;
+for i=1:length(etemp8)
+    Jtemp8 = Jtemp8 + etemp8(i).^2;
+end
+Jtemp8 = Jtemp8/8;
+f_J8 = Function('f_J8',{etemp8},{Jtemp8});
 
 %% Sum of products 
 % Function for 27 elements 
@@ -179,7 +195,7 @@ stiff	= SX.sym('stiff',1);
 damp	= SX.sym('damp',1);
 qin     = SX.sym('qin_pass',1);
 qdotin  = SX.sym('qdotin_pass',1);
-passTATorques = stiff * qin - damp * qdotin;
+passTATorques = -stiff * qin - damp * qdotin;
 f_passiveTATorques = Function('f_passiveTATorques',{stiff,damp,qin,qdotin}, ...
     {passTATorques});
 
