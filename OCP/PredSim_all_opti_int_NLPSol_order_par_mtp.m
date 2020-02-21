@@ -23,7 +23,7 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,0,0,0,0,0]; % This configuration solves the problem
+num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
@@ -863,29 +863,29 @@ if solveProblem
             Qdotskj_nsc(jointi.trunk.rot,j+1));        
         
         Tau_passj.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_flex.l,1), Qdotskj_nsc(jointi.sh_flex.l,1));
+            Qskj_nsc(jointi.sh_flex.l,j+1), Qdotskj_nsc(jointi.sh_flex.l,j+1));
         Tau_passj.sh_add.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_add.l,1), Qdotskj_nsc(jointi.sh_add.l,1));
+            Qskj_nsc(jointi.sh_add.l,j+1), Qdotskj_nsc(jointi.sh_add.l,j+1));
         Tau_passj.sh_rot.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_rot.l,1), Qdotskj_nsc(jointi.sh_rot.l,1));
+            Qskj_nsc(jointi.sh_rot.l,j+1), Qdotskj_nsc(jointi.sh_rot.l,j+1));
         Tau_passj.sh_flex.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_flex.r,1), Qdotskj_nsc(jointi.sh_flex.r,1));
+            Qskj_nsc(jointi.sh_flex.r,j+1), Qdotskj_nsc(jointi.sh_flex.r,j+1));
         Tau_passj.sh_add.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_add.r,1), Qdotskj_nsc(jointi.sh_add.r,1));
+            Qskj_nsc(jointi.sh_add.r,j+1), Qdotskj_nsc(jointi.sh_add.r,j+1));
         Tau_passj.sh_rot.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.sh_rot.r,1), Qdotskj_nsc(jointi.sh_rot.r,1));
+            Qskj_nsc(jointi.sh_rot.r,j+1), Qdotskj_nsc(jointi.sh_rot.r,j+1));
         Tau_passj.elb.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.elb.l,1), Qdotskj_nsc(jointi.elb.l,1));
+            Qskj_nsc(jointi.elb.l,j+1), Qdotskj_nsc(jointi.elb.l,j+1));
         Tau_passj.elb.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
-            Qskj_nsc(jointi.elb.r,1), Qdotskj_nsc(jointi.elb.r,1));        
+            Qskj_nsc(jointi.elb.r,j+1), Qdotskj_nsc(jointi.elb.r,j+1));        
         Tau_passj.arm = [Tau_passj.sh_flex.l, Tau_passj.sh_add.l, ...
             Tau_passj.sh_rot.l, Tau_passj.sh_flex.r, Tau_passj.sh_add.r, ...
             Tau_passj.sh_rot.r, Tau_passj.elb.l, Tau_passj.elb.r];       
 
         Tau_passj.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
-            Qskj_nsc(jointi.mtp.l,1), Qdotskj_nsc(jointi.mtp.l,1));
+            Qskj_nsc(jointi.mtp.l,j+1), Qdotskj_nsc(jointi.mtp.l,j+1));
         Tau_passj.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
-            Qskj_nsc(jointi.mtp.r,1), Qdotskj_nsc(jointi.mtp.r,1));       
+            Qskj_nsc(jointi.mtp.r,j+1), Qdotskj_nsc(jointi.mtp.r,j+1));       
         Tau_passj.mtp.all = [Tau_passj.mtp.l, Tau_passj.mtp.r];       
         
         Tau_passj_all = [Tau_passj.hip.flex.l,Tau_passj.hip.flex.r,...
@@ -895,6 +895,7 @@ if solveProblem
             Tau_passj.ankle.r,Tau_passj.subt.l,Tau_passj.subt.r,...
             Tau_passj.trunk.ext,Tau_passj.trunk.ben,...
             Tau_passj.trunk.rot,Tau_passj.arm,Tau_passj.mtp.all]';
+
         % Expression for the state derivatives at the collocation points
         Qsp_nsc      = Qskj_nsc*C(:,j+1);
         Qdotsp_nsc   = Qdotskj_nsc*C(:,j+1);            
