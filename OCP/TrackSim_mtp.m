@@ -26,8 +26,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,1,0,1,0,1]; % This configuration solves the problem
-% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+% num_set = [1,1,0,1,0,1]; % This configuration solves the problem
+num_set = [0,1,1,1,0,0]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
@@ -1467,11 +1467,9 @@ if analyseResults
         FTtilde_opt_unsc(p).p = FTtilde_opt(p).p(1:end-1,:).*repmat(...
             scaling(p).p.FTtilde,size(FTtilde_opt(p).p(1:end-1,:),1),1);
         % Arm activations
-        a_a_opt_unsc(p).p = a_a_opt(p).p(1:end-1,:).*repmat(...
-            scaling(p).p.a_a,size(a_a_opt(p).p(1:end-1,:),1),size(a_a_opt(p).p,2));
+        a_a_opt_unsc(p).p = a_a_opt(p).p(1:end-1,:);
         % Mtp activations
-        a_mtp_opt_unsc(p).p = a_mtp_opt(p).p(1:end-1,:).*repmat(...
-            scaling(p).p.a_mtp,size(a_mtp_opt(p).p(1:end-1,:),1),size(a_mtp_opt(p).p,2));
+        a_mtp_opt_unsc(p).p = a_mtp_opt(p).p(1:end-1,:);
         % Controls at mesh points
         % Time derivative of Qdots
         qdotdot_opt_unsc(p).p.rad = ...
@@ -1522,6 +1520,8 @@ if analyseResults
         Xk_Qdotdots_opt             = qdotdot_opt_unsc(p).p.rad;  
         out1_res_opt                = zeros(N,toes.TR.T.r(end));
         out2_res_opt                = zeros(N,GRMi.l(end));
+        Tau_pass_opt_mtp            = zeros(N,nq.mtp);
+        Tau_pass_opt_arm            = zeros(N,nq.arms);
         for i = 1:N
             out1_res = F1(Xk_Qs_Qdots_opt(i,:));
             out1_res_opt(i,:) = full(out1_res);
@@ -1694,28 +1694,8 @@ if analyseResults
             end
             out2_res = ...
                 F2([Xk_Qs_Qdots_opt(i,:)';Xk_Qdotdots_opt(i,:)';in_F2_opt']);        
-            out2_res_opt(i,:) = full(out2_res);  
-        end
-        % Optimal joint torques, ground reaction forces and moments
-        Tauk_out(p).p        = out2_res_opt(:,residualsi);
-        GRF_opt_unsc(p).p    = out2_res_opt(:,GRFi.all);
-        GRM_opt_unsc(p).p    = out2_res_opt(:,GRMi.all);
-        % assertArmTmax should be 0
-        assertArmTmax = max(max(abs(out2_res_opt(:,armsi)-(a_a_opt_unsc(p).p)*...
-            scaling(p).p.ArmTau + dampingArm*qdot_opt_unsc(p).p.rad(:,armsi))));
-        assertMtpTmax = max(max(abs(out2_res_opt(:,mtpi)-(a_mtp_opt_unsc(p).p)*...
-            scaling(p).p.MtpTau + stiffnessMtp*q_opt_unsc(p).p.rad(:,mtpi) + ...
-            dampingMtp*qdot_opt_unsc(p).p.rad(:,mtpi))));
-        if assertArmTmax > 10^(-tol_ipopt)
-            disp('error in arm torques')
-        end
-        if assertMtpTmax > 10^(-tol_ipopt)
-            disp('error in mtp torques')
-        end
-
-        % Passive joint torques at optimal solution
-        Tau_pass_opt_all(p).p = zeros(N,nq.act);
-        for i = 1:N    
+            out2_res_opt(i,:) = full(out2_res); 
+            
             Tau_pass_opt.hip.flex.l    = f_PassiveMoments(k_pass.hip.flex,...
                 theta.pass.hip.flex,Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2-1),...
                 Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2));
@@ -1786,6 +1766,10 @@ if analyseResults
             Tau_pass_opt.elb.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
                 Xk_Qs_Qdots_opt(i,jointi.elb.r*2-1), ...
                 Xk_Qs_Qdots_opt(i,jointi.elb.r*2));
+            
+            Tau_pass_opt_arm(i,:) = full([Tau_pass_opt.sh_flex.l; Tau_pass_opt.sh_add.l; ...
+                Tau_pass_opt.sh_rot.l; Tau_pass_opt.sh_flex.r; Tau_pass_opt.sh_add.r; ...
+                Tau_pass_opt.sh_rot.r; Tau_pass_opt.elb.l; Tau_pass_opt.elb.r]);    
 
             Tau_pass_opt.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.l*2-1), ...
@@ -1793,6 +1777,8 @@ if analyseResults
             Tau_pass_opt.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.r*2-1), ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.r*2));  
+            
+            Tau_pass_opt_mtp(i,:) = full([Tau_pass_opt.mtp.l,Tau_pass_opt.mtp.r]);
 
             Tau_pass_opt_all(p).p(i,:) = full([Tau_pass_opt.hip.flex.l,...
                 Tau_pass_opt.hip.add.l,Tau_pass_opt.hip.rot.l,...             
@@ -1807,7 +1793,23 @@ if analyseResults
                 Tau_pass_opt.sh_rot.l,Tau_pass_opt.sh_flex.r,...
                 Tau_pass_opt.sh_add.r,Tau_pass_opt.sh_rot.r,...
                 Tau_pass_opt.elb.l,Tau_pass_opt.elb.r]);
-        end        
+            
+        end
+        % Optimal joint torques, ground reaction forces and moments
+        Tauk_out(p).p        = out2_res_opt(:,residualsi);
+        GRF_opt_unsc(p).p    = out2_res_opt(:,GRFi.all);
+        GRM_opt_unsc(p).p    = out2_res_opt(:,GRMi.all);
+        % assertArmTmax should be 0
+        assertArmTmax = max(max(abs(out2_res_opt(:,armsi)/scaling(p).p.ArmTau - ...
+            (a_a_opt_unsc(p).p + Tau_pass_opt_arm/scaling(p).p.ArmTau))));
+        assertMtpTmax = max(max(abs(out2_res_opt(:,mtpi)/scaling(p).p.MtpTau - ...
+            (a_mtp_opt_unsc(p).p + Tau_pass_opt_mtp/scaling(p).p.MtpTau))));
+        if assertArmTmax > 10^(-tol_ipopt)
+            disp('error in arm torques')
+        end
+        if assertMtpTmax > 10^(-tol_ipopt)
+            disp('error in mtp torques')
+        end      
     end
     
     %% Create .mot file for OpenSim GUI
@@ -1866,7 +1868,9 @@ if analyseResults
         Results_tracking(ww).ww(p).Ts_opt = Tauk_out(p).p;
         Results_tracking(ww).ww(p).GRFs_opt = GRF_opt_unsc(p).p;
         Results_tracking(ww).ww(p).GRMs_opt = GRM_opt_unsc(p).p; 
-        Results_tracking(ww).ww(p).passT = Tau_pass_opt_all(p).p;        
+        Results_tracking(ww).ww(p).passT = Tau_pass_opt_all(p).p;      
+        Results_tracking(ww).ww(p).aMTP = a_mtp_opt_unsc(p).p;
+        Results_tracking(ww).ww(p).aArm = a_a_opt_unsc(p).p;
         Results_tracking(ww).ww(p).Qs_toTrack = Qs(p).p.allinterpfilt;
         Results_tracking(ww).ww(p).Ts_toTrack = ID(p).p.allinterp;
         Results_tracking(ww).ww(p).GRFs_toTrack = GRF(p).p.val.allinterp;

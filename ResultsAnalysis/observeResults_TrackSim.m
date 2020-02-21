@@ -23,12 +23,14 @@ trackSim_mtp_settings_all
 setup.derivatives = 'AD';
 showtrackplotsonly = 0;
 showlegend = 0;
-writeModel = 0;
+writeModel = 1;
 
 %% Load results
 % Pre-allocation structures
 Qs_opt          = struct('ww',[]);
 Ts_opt          = struct('ww',[]);
+aMTP_opt        = struct('ww',[]);
+passT_opt       = struct('ww',[]);
 GRFs_opt        = struct('ww',[]);
 GRMs_opt        = struct('ww',[]);
 Qs_toTrack      = struct('ww',[]);
@@ -54,7 +56,9 @@ for www = 1:length(idx_ww)
         Qs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).Qs_opt;
         Ts_opt(ww).ww(p).p = Results_tracking(ww).ww(p).Ts_opt;
         GRFs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).GRFs_opt;
-        GRMs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).GRMs_opt; 
+        GRMs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).GRMs_opt;
+        aMTP_opt(ww).ww(p).p = Results_tracking(ww).ww(p).aMTP; 
+        passT_opt(ww).ww(p).p = Results_tracking(ww).ww(p).passT; 
         Qs_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).Qs_toTrack;
         Ts_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).Ts_toTrack;
         GRFs_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).GRFs_toTrack;
@@ -250,6 +254,50 @@ for p = 1:length(trials(ww).ww)
     end  
 end
 
+%% MTP passive vs active torques
+idx_mtp = 19:20;
+pos_mtp = 1:2;
+for p = 1:length(trials(ww).ww)  
+    figure()
+    for i = 1:length(idx_mtp)
+        subplot(1,2,pos_mtp(i))
+        for k = 1:length(idx_ww)
+            ww = idx_ww(k);
+            Qs_toTrack_deg = Qs_toTrack(ww).ww(p).p;
+            % Simulation results    
+            plot(Ts_toTrack(ww).ww(p).p(:,1),Ts_opt(ww).ww(p).p(:,idx_mtp(i)),...
+                'color','k','linewidth',line_linewidth); 
+            hold on
+            % Passive torques
+            plot(Ts_toTrack(ww).ww(p).p(:,1),passT_opt(ww).ww(p).p(:,idx_mtp(i)-6),...
+                'color',color_all(2,:),'linewidth',line_linewidth); 
+            % Active torques
+            plot(Ts_toTrack(ww).ww(p).p(:,1),aMTP_opt(ww).ww(p).p(:,i)*100,...
+                'color','b','linewidth',line_linewidth);
+            l = legend('ID','Passive (stiffness + damping)','Active');
+            set(l,'Fontsize',20);
+            hold on;            
+        end
+        % Plot settings 
+        set(gca,'Fontsize',label_fontsize);    
+        title(RefData_str_tit{idx_Qs(idx_mtp(i))},'Fontsize',label_fontsize);  
+        % Y-axis
+        ylim([ylim_Qdots(idx_mtp(i),1) ylim_Qdots(idx_mtp(i),2)]);
+        L = get(gca,'YLim');
+        set(gca,'YTick',linspace(L(1),L(2),NumTicks_Qs));       
+        if i == 1 
+            ylabel('(Nm)','Fontsize',label_fontsize);
+        end      
+        % X-axis
+        xlim([Qs_toTrack_deg(1,1),Qs_toTrack_deg(end,1)])
+        set(gca,'XTick',[]);
+        box off;
+    end  
+    
+end
+
+
+
 %% Parameters
 for k = 1:length(idx_ww)
     p = 1;
@@ -259,8 +307,6 @@ for k = 1:length(idx_ww)
     subplot(1,2,1)
     scatter(1:2*cs,ParamsCM_opt(ww).ww(p).p(1:2*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
     scatter(1:2*cs,ParamsCM_gen(ww).ww(p).p(1:2*cs),'k','linewidth',2);        
-%     params_bounds_upper = bounds(ww).ww(p).p(1:2*cs) + dev_cm(ww).ww(p).p.loc/1000;
-%     params_bounds_lower = ParamsCM_gen(ww).ww(p).p(1:2*cs) - dev_cm(ww).ww(p).p.loc/1000;
     scatter(1:2*cs,bounds(ww).ww(p).p.params.upper(1:2*cs),'b','linewidth',2);
     scatter(1:2*cs,bounds(ww).ww(p).p.params.lower(1:2*cs),'r','linewidth',2);
     l = legend('Optimal','Generic');
@@ -268,11 +314,6 @@ for k = 1:length(idx_ww)
     subplot(1,2,2)
     scatter(1:cs,ParamsCM_opt(ww).ww(p).p(2*cs+1:3*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
     scatter(1:cs,ParamsCM_gen(ww).ww(p).p(2*cs+1:3*cs),'k','linewidth',2);    
-%     radii = 0.032*ones(1,cs);
-%     params_bounds_upper = radii + dev_cm(ww).ww(p).p.rad/100*radii; 
-%     params_bounds_lower = radii - dev_cm(ww).ww(p).p.rad/100*radii;
-%     scatter(1:cs,params_bounds_upper,'b','linewidth',2);
-%     scatter(1:cs,params_bounds_lower,'r','linewidth',2);
     scatter(1:cs,bounds(ww).ww(p).p.params.upper(2*cs+1:3*cs),'b','linewidth',2);
     scatter(1:cs,bounds(ww).ww(p).p.params.lower(2*cs+1:3*cs),'r','linewidth',2);
     l = legend('Optimal','Generic');
