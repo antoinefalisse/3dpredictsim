@@ -7,7 +7,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 % 
-function guess = getGuess_DI_tracking_mtp(Qs,nq,N,NMuscle,jointi,scaling,cs)
+function guess = getGuess_DI_tracking_mtp(Qs,nq,N,NMuscle,jointi,scaling,cs,csc)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
 Qs_spline.data = zeros(size(Qs.allinterpfilt));
@@ -211,12 +211,12 @@ guess.e_mtp = 0.1*ones(N,nq.mtp);
 % Original values
 B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
 guess.params = B_locSphere_s1_r;
-B_locSphere_s2_r    = [0.148386399942063, -0.028713422052654];
-guess.params = [guess.params,B_locSphere_s2_r];
+B_locSphere_s2_r = [0.148386399942063, -0.028713422052654];
+guess.params = [guess.params, B_locSphere_s2_r];
 B_locSphere_s3_r = [0.133001170607051, 0.0516362473449566];
-guess.params = [guess.params,B_locSphere_s3_r];
-B_locSphere_s4_r = [0.06, -0.0187603084619177];    
-guess.params = [guess.params,B_locSphere_s4_r];
+guess.params = [guess.params, B_locSphere_s3_r];
+B_locSphere_s4_r = [0.06, -0.0187603084619177];  
+guess.params = [guess.params, B_locSphere_s4_r]; 
 if cs == 5|| cs == 6
     B_locSphere_s5_r = [0.0662346661991635, 0.0263641606741698];
     guess.params = [guess.params,B_locSphere_s5_r];
@@ -224,6 +224,41 @@ if cs == 5|| cs == 6
         B_locSphere_s6_r = [0.045, 0.0618569567549652];
         guess.params = [guess.params,B_locSphere_s6_r];
     end
+end
+if cs == 4 && csc == 2
+    % Different configuration (1&2 on calcn, 4&6 on toes, 3&5 removed)
+    % Original values
+    guess.params = B_locSphere_s1_r;
+    guess.params = [guess.params, B_locSphere_s2_r];
+    guess.params = [guess.params, B_locSphere_s4_r];
+    B_locSphere_s6_r = [0.045, 0.0618569567549652];
+    guess.params = [guess.params, B_locSphere_s6_r];
+end
+if cs == 5 && csc == 2
+    B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
+    guess.params = B_locSphere_s1_r;
+    B_locSphere_s5_r = [0.0662346661991635, 0.026];
+    guess.params = [guess.params,B_locSphere_s5_r];
+    B_locSphere_s3_r = [0.130, 0.035];
+    guess.params = [guess.params, B_locSphere_s3_r];
+    B_locSphere_s4_r = [0.05, -0.015];   
+    guess.params = [guess.params, B_locSphere_s4_r]; 
+    B_locSphere_s6_r = [0.0125, 0.0175];
+    guess.params = [guess.params,B_locSphere_s6_r];
+end
+if (cs == 6 && csc == 2) || (cs == 6 && csc == 3)
+    B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
+    guess.params = B_locSphere_s1_r;
+    B_locSphere_s2_r = [0.148386399942063, -0.02];
+    guess.params = [guess.params, B_locSphere_s2_r];
+    B_locSphere_s3_r = [0.130, 0.035];
+    guess.params = [guess.params, B_locSphere_s3_r];
+    B_locSphere_s4_r = [0.05, -0.015];  
+    guess.params = [guess.params, B_locSphere_s4_r]; 
+    B_locSphere_s5_r = [B_locSphere_s5_r(1), 0.026];
+    guess.params = [guess.params,B_locSphere_s5_r];
+    B_locSphere_s6_r = [0.0125, 0.0175];
+    guess.params = [guess.params,B_locSphere_s6_r];
 end
 IG_rad = 0.032*ones(1,cs);
 guess.params = [guess.params,IG_rad];

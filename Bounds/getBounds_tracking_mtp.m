@@ -7,7 +7,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 %
-function [bounds,scaling] = getBounds_tracking_mtp(Qs,NMuscle,nq,jointi,dev_cm,GRF,cs)
+function [bounds,scaling] = getBounds_tracking_mtp(Qs,NMuscle,nq,jointi,dev_cm,GRF,cs,csc)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
 Qs_spline.data = zeros(size(Qs.allfilt));
@@ -401,7 +401,7 @@ bounds.e_mtp.lower = -ones(1,nq.mtp);
 bounds.e_mtp.upper = ones(1,nq.mtp);
 
 %% Parameters contact model
-% Original values
+% Original values & configuration (spheres 1,2,3&5 => calcn & 4&6 => toes)
 B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
 params_loc_IG = B_locSphere_s1_r;
 B_locSphere_s2_r = [0.148386399942063, -0.028713422052654];
@@ -419,11 +419,149 @@ if cs == 5 || cs == 6
     end
 end
 radii = 0.032*ones(1,cs);
+% Different configurations
+if cs == 4 && csc == 2 
+    % Sphere 3 => toes (originally sphere 4)
+    % Sphere 4 => toes (originally sphere 6)
+    % Original values
+    params_loc_IG = B_locSphere_s1_r;
+    params_loc_IG = [params_loc_IG, B_locSphere_s2_r];
+    params_loc_IG = [params_loc_IG, B_locSphere_s4_r];
+    B_locSphere_s6_r = [0.045, 0.0618569567549652];
+    params_loc_IG = [params_loc_IG, B_locSphere_s6_r];
+end
 % Allowed deviations
 params_loc_IG_upper = params_loc_IG + dev_cm.loc/1000;
 params_loc_IG_lower = params_loc_IG - dev_cm.loc/1000;
 radii_upper = radii + dev_cm.rad/100*radii;
 radii_lower = radii - dev_cm.rad/100*radii;
+% Manually constrained configurations
+if cs == 4 && csc == 2
+    params_loc_IG_lower(1) = 0;
+    params_loc_IG_upper(3) = 0.15; 
+    params_loc_IG_upper(4) = 0.03; 
+    params_loc_IG_lower(4) = -0.03; 
+    params_loc_IG_lower([5,7]) = 0.02;
+    params_loc_IG_upper([6,8]) = 0.06;
+    params_loc_IG_lower([6,8]) = -0.05;    
+    radii_upper(1) = 0.065;
+    % Case 12 vs case 11
+    radii_upper(2) = 0.065;
+end
+if cs == 6 
+    if csc == 2
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = B_locSphere_s1_r + 0.005;
+        B_locSphere_s1_r_dev_lb = B_locSphere_s1_r - 0.005;
+        radius_s1_ub = 0.032 + 0.05*0.032;
+        radius_s1_lb = 0.032 - 0.05*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [B_locSphere_s5_r(1) + 0.01, B_locSphere_s5_r(2)];
+        B_locSphere_s5_r_dev_lb = [B_locSphere_s5_r(1) - 0.01, B_locSphere_s5_r(2) - 0.01];
+        radius_s5_ub = 0.032 + 0.30*0.032;
+        radius_s5_lb = 0.032 - 0.30*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [B_locSphere_s3_r(1), 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, 0.02];
+        radius_s3_ub = 0.032 + 0.30*0.032;
+        radius_s3_lb = 0.032 - 0.30*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [0.155, -0.01];
+        B_locSphere_s2_r_dev_lb = [0.11, B_locSphere_s2_r(2)];
+        radius_s2_ub = 0.032 + 0.30*0.032;
+        radius_s2_lb = 0.032 - 0.30*0.032;
+        % Sphere 4
+        B_locSphere_s4_r_dev_ub = [B_locSphere_s4_r(1), 0];
+        B_locSphere_s4_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s4_ub = 0.032 + 0.30*0.032;
+        radius_s4_lb = 0.032 - 0.30*0.032;
+        % Sphere 6
+        B_locSphere_s6_r_dev_ub = [0.025, 0.035];
+        B_locSphere_s6_r_dev_lb = [0, 0];
+        radius_s6_ub = 0.032 + 0.30*0.032;
+        radius_s6_lb = 0.032 - 0.30*0.032;
+    elseif csc == 3
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = B_locSphere_s1_r + 0.005;
+        B_locSphere_s1_r_dev_lb = B_locSphere_s1_r - 0.005;
+        radius_s1_ub = 0.032 + 0.05*0.032;
+        radius_s1_lb = 0.032 - 0.05*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [B_locSphere_s5_r(1) + 0.01, B_locSphere_s5_r(2)];
+        B_locSphere_s5_r_dev_lb = [B_locSphere_s5_r(1) - 0.01, B_locSphere_s5_r(2) - 0.01];
+        radius_s5_ub = 0.032 + 0.05*0.032;
+        radius_s5_lb = 0.032 - 0.05*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [B_locSphere_s3_r(1), 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, 0.02];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.50*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [0.155, -0.01];
+        B_locSphere_s2_r_dev_lb = [0.11, B_locSphere_s2_r(2)];
+        radius_s2_ub = 0.032 + 0.50*0.032;
+        radius_s2_lb = 0.032 - 0.50*0.032;
+        % Sphere 4
+        B_locSphere_s4_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s4_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.50*0.032;
+        % Sphere 6
+        B_locSphere_s6_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s6_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s6_ub = 0.032 + 0.50*0.032;
+        radius_s6_lb = 0.032 - 0.50*0.032;        
+    end    
+    params_loc_IG_upper = [B_locSphere_s1_r_dev_ub,B_locSphere_s2_r_dev_ub,...
+        B_locSphere_s3_r_dev_ub,B_locSphere_s4_r_dev_ub,...
+        B_locSphere_s5_r_dev_ub,B_locSphere_s6_r_dev_ub];
+    params_loc_IG_lower = [B_locSphere_s1_r_dev_lb,B_locSphere_s2_r_dev_lb,...
+        B_locSphere_s3_r_dev_lb,B_locSphere_s4_r_dev_lb,...
+        B_locSphere_s5_r_dev_lb,B_locSphere_s6_r_dev_lb];
+    radii_upper = [radius_s1_ub,radius_s2_ub,radius_s3_ub,radius_s4_ub,...
+        radius_s5_ub,radius_s6_ub];
+    radii_lower = [radius_s1_lb,radius_s2_lb,radius_s3_lb,radius_s4_lb,...
+        radius_s5_lb,radius_s6_lb];
+end
+if cs == 5
+    if csc == 2
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = B_locSphere_s1_r + 0.005;
+        B_locSphere_s1_r_dev_lb = B_locSphere_s1_r - 0.005;
+        radius_s1_ub = 0.032 + 0.05*0.032;
+        radius_s1_lb = 0.032 - 0.05*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [B_locSphere_s5_r(1) + 0.01, B_locSphere_s5_r(2)];
+        B_locSphere_s2_r_dev_lb = [B_locSphere_s5_r(1) - 0.01, B_locSphere_s5_r(2) - 0.01];
+        radius_s2_ub = 0.032 + 0.05*0.032;
+        radius_s2_lb = 0.032 - 0.05*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [B_locSphere_s3_r(1), 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, 0.02];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.50*0.032;
+        % Sphere 4
+        B_locSphere_s4_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s4_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.50*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s5_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s5_ub = 0.032 + 0.50*0.032;
+        radius_s5_lb = 0.032 - 0.50*0.032;        
+    end    
+    params_loc_IG_upper = [B_locSphere_s1_r_dev_ub,B_locSphere_s2_r_dev_ub,...
+        B_locSphere_s3_r_dev_ub,B_locSphere_s4_r_dev_ub,...
+        B_locSphere_s5_r_dev_ub];
+    params_loc_IG_lower = [B_locSphere_s1_r_dev_lb,B_locSphere_s2_r_dev_lb,...
+        B_locSphere_s3_r_dev_lb,B_locSphere_s4_r_dev_lb,...
+        B_locSphere_s5_r_dev_lb];
+    radii_upper = [radius_s1_ub,radius_s2_ub,radius_s3_ub,radius_s4_ub,...
+        radius_s5_ub];
+    radii_lower = [radius_s1_lb,radius_s2_lb,radius_s3_lb,radius_s4_lb,...
+        radius_s5_lb];
+end
 bounds.params.upper = [params_loc_IG_upper,radii_upper];
 bounds.params.lower = [params_loc_IG_lower,radii_lower];
 
@@ -490,7 +628,7 @@ scaling.a_mtp = 1;
 % Mtp excitations
 scaling.e_mtp = 1;
 % Fixed scaling factor
-scaling.MtpTau = 10;
+scaling.MtpTau = 100;
 % Time derivative of muscle-tendon forces
 % Fixed scaling factor
 scaling.dFTtilde = 100;

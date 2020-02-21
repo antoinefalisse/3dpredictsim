@@ -20,23 +20,22 @@ close all;
 % num_set(4): set to 1 to save results
 % num_set(5): set to 1 to visualize guess-bounds 
 % num_set(6): set to 1 to write .mot file
-% num_set(7): set to 1 to decompose cost
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,0,0,0,0,0,0]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,0,0]; % This configuration analyzes the results
+% num_set = [1,0,0,0,0,0]; % This configuration solves the problem
+num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [22]; % Index row in matrix settings (1:198)
+idx_ww = [4]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
 subject = 'subject1';
 parallelMode = 'thread';
-NThreads = 8;
+NThreads = 2;
 
 solveProblem    = num_set(1); % set to 1 to solve problem
 analyseResults  = num_set(2); % set to 1 to analyze results
@@ -44,7 +43,6 @@ loadResults     = num_set(3); % set to 1 to load results
 saveResults     = num_set(4); % set to 1 to save sens. results
 checkBoundsIG   = num_set(5); % set to 1 to visualize guess-bounds 
 writeIKmotion   = num_set(6); % set to 1 to write .mot file
-decomposeCost   = num_set(7); % set to 1 to decompose cost
 
 % settings describes the parameters used in the optimal control problems.
 % settings(1): average speed: max 2 digits.
@@ -83,269 +81,14 @@ decomposeCost   = num_set(7); % set to 1 to decompose cost
 settings = [    
     % A. Varying prescribed gait speed
     % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 1
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 2
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 3
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 4
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 5
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 6
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 7
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 8
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 9
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 10
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 11
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 12
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 13
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 14
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 15
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 16
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 17
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 18
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 19
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 20
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 21    
+    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 1  
     % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 22
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 23
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 24
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 25
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 26
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 27
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 28
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 29
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 30
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 31
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 32
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 33
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 34
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 35
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 36
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 37
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 38
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 39
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 40
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 41
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 42
-    % Data-informed (running) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 43
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 44
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 45
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 46
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 47
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 48
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 49
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 50
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 51
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 52
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 53
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 54
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 55
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 56
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 57
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 58
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 59
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 60
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 61
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 62
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 63
-    % Data-informed (full solution at closest speed) initial guess
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 1, 0, 0, 0, 0, 0;    % 64
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 64, 0, 0, 0, 0, 0;   % 65
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 65, 0, 0, 0, 0, 0;   % 66
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 66, 0, 0, 0, 0, 0;   % 67
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 67, 0, 0, 0, 0, 0;   % 68
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 68, 0, 0, 0, 0, 0;   % 69
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 1, 0, 0, 0, 0, 0;    % 70
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 70, 0, 0, 0, 0, 0;   % 71
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 71, 0, 0, 0, 0, 0;   % 72
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 72, 0, 0, 0, 0, 0;   % 73
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 73, 0, 0, 0, 0, 0;   % 74
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 74, 0, 0, 0, 0, 0;   % 75
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 75, 0, 0, 0, 0, 0;   % 76
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 76, 0, 0, 0, 0, 0;   % 77
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 77, 0, 0, 0, 0, 0;   % 78
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 78, 0, 0, 0, 0, 0;   % 79
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 79, 0, 0, 0, 0, 0;   % 80
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 80, 0, 0, 0, 0, 0;   % 81
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 81, 0, 0, 0, 0, 0;   % 82
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 82, 0, 0, 0, 0, 0;   % 83 
-    % Data-informed (partial solution at closest speed) initial guess
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 1, 0, 0, 0, 0, 0;    % 84
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 84, 0, 0, 0, 0, 0;   % 85
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 85, 0, 0, 0, 0, 0;   % 86
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 86, 0, 0, 0, 0, 0;   % 87
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 87, 0, 0, 0, 0, 0;   % 88
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 88, 0, 0, 0, 0, 0;   % 89
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 1, 0, 0, 0, 0, 0;    % 90
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 90, 0, 0, 0, 0, 0;   % 91
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 91, 0, 0, 0, 0, 0;   % 92
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 92, 0, 0, 0, 0, 0;   % 93
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 93, 0, 0, 0, 0, 0;   % 94
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 94, 0, 0, 0, 0, 0;   % 95
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 95, 0, 0, 0, 0, 0;   % 96
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 96, 0, 0, 0, 0, 0;   % 97
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 97, 0, 0, 0, 0, 0;   % 98
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 98, 0, 0, 0, 0, 0;   % 99
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 99, 0, 0, 0, 0, 0;   % 100
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 100, 0, 0, 0, 0, 0;  % 101
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 101, 0, 0, 0, 0, 0;  % 102
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 102, 0, 0, 0, 0, 0;  % 103    
-    % B. Altering cost function
-    % No metabolic energy rate term
-    % Quasi-random initial guess
-    1.33, 4, 50, 0, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;      % 104
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 0, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;      % 105
-    % No muscle activity term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;       % 106
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 0, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;       % 107
-    % Not squaring metabolic energy rate term
-    % Quasi-random initial guess
-    1.33, 4, 50, 1000, 50000, 1000000, 1000, 2000, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0;   % 108
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 1000, 50000, 1000000, 1000, 2000, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0;   % 109
-    % No passive torque term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 0, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;       % 110
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 0, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;       % 111
-    % Very low weight on joint acceleration term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 1, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;        % 112
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 1, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;        % 113    
+    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 2
     % C. Subject-specific contact model
     % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0;    % 114
+    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0;    % 3
     % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0;    % 115      
-    % D. More mesh points
-    % Quasi-random initial guess
-    1.33, 4, 100, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;   % 116
-    % Data-informed (walking) initial guess
-    1.33, 4, 100, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;   % 117    
-    % E. Weak hip muscles
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 50, 0, 0, 0, 0;   % 118
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 50, 0, 0, 0, 0;   % 119
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 75, 0, 0, 0, 0;   % 120
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 75, 0, 0, 0, 0;   % 121
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 90, 0, 0, 0, 0;   % 122
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 90, 0, 0, 0, 0;   % 123         
-    % F. Increased maximum muscle contraction velocities
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 124
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 125
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 126
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 127
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 128
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 129
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 130
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 131
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 132
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 133
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 134
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 135
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 136
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 137
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 138
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 139
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 140
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 141
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 142
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 143
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 144
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 145    
-    % Data-informed (running) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 146
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 147
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 148
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 149
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 150
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 151
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 152
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 153
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 154
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 155
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 156
-    % Data-informed (full solution at closest speed) initial guess
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 124, 0, 1, 0, 0, 0;  % 157
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 157, 0, 1, 0, 0, 0;  % 158
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 158, 0, 1, 0, 0, 0;  % 159
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 159, 0, 1, 0, 0, 0;  % 160
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 160, 0, 1, 0, 0, 0;  % 161
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 161, 0, 1, 0, 0, 0;  % 162
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 162, 0, 1, 0, 0, 0;  % 163
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 163, 0, 1, 0, 0, 0;  % 164
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 164, 0, 1, 0, 0, 0;  % 165
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 165, 0, 1, 0, 0, 0;  % 166
-    % Data-informed (partial solution at closest speed) initial guess
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 124, 0, 1, 0, 0, 0;  % 167
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 167, 0, 1, 0, 0, 0;  % 168
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 168, 0, 1, 0, 0, 0;  % 169
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 169, 0, 1, 0, 0, 0;  % 170
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 170, 0, 1, 0, 0, 0;  % 171
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 171, 0, 1, 0, 0, 0;  % 172
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 172, 0, 1, 0, 0, 0;  % 173
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 173, 0, 1, 0, 0, 0;  % 174
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 174, 0, 1, 0, 0, 0;  % 175
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 175, 0, 1, 0, 0, 0;  % 176    
-    % G. Weakness ankle plantaflexors
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 50, 0, 0;   % 177   
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 75, 0, 0;   % 178   
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 90, 0, 0;   % 179
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 50, 0, 0;   % 180 
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 75, 0, 0;   % 181
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 90, 0, 0;   % 182    
-    % H. Different metabolic energy models
-    % Metabolic energy model from Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 1, 0;    % 183
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 1, 0;    % 184
-    % Metabolic energy model from Umberger (2010)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 2, 0;    % 185
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 2, 0;    % 186
-    % Metabolic energy model from Uchida et al. (2016)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 3, 0;    % 187
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 3, 0;    % 188  
-    % Metabolic energy model from Umberger (2010) treating muscle lengthening heat rate as Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 4, 0;    % 189
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 4, 0;    % 190
-    % Metabolic energy model from Umberger (2010) treating negative mechanical work as Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 5, 0;    % 191
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 5, 0;    % 192    
-    % I. Co-contraction
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1;    % 193
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1;    % 194
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 2;    % 195
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 2;    % 196    
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 3;    % 197
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 3;    % 198
+    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0;    % 4   
 ];
 
 %% Select settings
@@ -374,6 +117,7 @@ mE          = settings(ww,17);   % metabolic energy model identifier
 coCont      = settings(ww,18);   % co-contraction identifier
 % Fixed parameter
 W.u = 0.001;
+W.Mtp = 1000;
 % The filename used to save the results depends on the settings 
 v_tgt_id = round(v_tgt,2);
 savename = ['_c',num2str(ww),'_v',num2str(v_tgt_id*100),...
@@ -434,15 +178,14 @@ if ispc
     switch setup.derivatives
         case {'AD'}   
             if cm == 1
-                F = external('F','PredSim.dll');   
-                F2 = external('F','PredSim_mtp.dll'); 
+                F = external('F','PredSim_mtp.dll');   
                 if analyseResults
-                    F1 = external('F','PredSim_pp.dll');
+                    F1 = external('F','PredSim_mtp_pp.dll');
                 end
             elseif cm == 2
-                F = external('F','PredSim_SSCM.dll');   
+                F = external('F','PredSim_mtp_cm1.dll');   
                 if analyseResults
-                    F1 = external('F','PredSim_SSCM_pp.dll');
+                    F1 = external('F','PredSim_mtp_pp_cm1.dll');
                 end
             end
     end
@@ -467,13 +210,12 @@ end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
-vec1 = -5*ones(87,1);
-res1 = full(F(vec1));
-vec2 = -5*ones(93,1);
-vec2(19*2-1:20*2) = 0;
-vec2(31*2+19) = 0;
-res2 = full(F2(vec2));
-
+% vec1 = -5*ones(87,1);
+% res1 = full(F(vec1));
+% vec2 = -5*ones(93,1);
+% vec2(19*2-1:20*2) = 0;
+% vec2(31*2+19) = 0;
+% res2 = full(F2(vec2));
 
 % res2 = full(F1(vec1));
 
@@ -499,22 +241,25 @@ jointi.ankle.l      = 15;
 jointi.ankle.r      = 16;
 jointi.subt.l       = 17;
 jointi.subt.r       = 18;
-jointi.trunk.ext    = 19;
-jointi.trunk.ben    = 20;
-jointi.trunk.rot    = 21;
-jointi.sh_flex.l    = 22;
-jointi.sh_add.l     = 23;
-jointi.sh_rot.l     = 24;
-jointi.sh_flex.r    = 25;
-jointi.sh_add.r     = 26;
-jointi.sh_rot.r     = 27;
-jointi.elb.l        = 28;
-jointi.elb.r        = 29;
+jointi.mtp.l        = 19;
+jointi.mtp.r        = 20;
+jointi.trunk.ext    = 21;
+jointi.trunk.ben    = 22;
+jointi.trunk.rot    = 23;
+jointi.sh_flex.l    = 24;
+jointi.sh_add.l     = 25;
+jointi.sh_rot.l     = 26;
+jointi.sh_flex.r    = 27;
+jointi.sh_add.r     = 28;
+jointi.sh_rot.r     = 29;
+jointi.elb.l        = 30;
+jointi.elb.r        = 31;
 % Vectors of indices for later use
 residualsi          = jointi.pelvis.tilt:jointi.elb.r; % all 
 ground_pelvisi      = jointi.pelvis.tilt:jointi.pelvis.tz; % ground-pelvis
 trunki              = jointi.trunk.ext:jointi.trunk.rot; % trunk
 armsi               = jointi.sh_flex.l:jointi.elb.r; % arms
+mtpi                = jointi.mtp.l:jointi.mtp.r; % mtps
 residuals_noarmsi   = jointi.pelvis.tilt:jointi.trunk.rot; % all but arms
 roti                = [jointi.pelvis.tilt:jointi.pelvis.rot,...
     jointi.hip_flex.l:jointi.elb.r];
@@ -523,37 +268,38 @@ nq.all      = length(residualsi); % all
 nq.abs      = length(ground_pelvisi); % ground-pelvis
 nq.trunk    = length(trunki); % trunk
 nq.arms     = length(armsi); % arms
-nq.leg      = 9; % #joints needed for polynomials
+nq.mtp     = length(mtpi); % arms
+nq.leg      = 10; % #joints needed for polynomials
 % Second, origins bodies. 
 % Calcaneus
-calcOr.r    = 30:31;
-calcOr.l    = 32:33;
+calcOr.r    = 32:33;
+calcOr.l    = 34:35;
 calcOr.all  = [calcOr.r,calcOr.l];
 NcalcOr     = length(calcOr.all);
 % Femurs
-femurOr.r   = 34:35;
-femurOr.l   = 36:37;
+femurOr.r   = 36:37;
+femurOr.l   = 38:39;
 femurOr.all = [femurOr.r,femurOr.l];
 NfemurOr    = length(femurOr.all);
 % Hands
-handOr.r    = 38:39;
-handOr.l    = 40:41;
+handOr.r    = 40:41;
+handOr.l    = 42:43;
 handOr.all  = [handOr.r,handOr.l];
 NhandOr     = length(handOr.all);
 % Tibias
-tibiaOr.r   = 42:43;
-tibiaOr.l   = 44:45;
+tibiaOr.r   = 44:45;
+tibiaOr.l   = 46:47;
 tibiaOr.all = [tibiaOr.r,tibiaOr.l];
 NtibiaOr    = length(tibiaOr.all);
 % External function: F1 (post-processing purpose only)
 % Ground reaction forces (GRFs)
-GRFi.r      = 30:32;
-GRFi.l      = 33:35;
+GRFi.r      = 32:34;
+GRFi.l      = 35:37;
 GRFi.all    = [GRFi.r,GRFi.l];
 NGRF        = length(GRFi.all);
 % Origins calcaneus (3D)
-calcOrall.r     = 36:38;
-calcOrall.l     = 39:41;
+calcOrall.r     = 38:40;
+calcOrall.l     = 41:43;
 calcOrall.all   = [calcOrall.r,calcOrall.l];
 NcalcOrall      = length(calcOrall.all);
 
@@ -595,12 +341,12 @@ NMuscle = length(muscleNames(1:end-3))*2;
 % Muscle-tendon parameters. Row 1: maximal isometric forces; Row 2: optimal
 % fiber lengths; Row 3: tendon slack lengths; Row 4: optimal pennation 
 % angles; Row 5: maximal contraction velocities
-load([pathmusclemodel,'/MTparameters_',subject,'.mat']);
+load([pathmusclemodel,'/MTparameters_',subject,'_mtp.mat']);
 MTparameters_m = [MTparameters(:,musi),MTparameters(:,musi)];
 % Indices of the muscles actuating the different joints for later use
 pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
-tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
+tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_mtp.mat']);
 [~,mai] = MomentArmIndices(muscleNames(1:end-3),...
     tl.muscle_spanning_joint_INFO(1:end-3,:));
 
@@ -660,14 +406,14 @@ pctsts = [pctst;pctst];
 pathCasADiFunctions = [pathRepo,'/CasADiFunctions'];
 addpath(genpath(pathCasADiFunctions));
 % We load some variables for the polynomial approximations
-load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'.mat']);
-load([pathpolynomial,'/MuscleInfo_',subject,'.mat']);
+load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_mtp.mat']);
+load([pathpolynomial,'/MuscleInfo_',subject,'_mtp.mat']);
 % For the polynomials, we want all independent muscles. So we do not need 
 % the muscles from both legs, since we assume bilateral symmetry, but want
 % all muscles from the back (indices 47:49).
 musi_pol = [musi,47,48,49];
 NMuscle_pol = NMuscle/2+3;
-CasADiFunctions_all
+CasADiFunctions_all_mtp
 
 %% Passive joint torques
 % We extract the parameters for the passive torques of the lower limbs and
@@ -676,6 +422,11 @@ pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
 
+stiffnessArm = 0;
+dampingArm = 0.1;
+stiffnessMtp = 1.5/(pi/180)/5;
+dampingMtp = 0.5;
+
 %% Experimental data
 % We extract experimental data to set bounds and initial guesses if needed
 pathData = [pathRepo,'/OpenSimModel/',subject];
@@ -683,15 +434,15 @@ joints = {'pelvis_tilt','pelvis_list','pelvis_rotation','pelvis_tx',...
     'pelvis_ty','pelvis_tz','hip_flexion_l','hip_adduction_l',...
     'hip_rotation_l','hip_flexion_r','hip_adduction_r','hip_rotation_r',...
     'knee_angle_l','knee_angle_r','ankle_angle_l','ankle_angle_r',...
-    'subtalar_angle_l','subtalar_angle_r','lumbar_extension',...
-    'lumbar_bending','lumbar_rotation','arm_flex_l','arm_add_l',...
-    'arm_rot_l','arm_flex_r','arm_add_r','arm_rot_r','elbow_flex_l',...
-    'elbow_flex_r'};
+    'subtalar_angle_l','subtalar_angle_r','mtp_angle_l','mtp_angle_r',...
+    'lumbar_extension','lumbar_bending','lumbar_rotation','arm_flex_l',...
+    'arm_add_l','arm_rot_l','arm_flex_r','arm_add_r','arm_rot_r',...
+    'elbow_flex_l','elbow_flex_r'};
 pathVariousFunctions = [pathRepo,'/VariousFunctions'];
 addpath(genpath(pathVariousFunctions));
 % Extract joint positions from average walking motion
 motion_walk         = 'walking';
-nametrial_walk.id   = ['average_',motion_walk,'_HGC']; 
+nametrial_walk.id   = ['average_',motion_walk,'_HGC_mtp']; 
 nametrial_walk.IK   = ['IK_',nametrial_walk.id];
 pathIK_walk         = [pathData,'/IK/',nametrial_walk.IK,'.mat'];
 Qs_walk             = getIK(pathIK_walk,joints);
@@ -719,7 +470,7 @@ end
 %% Bounds
 pathBounds = [pathRepo,'/Bounds'];
 addpath(genpath(pathBounds));
-[bounds,scaling] = getBounds_all(Qs_walk,NMuscle,nq,jointi,v_tgt);
+[bounds,scaling] = getBounds_all_mtp(Qs_walk,NMuscle,nq,jointi,v_tgt);
 % Simulate co-contraction by increasing the lower bound on muscle activations
 if coCont == 1
     bounds.a.lower = 0.1*ones(1,NMuscle);
@@ -738,7 +489,7 @@ if IGsel == 1 % Quasi-random initial guess
 elseif IGsel == 2 % Data-informed initial guess
     if IGm == 1 % Data from average walking motion
         time_IC = [Qs_walk.time(1),Qs_walk.time(end)];
-        guess = getGuess_DI_opti_int(Qs_walk,nq,N,time_IC,NMuscle,jointi,...
+        guess = getGuess_DI_opti_int_mtp(Qs_walk,nq,N,time_IC,NMuscle,jointi,...
             scaling,v_tgt,d);   
     elseif IGm == 2 % Data from average runing motion    
         time_IC = [Qs_run.time(1),Qs_run.time(end)];
@@ -762,7 +513,7 @@ end
 if checkBoundsIG
     pathPlots = [pathRepo,'/Plots'];
     addpath(genpath(pathPlots));
-    plot_BoundsVSInitialGuess_all
+    plot_BoundsVSInitialGuess_all_mtp
 end
 
 %% Formulate the NLP
@@ -834,6 +585,16 @@ if solveProblem
     opti.subject_to(bounds.a_a.lower'*ones(1,d*N) < a_a_col < ...
         bounds.a_a.upper'*ones(1,d*N));
     opti.set_initial(a_a_col, guess.a_a_col');
+    % Arm activations at mesh points
+    a_mtp = opti.variable(nq.mtp,N+1);
+    opti.subject_to(bounds.a_mtp.lower'*ones(1,N+1) < a_mtp < ...
+        bounds.a_mtp.upper'*ones(1,N+1));
+    opti.set_initial(a_mtp, guess.a_mtp');  
+    % Mtp activations at collocation points
+    a_mtp_col = opti.variable(nq.mtp,d*N);
+    opti.subject_to(bounds.a_mtp.lower'*ones(1,d*N) < a_mtp_col < ...
+        bounds.a_mtp.upper'*ones(1,d*N));
+    opti.set_initial(a_mtp_col, guess.a_mtp_col');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define controls
     % Time derivative of muscle activations (states) at mesh points
@@ -846,6 +607,11 @@ if solveProblem
     opti.subject_to(bounds.e_a.lower'*ones(1,N) < e_a < ...
         bounds.e_a.upper'*ones(1,N));
     opti.set_initial(e_a, guess.e_a');
+    % Mtp excitations
+    e_mtp = opti.variable(nq.mtp, N);
+    opti.subject_to(bounds.e_mtp.lower'*ones(1,N) < e_mtp < ...
+        bounds.e_mtp.upper'*ones(1,N));
+    opti.set_initial(e_mtp, guess.e_mtp');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Define "slack" controls
     % Time derivative of muscle-tendon forces (states) at collocation points
@@ -878,9 +644,13 @@ if solveProblem
     a_ak = MX.sym('a_ak',nq.arms);
     a_aj = MX.sym('a_akmesh',nq.arms,d);
     a_akj = [a_ak a_aj];
+    a_mtpk = MX.sym('a_mtpk',nq.mtp);
+    a_mtpj = MX.sym('a_mtpkmesh',nq.mtp,d);
+    a_mtpkj = [a_mtpk a_mtpj];
     % Define CasADi variables for controls
     vAk = MX.sym('vAk',NMuscle);
     e_ak = MX.sym('e_ak',nq.arms);
+    e_mtpk = MX.sym('e_mtpk',nq.mtp);
     % Define CasADi variables for "slack" controls
     dFTtildej = MX.sym('dFTtildej',NMuscle,d);
     Aj = MX.sym('Aj',nq.all,d);  
@@ -919,6 +689,7 @@ if solveProblem
             Qskj_nsc(jointi.knee.l,j+1), ...
             Qskj_nsc(jointi.ankle.l,j+1),...
             Qskj_nsc(jointi.subt.l,j+1),...
+            Qskj_nsc(jointi.mtp.l,j+1),...
             Qskj_nsc(jointi.trunk.ext,j+1),...
             Qskj_nsc(jointi.trunk.ben,j+1),...
             Qskj_nsc(jointi.trunk.rot,j+1)];  
@@ -928,6 +699,7 @@ if solveProblem
             Qdotskj_nsc(jointi.knee.l,j+1),...
             Qdotskj_nsc(jointi.ankle.l,j+1),...
             Qdotskj_nsc(jointi.subt.l,j+1),...
+            Qdotskj_nsc(jointi.mtp.l,j+1),...
             Qdotskj_nsc(jointi.trunk.ext,j+1),...
             Qdotskj_nsc(jointi.trunk.ben,j+1),...
             Qdotskj_nsc(jointi.trunk.rot,j+1)];  
@@ -943,9 +715,9 @@ if solveProblem
         % muscles (44:46) and then the left muscles (47:49). Since the back
         % muscles only depend on back dofs, we do not care if we extract
         % them "from the left or right leg" so here we just picked left.
-        MAj.trunk_ext    =  MAj_l([47:49,mai(7).mus.l]',7);
-        MAj.trunk_ben    =  MAj_l([47:49,mai(8).mus.l]',8);
-        MAj.trunk_rot    =  MAj_l([47:49,mai(9).mus.l]',9);
+        MAj.trunk_ext    =  MAj_l([47:49,mai(8).mus.l]',8);
+        MAj.trunk_ben    =  MAj_l([47:49,mai(9).mus.l]',9);
+        MAj.trunk_rot    =  MAj_l([47:49,mai(10).mus.l]',10);
         % Right leg
         qinj_r = [Qskj_nsc(jointi.hip_flex.r,j+1),...
             Qskj_nsc(jointi.hip_add.r,j+1),...
@@ -953,6 +725,7 @@ if solveProblem
             Qskj_nsc(jointi.knee.r,j+1),...
             Qskj_nsc(jointi.ankle.r,j+1),...
             Qskj_nsc(jointi.subt.r,j+1),...
+            Qskj_nsc(jointi.mtp.r,j+1),...
             Qskj_nsc(jointi.trunk.ext,j+1),...
             Qskj_nsc(jointi.trunk.ben,j+1),...
             Qskj_nsc(jointi.trunk.rot,j+1)];  
@@ -962,6 +735,7 @@ if solveProblem
             Qdotskj_nsc(jointi.knee.r,j+1),...
             Qdotskj_nsc(jointi.ankle.r,j+1),...
             Qdotskj_nsc(jointi.subt.r,j+1),...
+            Qdotskj_nsc(jointi.mtp.r,j+1),...
             Qdotskj_nsc(jointi.trunk.ext,j+1),...
             Qdotskj_nsc(jointi.trunk.ben,j+1),...
             Qdotskj_nsc(jointi.trunk.rot,j+1)];      
@@ -1087,19 +861,47 @@ if solveProblem
         Tau_passj.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
             theta.pass.trunk.rot,Qskj_nsc(jointi.trunk.rot,j+1),...
             Qdotskj_nsc(jointi.trunk.rot,j+1));        
+        
+        Tau_passk.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_flex.l,1), Qdotskj_nsc(jointi.sh_flex.l,1));
+        Tau_passk.sh_add.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_add.l,1), Qdotskj_nsc(jointi.sh_add.l,1));
+        Tau_passk.sh_rot.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_rot.l,1), Qdotskj_nsc(jointi.sh_rot.l,1));
+        Tau_passk.sh_flex.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_flex.r,1), Qdotskj_nsc(jointi.sh_flex.r,1));
+        Tau_passk.sh_add.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_add.r,1), Qdotskj_nsc(jointi.sh_add.r,1));
+        Tau_passk.sh_rot.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.sh_rot.r,1), Qdotskj_nsc(jointi.sh_rot.r,1));
+        Tau_passk.elb.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.elb.l,1), Qdotskj_nsc(jointi.elb.l,1));
+        Tau_passk.elb.r = f_passiveTATorques(stiffnessArm, dampingArm, ...
+            Qskj_nsc(jointi.elb.r,1), Qdotskj_nsc(jointi.elb.r,1));        
+        Tau_passk.arm = [Tau_passk.sh_flex.l, Tau_passk.sh_add.l, ...
+            Tau_passk.sh_rot.l, Tau_passk.sh_flex.r, Tau_passk.sh_add.r, ...
+            Tau_passk.sh_rot.r, Tau_passk.elb.l, Tau_passk.elb.r];       
+
+        Tau_passk.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Qskj_nsc(jointi.mtp.l,1), Qdotskj_nsc(jointi.mtp.l,1));
+        Tau_passk.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Qskj_nsc(jointi.mtp.r,1), Qdotskj_nsc(jointi.mtp.r,1));       
+        Tau_passk.mtp.all = [Tau_passk.mtp.l, Tau_passk.mtp.r];       
+        
         Tau_passj_all = [Tau_passj.hip.flex.l,Tau_passj.hip.flex.r,...
             Tau_passj.hip.add.l,Tau_passj.hip.add.r,...
             Tau_passj.hip.rot.l,Tau_passj.hip.rot.r,...
             Tau_passj.knee.l,Tau_passj.knee.r,Tau_passj.ankle.l,...
             Tau_passj.ankle.r,Tau_passj.subt.l,Tau_passj.subt.r,...
             Tau_passj.trunk.ext,Tau_passj.trunk.ben,...
-            Tau_passj.trunk.rot]';
+            Tau_passj.trunk.rot,Tau_passk.arm,Tau_passk.mtp.all]';
         % Expression for the state derivatives at the collocation points
-        Qsp_nsc          = Qskj_nsc*C(:,j+1);
-        Qdotsp_nsc       = Qdotskj_nsc*C(:,j+1);            
-        FTtildep_nsc    = FTtildekj_nsc*C(:,j+1);
-        ap              = akj*C(:,j+1);
-        a_ap            = a_akj*C(:,j+1);
+        Qsp_nsc      = Qskj_nsc*C(:,j+1);
+        Qdotsp_nsc   = Qdotskj_nsc*C(:,j+1);            
+        FTtildep_nsc = FTtildekj_nsc*C(:,j+1);
+        ap           = akj*C(:,j+1);
+        a_ap         = a_akj*C(:,j+1);
+        a_mtpp       = a_mtpkj*C(:,j+1);
         % Append collocation equations
         % Dynamic constraints are scaled using the same scale
         % factors as the ones used to scale the states
@@ -1114,8 +916,11 @@ if solveProblem
         eq_constr{end+1} = (h*Aj_nsc(:,j) - Qdotsp_nsc)./...
             scaling.QsQdots(2:2:end)';
         % Arm activation dynamics (explicit formulation)  
-        dadtj = f_ArmActivationDynamics(e_ak,a_akj(:,j+1)');
-        eq_constr{end+1} = (h*dadtj - a_ap)./scaling.a_a;
+        da_adtj = f_ArmActivationDynamics(e_ak,a_akj(:,j+1)');
+        eq_constr{end+1} = (h*da_adtj - a_ap)./scaling.a_a;
+        % Mtp activation dynamics (explicit formulation)  
+        da_mtpdtj = f_MtpActivationDynamics(e_mtpk,a_mtpkj(:,j+1)');
+        eq_constr{end+1} = (h*da_mtpdtj - a_mtpp);
         % Add contribution to the quadrature function
         if W.E == 0
         J = J + 1*(...
@@ -1149,8 +954,9 @@ if solveProblem
             W.E*B(j+1)      *(f_J92exp(e_totj,exp_E))/body_mass*h + ...
             W.A*B(j+1)      *(f_J92(akj(:,j+1)'))*h + ...
             W.ArmE*B(j+1)   *(f_J8(e_ak))*h +... 
-            W.Ak*B(j+1)     *(f_J21(Aj(residuals_noarmsi,j)))*h + ... 
-            W.passMom*B(j+1)*(f_J15(Tau_passj_all))*h + ...
+            W.Mtp*B(j+1)    *(f_J2(e_mtpk))*h +... 
+            W.Ak*B(j+1)     *(f_J23(Aj(residuals_noarmsi,j)))*h + ... 
+            W.passMom*B(j+1)*(f_J25(Tau_passj_all))*h + ...
             W.u*B(j+1)      *(f_J92(vAk))*h + ...
             W.u*B(j+1)      *(f_J92(dFTtildej(:,j)))*h + ...                
             W.u*B(j+1)      *(f_J8(Aj(armsi,j)))*h);
@@ -1167,81 +973,84 @@ if solveProblem
         Ft_hip_flex_l   = FTj(mai(1).mus.l',1);
         T_hip_flex_l    = f_T27(MAj.hip_flex.l,Ft_hip_flex_l);
         eq_constr{end+1} = Tj(jointi.hip_flex.l,1)-(T_hip_flex_l + ...
-            Tau_passj.hip.flex.l - 0.1*Qdotskj_nsc(jointi.hip_flex.l,j+1));
+            Tau_passj.hip.flex.l);
         % Hip flexion, right
         Ft_hip_flex_r   = FTj(mai(1).mus.r',1);
         T_hip_flex_r    = f_T27(MAj.hip_flex.r,Ft_hip_flex_r);
         eq_constr{end+1} = Tj(jointi.hip_flex.r,1)-(T_hip_flex_r + ...
-            Tau_passj.hip.flex.r - 0.1*Qdotskj_nsc(jointi.hip_flex.r,j+1));
+            Tau_passj.hip.flex.r);
         % Hip adduction, left
         Ft_hip_add_l    = FTj(mai(2).mus.l',1);
         T_hip_add_l     = f_T27(MAj.hip_add.l,Ft_hip_add_l);
         eq_constr{end+1} = Tj(jointi.hip_add.l,1)-(T_hip_add_l + ...
-            Tau_passj.hip.add.l - 0.1*Qdotskj_nsc(jointi.hip_add.l,j+1));
+            Tau_passj.hip.add.l);
         % Hip adduction, right
         Ft_hip_add_r    = FTj(mai(2).mus.r',1);
         T_hip_add_r     = f_T27(MAj.hip_add.r,Ft_hip_add_r);
         eq_constr{end+1} = Tj(jointi.hip_add.r,1)-(T_hip_add_r + ...
-            Tau_passj.hip.add.r - 0.1*Qdotskj_nsc(jointi.hip_add.r,j+1));
+            Tau_passj.hip.add.r);
         % Hip rotation, left
         Ft_hip_rot_l    = FTj(mai(3).mus.l',1);
         T_hip_rot_l     = f_T27(MAj.hip_rot.l,Ft_hip_rot_l);
         eq_constr{end+1} = Tj(jointi.hip_rot.l,1)-(T_hip_rot_l + ...
-            Tau_passj.hip.rot.l - 0.1*Qdotskj_nsc(jointi.hip_rot.l,j+1));
+            Tau_passj.hip.rot.l);
         % Hip rotation, right
         Ft_hip_rot_r    = FTj(mai(3).mus.r',1);
         T_hip_rot_r     = f_T27(MAj.hip_rot.r,Ft_hip_rot_r);
         eq_constr{end+1} = Tj(jointi.hip_rot.r,1)-(T_hip_rot_r + ...
-            Tau_passj.hip.rot.r - 0.1*Qdotskj_nsc(jointi.hip_rot.r,j+1));
+            Tau_passj.hip.rot.r);
         % Knee, left
         Ft_knee_l       = FTj(mai(4).mus.l',1);
         T_knee_l        = f_T13(MAj.knee.l,Ft_knee_l);
         eq_constr{end+1} = Tj(jointi.knee.l,1)-(T_knee_l + ...
-            Tau_passj.knee.l - 0.1*Qdotskj_nsc(jointi.knee.l,j+1));
+            Tau_passj.knee.l);
         % Knee, right
         Ft_knee_r       = FTj(mai(4).mus.r',1);
         T_knee_r        = f_T13(MAj.knee.r,Ft_knee_r);
         eq_constr{end+1} = Tj(jointi.knee.r,1)-(T_knee_r + ...
-            Tau_passj.knee.r - 0.1*Qdotskj_nsc(jointi.knee.r,j+1));
+            Tau_passj.knee.r);
         % Ankle, left
         Ft_ankle_l      = FTj(mai(5).mus.l',1);
         T_ankle_l       = f_T12(MAj.ankle.l,Ft_ankle_l);
         eq_constr{end+1} = Tj(jointi.ankle.l,1)-(T_ankle_l + ...
-            Tau_passj.ankle.l - 0.1*Qdotskj_nsc(jointi.ankle.l,j+1));
+            Tau_passj.ankle.l);
         % Ankle, right
         Ft_ankle_r      = FTj(mai(5).mus.r',1);
         T_ankle_r       = f_T12(MAj.ankle.r,Ft_ankle_r);
         eq_constr{end+1} = Tj(jointi.ankle.r,1)-(T_ankle_r + ...
-            Tau_passj.ankle.r - 0.1*Qdotskj_nsc(jointi.ankle.r,j+1));
+            Tau_passj.ankle.r);
         % Subtalar, left
         Ft_subt_l       = FTj(mai(6).mus.l',1);
         T_subt_l        = f_T12(MAj.subt.l,Ft_subt_l);
         eq_constr{end+1} = Tj(jointi.subt.l,1)-(T_subt_l + ...
-            Tau_passj.subt.l - 0.1*Qdotskj_nsc(jointi.subt.l,j+1));
+            Tau_passj.subt.l);
         % Subtalar, right
         Ft_subt_r       = FTj(mai(6).mus.r',1);
         T_subt_r        = f_T12(MAj.subt.r,Ft_subt_r);
         eq_constr{end+1} = Tj(jointi.subt.r,1)-(T_subt_r + ...
-            Tau_passj.subt.r - 0.1*Qdotskj_nsc(jointi.subt.r,j+1));
+            Tau_passj.subt.r);
         % Lumbar extension
-        Ft_trunk_ext    = FTj([mai(7).mus.l,mai(7).mus.r]',1);
+        Ft_trunk_ext    = FTj([mai(8).mus.l,mai(8).mus.r]',1);
         T_trunk_ext     = f_T6(MAj.trunk_ext,Ft_trunk_ext);
         eq_constr{end+1} = Tj(jointi.trunk.ext,1)-(T_trunk_ext + ...
-            Tau_passj.trunk.ext - 0.1*Qdotskj_nsc(jointi.trunk.ext,j+1));
+            Tau_passj.trunk.ext);
         % Lumbar bending
-        Ft_trunk_ben    = FTj([mai(8).mus.l,mai(8).mus.r]',1);
+        Ft_trunk_ben    = FTj([mai(9).mus.l,mai(9).mus.r]',1);
         T_trunk_ben     = f_T6(MAj.trunk_ben,Ft_trunk_ben);
         eq_constr{end+1} = Tj(jointi.trunk.ben,1)-(T_trunk_ben + ...
-            Tau_passj.trunk.ben - 0.1*Qdotskj_nsc(jointi.trunk.ben,j+1));
+            Tau_passj.trunk.ben);
         % Lumbar rotation
-        Ft_trunk_rot    = FTj([mai(9).mus.l,mai(9).mus.r]',1);
+        Ft_trunk_rot    = FTj([mai(10).mus.l,mai(10).mus.r]',1);
         T_trunk_rot     = f_T6(MAj.trunk_rot,Ft_trunk_rot);
         eq_constr{end+1} = Tj(jointi.trunk.rot,1)-(T_trunk_rot + ...
-            Tau_passj.trunk.rot - 0.1*Qdotskj_nsc(jointi.trunk.rot,j+1));
+            Tau_passj.trunk.rot);
         % Torque-driven joint torques for the arms
         % Arms
-        eq_constr{end+1} = Tj(armsi,1)/scaling.ArmTau - a_akj(:,j+1) + ...
-            0.1/scaling.ArmTau*Qdotskj_nsc(armsi,j+1);
+        eq_constr{end+1} = Tj(armsi,1)/scaling.ArmTau - (a_akj(:,j+1) + ...
+            (Tau_passk.arm)'/scaling.ArmTau);
+        % Mtp
+        eq_constr{end+1} = Tj(mtpi,1)/scaling.MtpTau - (a_mtpkj(:,j+1) + ...
+            (Tau_passk.mtp.all)'/scaling.MtpTau);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Activation dynamics (implicit formulation)            
         act1 = vAk_nsc + akj(:,j+1)./(ones(size(akj(:,j+1),1),1)*tdeact);
@@ -1271,14 +1080,15 @@ if solveProblem
     ineq_constr4 = vertcat(ineq_constr4{:});
     ineq_constr5 = vertcat(ineq_constr5{:});
     f_coll = Function('f_coll',{tfk,ak,aj,FTtildek,FTtildej,Qsk,Qsj,Qdotsk,...
-        Qdotsj,a_ak,a_aj,vAk,e_ak,dFTtildej,Aj},{eq_constr,ineq_constr1,...
-        ineq_constr2,ineq_constr3,ineq_constr4,ineq_constr5,J});
+        Qdotsj,a_ak,a_aj,a_mtpk,a_mtpj,vAk,e_ak,e_mtpk,dFTtildej,Aj},...
+        {eq_constr,ineq_constr1,ineq_constr2,ineq_constr3,ineq_constr4,...
+        ineq_constr5,J});
     f_coll_map = f_coll.map(N,parallelMode,NThreads);
     [coll_eq_constr, coll_ineq_constr1, coll_ineq_constr2, coll_ineq_constr3,...
         coll_ineq_constr4, coll_ineq_constr5, Jall] = f_coll_map(tf,...
         a(:,1:end-1), a_col, FTtilde(:,1:end-1), FTtilde_col, Qs(:,1:end-1), ...
-        Qs_col, Qdots(:,1:end-1), Qdots_col, a_a(:,1:end-1), a_a_col, vA, ...
-        e_a, dFTtilde_col, A_col);
+        Qs_col, Qdots(:,1:end-1), Qdots_col, a_a(:,1:end-1), a_a_col, ...
+        a_mtp(:,1:end-1), a_mtp_col, vA, e_a, e_mtp, dFTtilde_col, A_col);
     opti.subject_to(coll_eq_constr == 0);
     opti.subject_to(coll_ineq_constr1(:) >= 0);
     opti.subject_to(coll_ineq_constr2(:) <= 1/tact);
@@ -1295,6 +1105,7 @@ if solveProblem
         Qskj = [Qs(:,k), Qs_col(:,(k-1)*d+1:k*d)];
         Qdotskj = [Qdots(:,k), Qdots_col(:,(k-1)*d+1:k*d)];
         a_akj = [a_a(:,k), a_a_col(:,(k-1)*d+1:k*d)];
+        a_mtpkj = [a_mtp(:,k), a_mtp_col(:,(k-1)*d+1:k*d)];
         % Add equality constraints (next interval starts with end values of 
         % states from previous interval)
         opti.subject_to(a(:,k+1) == akj*D);
@@ -1302,6 +1113,7 @@ if solveProblem
         opti.subject_to(Qs(:,k+1) == Qskj*D); % scaled
         opti.subject_to(Qdots(:,k+1) == Qdotskj*D); % scaled
         opti.subject_to(a_a(:,k+1) == a_akj*D);
+        opti.subject_to(a_mtp(:,k+1) == a_mtpkj*D);
     end % End loop over mesh points  
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Additional path constraints
@@ -1321,6 +1133,8 @@ if solveProblem
         jointi.ankle.l,...
         jointi.subt.r,...
         jointi.subt.l,...
+        jointi.mtp.r,...
+        jointi.mtp.l,...
         jointi.trunk.ext,...
         jointi.sh_flex.r:jointi.sh_rot.r,...
         jointi.sh_flex.l:jointi.sh_rot.l,...
@@ -1341,6 +1155,8 @@ if solveProblem
         jointi.ankle.l,...
         jointi.subt.r,...
         jointi.subt.l,...
+        jointi.mtp.r,...
+        jointi.mtp.l,...
         jointi.trunk.ext,...
         jointi.sh_flex.r:jointi.sh_rot.r,...
         jointi.sh_flex.l:jointi.sh_rot.l,...
@@ -1368,6 +1184,9 @@ if solveProblem
     jointi.elb.r:jointi.elb.r,...
     jointi.elb.l:jointi.elb.l]-jointi.sh_flex.l+1;
     opti.subject_to(a_a(:,end) - a_a(orderArmInv,1) == 0);
+    % Mtp activations
+    orderMtpInv = [jointi.mtp.r,jointi.mtp.l]-jointi.mtp.l+1;
+    opti.subject_to(a_mtp(:,end) - a_mtp(orderMtpInv,1) == 0);
     % Average speed
     % Provide expression for the distance traveled
     Qs_nsc = Qs.*(scaling.QsQdots(1:2:end)'*ones(1,N+1));
@@ -1451,14 +1270,23 @@ if analyseResults
     starti = starti + nq.arms*(N+1);
     a_a_col_opt = reshape(w_opt(starti:starti+nq.arms*(d*N)-1),nq.arms,d*N)';
     starti = starti + nq.arms*(d*N);
+    a_mtp_opt = reshape(w_opt(starti:starti+nq.mtp*(N+1)-1),nq.mtp,N+1)';
+    starti = starti + nq.mtp*(N+1);
+    a_mtp_col_opt = reshape(w_opt(starti:starti+nq.mtp*(d*N)-1),nq.mtp,d*N)';
+    starti = starti + nq.mtp*(d*N);
     vA_opt = reshape(w_opt(starti:starti+NMuscle*N-1),NMuscle,N)';
     starti = starti + NMuscle*N;
     e_a_opt = reshape(w_opt(starti:starti+nq.arms*N-1),nq.arms,N)';
     starti = starti + nq.arms*N;   
+    e_mtp_opt = reshape(w_opt(starti:starti+nq.mtp*N-1),nq.mtp,N)';
+    starti = starti + nq.mtp*N;   
     dFTtilde_col_opt=reshape(w_opt(starti:starti+NMuscle*(d*N)-1),NMuscle,d*N)';
     starti = starti + NMuscle*(d*N);
     qdotdot_col_opt =reshape(w_opt(starti:starti+nq.all*(d*N)-1),nq.all,(d*N))';
     starti = starti + nq.all*(d*N);
+    if starti - 1 ~= length(w_opt)
+        disp('error when extracting results')
+    end
     % Combine results at mesh and collocation points
     a_mesh_col_opt=zeros(N*(d+1)+1,NMuscle);
     a_mesh_col_opt(1:(d+1):end,:)= a_opt;
@@ -1470,6 +1298,8 @@ if analyseResults
     Qdots_mesh_col_opt(1:(d+1):end,:)= Qdots_opt;
     a_a_mesh_col_opt=zeros(N*(d+1)+1,nq.arms);
     a_a_mesh_col_opt(1:(d+1):end,:)= a_a_opt;
+    a_mtp_mesh_col_opt=zeros(N*(d+1)+1,nq.mtp);
+    a_mtp_mesh_col_opt(1:(d+1):end,:)= a_mtp_opt;
     for k=1:N
         rangei = k*(d+1)-(d-1):k*(d+1);
         rangebi = (k-1)*d+1:k*d;
@@ -1478,6 +1308,7 @@ if analyseResults
         Qs_mesh_col_opt(rangei,:) = Qs_col_opt(rangebi,:);
         Qdots_mesh_col_opt(rangei,:) = Qdots_col_opt(rangebi,:);
         a_a_mesh_col_opt(rangei,:) = a_a_col_opt(rangebi,:);
+        a_mtp_mesh_col_opt(rangei,:) = a_mtp_col_opt(rangebi,:);
     end
     
     %% Unscale results
@@ -1508,11 +1339,13 @@ if analyseResults
     FTtilde_opt_unsc = FTtilde_opt(1:end-1,:).*repmat(...
         scaling.FTtilde,size(FTtilde_opt(1:end-1,:),1),1);
     % Arm activations (1:N-1)
-    a_a_opt_unsc = a_a_opt(1:end-1,:).*repmat(...
-        scaling.a_a,size(a_a_opt(1:end-1,:),1),size(a_a_opt,2));
+    a_a_opt_unsc = a_a_opt(1:end-1,:);
     % Arm activations (1:N)
-    a_a_opt_unsc_all = ...
-        a_a_opt.*repmat(scaling.a_a,size(a_a_opt,1),size(a_a_opt,2));
+    a_a_opt_unsc_all = a_a_opt;
+    % Mtp activations (1:N-1)
+    a_mtp_opt_unsc = a_mtp_opt(1:end-1,:);
+    % Mtp activations (1:N)
+    a_mtp_opt_unsc_all = a_mtp_opt;
     % Controls at mesh points
     % Time derivative of muscle activations (states)
     vA_opt_unsc = vA_opt.*repmat(scaling.vA,size(vA_opt,1),size(vA_opt,2));
@@ -1541,8 +1374,9 @@ if analyseResults
     FTtilde_col_opt_unsc = FTtilde_col_opt.*repmat(...
         scaling.FTtilde,size(FTtilde_col_opt,1),1);
     % Arm activations
-    a_a_col_opt_unsc = a_a_col_opt.*repmat(...
-        scaling.a_a,size(a_a_col_opt,1),size(a_a_col_opt,2));    
+    a_a_col_opt_unsc = a_a_col_opt;   
+    % Mtp activations
+    a_mtp_col_opt_unsc = a_mtp_col_opt;    
     % "Slack" controls at collocation points    
     % Time derivative of Qdots
     qdotdot_col_opt_unsc.rad = ...
@@ -1576,15 +1410,45 @@ if analyseResults
     Foutk_opt = zeros(N,nq.all+NGRF+NcalcOrall);
     for i = 1:N
         [res] = F1([Xk_Qs_Qdots_opt(i,:)';Xk_Qdotdots_opt(i,:)']);
-        Foutk_opt(i,:) = full(res);    
+        Foutk_opt(i,:) = full(res);   
+        
+        Tau_passk_opt.sh_flex.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_flex.l), qdot_opt_unsc_all.rad(i+1,jointi.sh_flex.l)));
+        Tau_passk_opt.sh_add.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_add.l), qdot_opt_unsc_all.rad(i+1,jointi.sh_add.l)));
+        Tau_passk_opt.sh_rot.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_rot.l), qdot_opt_unsc_all.rad(i+1,jointi.sh_rot.l)));
+        Tau_passk_opt.sh_flex.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_flex.r), qdot_opt_unsc_all.rad(i+1,jointi.sh_flex.r)));
+        Tau_passk_opt.sh_add.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_add.r), qdot_opt_unsc_all.rad(i+1,jointi.sh_add.r)));
+        Tau_passk_opt.sh_rot.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.sh_rot.r), qdot_opt_unsc_all.rad(i+1,jointi.sh_rot.r)));
+        Tau_passk_opt.elb.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.elb.l), qdot_opt_unsc_all.rad(i+1,jointi.elb.l)));
+        Tau_passk_opt.elb.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_opt_unsc_all.rad(i+1,jointi.elb.r), qdot_opt_unsc_all.rad(i+1,jointi.elb.r)));          
+        Tau_passk_opt.arm(i,:) = [Tau_passk_opt.sh_flex.l, Tau_passk_opt.sh_add.l, ...
+            Tau_passk_opt.sh_rot.l, Tau_passk_opt.sh_flex.r, Tau_passk_opt.sh_add.r, ...
+            Tau_passk_opt.sh_rot.r, Tau_passk_opt.elb.l, Tau_passk_opt.elb.r]; 
+        
+        Tau_passk_opt.mtp.l = full(f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            q_opt_unsc_all.rad(i+1,jointi.mtp.l), qdot_opt_unsc_all.rad(i+1,jointi.mtp.l)));
+        Tau_passk_opt.mtp.r = full(f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            q_opt_unsc_all.rad(i+1,jointi.mtp.r), qdot_opt_unsc_all.rad(i+1,jointi.mtp.r)));       
+        Tau_passk_opt.mtp.all(i,:) = [Tau_passk_opt.mtp.l, Tau_passk_opt.mtp.r]; 
+        
     end
     GRFk_opt = Foutk_opt(:,GRFi.all);
-    % assertArmTmaxj should be 0
-    assertArmTmaxk = max(max(abs(Foutk_opt(:,armsi) - ...
-        (a_a_opt_unsc_all(2:end,:)*scaling.ArmTau - ...
-        0.1*Xk_Qs_Qdots_opt(:,armsi*2))))); 
+    assertArmTmaxk = max(max(abs(Foutk_opt(:,armsi)/scaling.ArmTau - ...
+        (a_a_opt_unsc_all(2:end,:) + Tau_passk_opt.arm/scaling.ArmTau))));     
+    assertMtpTmaxk = max(max(abs(Foutk_opt(:,mtpi)/scaling.MtpTau - ...
+        (a_mtp_opt_unsc_all(2:end,:) + Tau_passk_opt.mtp.all/scaling.MtpTau))));     
     if assertArmTmaxk > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing residual forces')
+        disp(['Issue when reconstructing arm residual forces: mesh points; max error: ', num2str(assertArmTmaxk)])
+    end 
+    if assertMtpTmaxk > 1*10^(-tol_ipopt)
+        disp(['Issue when reconstructing mtp residual forces: mesh points; max error: ', num2str(assertMtpTmaxk)])
     end 
 
     %% Joint torques and ground reaction forces at collocation points
@@ -1593,18 +1457,107 @@ if analyseResults
     Xj_Qs_Qdots_opt(:,2:2:end)  = qdot_col_opt_unsc.rad;
     Xj_Qdotdots_opt             = qdotdot_col_opt_unsc.rad;
     Foutj_opt = zeros(d*N,nq.all+NGRF+NcalcOrall);
+    Tau_passj_opt_all = zeros(d*N,nq.all-nq.abs);
     for i = 1:d*N
         [res] = F1([Xj_Qs_Qdots_opt(i,:)';Xj_Qdotdots_opt(i,:)']);
-        Foutj_opt(i,:) = full(res);    
+        Foutj_opt(i,:) = full(res); 
+        
+        Tau_passj_opt.hip.flex.l = full(f_PassiveMoments(k_pass.hip.flex,...
+           theta.pass.hip.flex,q_col_opt_unsc.rad(i,jointi.hip_flex.l),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_flex.l)));
+        Tau_passj_opt.hip.flex.r = full(f_PassiveMoments(k_pass.hip.flex,...
+           theta.pass.hip.flex,q_col_opt_unsc.rad(i,jointi.hip_flex.r),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_flex.r)));
+        Tau_passj_opt.hip.add.l = full(f_PassiveMoments(k_pass.hip.add,...
+           theta.pass.hip.add,q_col_opt_unsc.rad(i,jointi.hip_add.l),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_add.l)));
+        Tau_passj_opt.hip.add.r = full(f_PassiveMoments(k_pass.hip.add,...
+           theta.pass.hip.add,q_col_opt_unsc.rad(i,jointi.hip_add.r),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_add.r)));
+        Tau_passj_opt.hip.rot.l = full(f_PassiveMoments(k_pass.hip.rot,...
+           theta.pass.hip.rot,q_col_opt_unsc.rad(i,jointi.hip_rot.l),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_rot.l)));
+        Tau_passj_opt.hip.rot.r = full(f_PassiveMoments(k_pass.hip.rot,...
+           theta.pass.hip.rot,q_col_opt_unsc.rad(i,jointi.hip_rot.r),...
+           qdot_col_opt_unsc.rad(i,jointi.hip_rot.r)));
+        Tau_passj_opt.knee.l = full(f_PassiveMoments(k_pass.knee,...
+           theta.pass.knee,q_col_opt_unsc.rad(i,jointi.knee.l),...
+           qdot_col_opt_unsc.rad(i,jointi.knee.l)));
+        Tau_passj_opt.knee.r = full(f_PassiveMoments(k_pass.knee,...
+           theta.pass.knee,q_col_opt_unsc.rad(i,jointi.knee.r),...
+           qdot_col_opt_unsc.rad(i,jointi.knee.r)));
+        Tau_passj_opt.ankle.l = full(f_PassiveMoments(k_pass.ankle,...
+           theta.pass.ankle,q_col_opt_unsc.rad(i,jointi.ankle.l),...
+           qdot_col_opt_unsc.rad(i,jointi.ankle.l)));
+        Tau_passj_opt.ankle.r = full(f_PassiveMoments(k_pass.ankle,...
+           theta.pass.ankle,q_col_opt_unsc.rad(i,jointi.ankle.r),...
+           qdot_col_opt_unsc.rad(i,jointi.ankle.r)));
+        Tau_passj_opt.subt.l = full(f_PassiveMoments(k_pass.subt,...
+           theta.pass.subt,q_col_opt_unsc.rad(i,jointi.subt.l),...
+           qdot_col_opt_unsc.rad(i,jointi.subt.l)));
+        Tau_passj_opt.subt.r = full(f_PassiveMoments(k_pass.subt,...
+           theta.pass.subt,q_col_opt_unsc.rad(i,jointi.subt.r),...
+           qdot_col_opt_unsc.rad(i,jointi.subt.r)));
+        Tau_passj_opt.trunk.ext = full(f_PassiveMoments(k_pass.trunk.ext,...
+           theta.pass.trunk.ext,q_col_opt_unsc.rad(i,jointi.trunk.ext),...
+           qdot_col_opt_unsc.rad(i,jointi.trunk.ext)));
+        Tau_passj_opt.trunk.ben = full(f_PassiveMoments(k_pass.trunk.ben,...
+           theta.pass.trunk.ben,q_col_opt_unsc.rad(i,jointi.trunk.ben),...
+           qdot_col_opt_unsc.rad(i,jointi.trunk.ben)));
+        Tau_passj_opt.trunk.rot = full(f_PassiveMoments(k_pass.trunk.rot,...
+           theta.pass.trunk.rot,q_col_opt_unsc.rad(i,jointi.trunk.rot),...
+           qdot_col_opt_unsc.rad(i,jointi.trunk.rot)));  
+        
+        Tau_passj_opt.sh_flex.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_flex.l), qdot_col_opt_unsc.rad(i,jointi.sh_flex.l)));
+        Tau_passj_opt.sh_add.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_add.l), qdot_col_opt_unsc.rad(i,jointi.sh_add.l)));
+        Tau_passj_opt.sh_rot.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_rot.l), qdot_col_opt_unsc.rad(i,jointi.sh_rot.l)));
+        Tau_passj_opt.sh_flex.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_flex.r), qdot_col_opt_unsc.rad(i,jointi.sh_flex.r)));
+        Tau_passj_opt.sh_add.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_add.r), qdot_col_opt_unsc.rad(i,jointi.sh_add.r)));
+        Tau_passj_opt.sh_rot.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.sh_rot.r), qdot_col_opt_unsc.rad(i,jointi.sh_rot.r)));
+        Tau_passj_opt.elb.l = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.elb.l), qdot_col_opt_unsc.rad(i,jointi.elb.l)));
+        Tau_passj_opt.elb.r = full(f_passiveTATorques(stiffnessArm, dampingArm, ...
+            q_col_opt_unsc.rad(i,jointi.elb.r), qdot_col_opt_unsc.rad(i,jointi.elb.r)));          
+        Tau_passj_opt.arm(i,:) = [Tau_passj_opt.sh_flex.l, Tau_passj_opt.sh_add.l, ...
+            Tau_passj_opt.sh_rot.l, Tau_passj_opt.sh_flex.r, Tau_passj_opt.sh_add.r, ...
+            Tau_passj_opt.sh_rot.r, Tau_passj_opt.elb.l, Tau_passj_opt.elb.r]; 
+        
+        Tau_passj_opt.mtp.l = full(f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            q_col_opt_unsc.rad(i,jointi.mtp.l), qdot_col_opt_unsc.rad(i,jointi.mtp.l)));
+        Tau_passj_opt.mtp.r = full(f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            q_col_opt_unsc.rad(i,jointi.mtp.r), qdot_col_opt_unsc.rad(i,jointi.mtp.r)));       
+        Tau_passj_opt.mtp.all(i,:) = [Tau_passj_opt.mtp.l, Tau_passj_opt.mtp.r]; 
+        
+        Tau_passj_opt_all(i,:) = [Tau_passj_opt.hip.flex.l,...
+               Tau_passj_opt.hip.add.l,Tau_passj_opt.hip.rot.l,...             
+               Tau_passj_opt.hip.flex.r,Tau_passj_opt.hip.add.r,...
+               Tau_passj_opt.hip.rot.r,Tau_passj_opt.knee.l,...
+               Tau_passj_opt.knee.r,Tau_passj_opt.ankle.l,...
+               Tau_passj_opt.ankle.r,Tau_passj_opt.subt.l,...
+               Tau_passj_opt.subt.r,Tau_passj_opt.trunk.ext,...
+               Tau_passj_opt.trunk.ben,Tau_passj_opt.trunk.rot,...
+               Tau_passj_opt.arm(i,:),Tau_passj_opt.mtp.all(i,:)];
+        
     end
     GRFj_opt = Foutj_opt(:,GRFi.all);
-    % assertArmTmaxj should be 0
-    assertArmTmaxj = max(max(abs(Foutj_opt(:,armsi)-(a_a_col_opt_unsc*...
-        scaling.ArmTau - 0.1*Xj_Qs_Qdots_opt(:,armsi*2))))); 
+    % assertArmTmaxj should be 0    
+    assertArmTmaxj = max(max(abs(Foutj_opt(:,armsi)/scaling.ArmTau - ...
+        (a_a_col_opt_unsc + Tau_passj_opt.arm/scaling.ArmTau))));
+    assertMtpTmaxj = max(max(abs(Foutj_opt(:,mtpi)/scaling.MtpTau - ...
+        (a_mtp_col_opt_unsc + Tau_passj_opt.mtp.all/scaling.MtpTau))));    
     if assertArmTmaxj > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing residual forces')
+        disp(['Issue when reconstructing arm residual forces: collocation points; max error: ', num2str(assertArmTmaxj)])
     end 
-
+    if assertMtpTmaxj > 1*10^(-tol_ipopt)
+        disp(['Issue when reconstructing mtp residual forces: collocation points; max error: ', num2str(assertMtpTmaxj)])
+    end 
+    
     %% Stride length and width  
     % For the stride length we also need the values at the end of the
     % interval so N+1 where states but not controls are defined
@@ -1633,70 +1586,8 @@ if analyseResults
     StepWidth_opt = full(abs(out_res_opt_all(:,calcOrall.r(3)) - ...
         out_res_opt_all(:,calcOrall.l(3))));
     stride_width_mean = mean(StepWidth_opt);
-    stride_width_std = std(StepWidth_opt);
-    
-    %% Passive joint torques at optimal solution
-    Tau_pass_opt_all = zeros(N,15);
-    i = 1;
-    for k = 1:N    
-        for j=1:d
-            Tau_pass_opt.hip.flex.l    = f_PassiveMoments(k_pass.hip.flex,...
-               theta.pass.hip.flex,Xj_Qs_Qdots_opt(i,jointi.hip_flex.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_flex.l*2));
-            Tau_pass_opt.hip.flex.r    = f_PassiveMoments(k_pass.hip.flex,...
-               theta.pass.hip.flex,Xj_Qs_Qdots_opt(i,jointi.hip_flex.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_flex.r*2));
-            Tau_pass_opt.hip.add.l     = f_PassiveMoments(k_pass.hip.add,...
-               theta.pass.hip.add,Xj_Qs_Qdots_opt(i,jointi.hip_add.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_add.l*2));
-            Tau_pass_opt.hip.add.r     = f_PassiveMoments(k_pass.hip.add,...
-               theta.pass.hip.add,Xj_Qs_Qdots_opt(i,jointi.hip_add.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_add.r*2));
-            Tau_pass_opt.hip.rot.l     = f_PassiveMoments(k_pass.hip.rot,...
-               theta.pass.hip.rot,Xj_Qs_Qdots_opt(i,jointi.hip_rot.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_rot.l*2));
-            Tau_pass_opt.hip.rot.r     = f_PassiveMoments(k_pass.hip.rot,...
-               theta.pass.hip.rot,Xj_Qs_Qdots_opt(i,jointi.hip_rot.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.hip_rot.r*2));
-            Tau_pass_opt.knee.l        = f_PassiveMoments(k_pass.knee,...
-               theta.pass.knee,Xj_Qs_Qdots_opt(i,jointi.knee.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.knee.l*2));
-            Tau_pass_opt.knee.r        = f_PassiveMoments(k_pass.knee,...
-               theta.pass.knee,Xj_Qs_Qdots_opt(i,jointi.knee.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.knee.r*2));
-            Tau_pass_opt.ankle.l       = f_PassiveMoments(k_pass.ankle,...
-               theta.pass.ankle,Xj_Qs_Qdots_opt(i,jointi.ankle.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.ankle.l*2));
-            Tau_pass_opt.ankle.r       = f_PassiveMoments(k_pass.ankle,...
-               theta.pass.ankle,Xj_Qs_Qdots_opt(i,jointi.ankle.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.ankle.r*2));
-            Tau_pass_opt.subt.l       = f_PassiveMoments(k_pass.subt,...
-               theta.pass.subt,Xj_Qs_Qdots_opt(i,jointi.subt.l*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.subt.l*2));
-            Tau_pass_opt.subt.r       = f_PassiveMoments(k_pass.subt,...
-               theta.pass.subt,Xj_Qs_Qdots_opt(i,jointi.subt.r*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.subt.r*2));
-            Tau_pass_opt.trunk.ext     = f_PassiveMoments(k_pass.trunk.ext,...
-               theta.pass.trunk.ext,Xj_Qs_Qdots_opt(i,jointi.trunk.ext*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.trunk.ext*2));
-            Tau_pass_opt.trunk.ben     = f_PassiveMoments(k_pass.trunk.ben,...
-               theta.pass.trunk.ben,Xj_Qs_Qdots_opt(i,jointi.trunk.ben*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.trunk.ben*2));
-            Tau_pass_opt.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
-               theta.pass.trunk.rot,Xj_Qs_Qdots_opt(i,jointi.trunk.rot*2-1),...
-               Xj_Qs_Qdots_opt(i,jointi.trunk.rot*2));        
-            Tau_pass_opt_all(i,:) = full([Tau_pass_opt.hip.flex.l,...
-               Tau_pass_opt.hip.add.l,Tau_pass_opt.hip.rot.l,...             
-               Tau_pass_opt.hip.flex.r,Tau_pass_opt.hip.add.r,...
-               Tau_pass_opt.hip.rot.r,Tau_pass_opt.knee.l,...
-               Tau_pass_opt.knee.r,Tau_pass_opt.ankle.l,...
-               Tau_pass_opt.ankle.r,Tau_pass_opt.subt.l,...
-               Tau_pass_opt.subt.r,Tau_pass_opt.trunk.ext,...
-               Tau_pass_opt.trunk.ben,Tau_pass_opt.trunk.rot]);
-           i = i + 1;
-        end
-    end    
-    
+    stride_width_std = std(StepWidth_opt);    
+        
     %% Assert average speed    
     dist_trav_opt = q_opt_unsc_all.rad(end,jointi.pelvis.tx) - ...
         q_opt_unsc_all.rad(1,jointi.pelvis.tx); % distance traveled
@@ -1709,11 +1600,11 @@ if analyseResults
     end 
     
     %% Decompose optimal cost
-if decomposeCost
     J_opt           = 0;
     E_cost          = 0;
     A_cost          = 0;
     Arm_cost        = 0;
+    Mtp_cost        = 0;
     Qdotdot_cost    = 0;
     Pass_cost       = 0;
     GRF_cost        = 0;
@@ -1732,6 +1623,7 @@ if decomposeCost
                 Xj_Qs_Qdots_opt(count,jointi.knee.l*2-1), ...
                 Xj_Qs_Qdots_opt(count,jointi.ankle.l*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.subt.l*2-1),...
+                Xj_Qs_Qdots_opt(count,jointi.mtp.l*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ext*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ben*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.rot*2-1)];  
@@ -1741,6 +1633,7 @@ if decomposeCost
                 Xj_Qs_Qdots_opt(count,jointi.knee.l*2),...
                 Xj_Qs_Qdots_opt(count,jointi.ankle.l*2),...
                 Xj_Qs_Qdots_opt(count,jointi.subt.l*2),...
+                Xj_Qs_Qdots_opt(count,jointi.mtp.l*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ext*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ben*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.rot*2)];  
@@ -1753,6 +1646,7 @@ if decomposeCost
                 Xj_Qs_Qdots_opt(count,jointi.knee.r*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.ankle.r*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.subt.r*2-1),...
+                Xj_Qs_Qdots_opt(count,jointi.mtp.r*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ext*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ben*2-1),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.rot*2-1)];  
@@ -1762,6 +1656,7 @@ if decomposeCost
                 Xj_Qs_Qdots_opt(count,jointi.knee.r*2),...
                 Xj_Qs_Qdots_opt(count,jointi.ankle.r*2),...
                 Xj_Qs_Qdots_opt(count,jointi.subt.r*2),...
+                Xj_Qs_Qdots_opt(count,jointi.mtp.r*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ext*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.ben*2),...
                 Xj_Qs_Qdots_opt(count,jointi.trunk.rot*2)];      
@@ -1845,16 +1740,15 @@ if decomposeCost
             e_tot_opt_all = full(e_tot_all)';
                             
             J_opt = J_opt + 1/(dist_trav_opt)*(...
-                W.E*B(j+1)      *...
-                    (f_J92exp(e_tot_opt_all,exp_E))/body_mass*h_opt + ...                   
-                W.A*B(j+1)      *(f_J92(a_col_opt(count,:)))*h_opt +...      
-                W.ArmE*B(j+1)   *(f_J8(e_a_opt(k,:)))*h_opt +...                    
-                W.Ak*B(j+1)     *...
-                    (f_J21(qdotdot_col_opt(count,residuals_noarmsi)))*h_opt +...                     
-                W.passMom*B(j+1)*(f_J15(Tau_pass_opt_all(count,:)))*h_opt + ...                    
-                W.u*B(j+1)      *(f_J92(vA_opt(k,:)))*h_opt + ...        
-                W.u*B(j+1)      *(f_J92(dFTtilde_col_opt(count,:)))*h_opt + ...                           
-                W.u*B(j+1)      *(f_J8(qdotdot_col_opt(count,armsi)))*h_opt);    
+                W.E*B(j+1) * (f_J92exp(e_tot_opt_all,exp_E))/body_mass*h_opt + ...                   
+                W.A*B(j+1) * (f_J92(a_col_opt(count,:)))*h_opt +...      
+                W.ArmE*B(j+1) * (f_J8(e_a_opt(k,:)))*h_opt +...    
+                W.Mtp*B(j+1) * (f_J2(e_mtp_opt(k,:)))*h_opt +...  
+                W.Ak*B(j+1) * (f_J23(qdotdot_col_opt(count,residuals_noarmsi)))*h_opt +...                     
+                W.passMom*B(j+1)* (f_J25(Tau_passj_opt_all(count,:)))*h_opt + ...                    
+                W.u*B(j+1) * (f_J92(vA_opt(k,:)))*h_opt + ...        
+                W.u*B(j+1) * (f_J92(dFTtilde_col_opt(count,:)))*h_opt + ...                           
+                W.u*B(j+1) * (f_J8(qdotdot_col_opt(count,armsi)))*h_opt);    
             
                 E_cost = E_cost + W.E*B(j+1)*...
                     (f_J92exp(e_tot_opt_all,exp_E))/body_mass*h_opt;
@@ -1862,10 +1756,12 @@ if decomposeCost
                     (f_J92(a_col_opt(count,:)))*h_opt;
                 Arm_cost = Arm_cost + W.ArmE*B(j+1)*...
                     (f_J8(e_a_opt(k,:)))*h_opt;
+                Mtp_cost = Mtp_cost + W.Mtp*B(j+1)*...
+                    (f_J2(e_mtp_opt(k,:)))*h_opt;
                 Qdotdot_cost = Qdotdot_cost + W.Ak*B(j+1)*...
-                    (f_J21(qdotdot_col_opt(count,residuals_noarmsi)))*h_opt;
+                    (f_J23(qdotdot_col_opt(count,residuals_noarmsi)))*h_opt;
                 Pass_cost = Pass_cost + W.passMom*B(j+1)*...
-                    (f_J15(Tau_pass_opt_all(count,:)))*h_opt;
+                    (f_J25(Tau_passj_opt_all(count,:)))*h_opt;
                 vA_cost = vA_cost + W.u*B(j+1)*...
                     (f_J92(vA_opt(k,:)))*h_opt;
                 dFTtilde_cost = dFTtilde_cost + W.u*B(j+1)*...
@@ -1879,23 +1775,23 @@ if decomposeCost
     E_costf = full(E_cost);
     A_costf = full(A_cost);
     Arm_costf = full(Arm_cost);
+    Mtp_costf = full(Mtp_cost);
     Qdotdot_costf = full(Qdotdot_cost);
     Pass_costf = full(Pass_cost);
     vA_costf = full(vA_cost);
     dFTtilde_costf = full(dFTtilde_cost);
     QdotdotArm_costf = full(QdotdotArm_cost);
     % assertCost should be 0 
-    assertCost = J_optf - 1/(dist_trav_opt)*(E_costf+A_costf+Arm_costf+...
-        Qdotdot_costf+Pass_costf+vA_costf+dFTtilde_costf+...
-        QdotdotArm_costf);
-    assertCost2 = stats.iterations.obj(end) - J_optf;
+    assertCost = abs(J_optf - 1/(dist_trav_opt)*(E_costf+A_costf+Arm_costf+...
+        Mtp_costf+Qdotdot_costf+Pass_costf+vA_costf+dFTtilde_costf+...
+        QdotdotArm_costf));
+    assertCost2 = abs(stats.iterations.obj(end) - J_optf);
     if assertCost > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing optimal cost')
+        disp('Issue when reconstructing optimal cost wrt sum of terms')
     end 
     if assertCost2 > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing optimal cost')
+        disp('Issue when reconstructing optimal cost wrt stats')
     end 
-end 
 
     %% Reconstruct full gait cycle
     % We reconstruct the full gait cycle from the simulated half gait cycle
@@ -1904,16 +1800,6 @@ end
     % We adjust some thresholds manually
     if ww == 17
         threshold = 31;
-    elseif ww == 133
-        threshold = 21;    
-    elseif ww == 159
-        threshold = 42;
-    elseif ww == 160
-        threshold = 44;
-    elseif ww == 161
-        threshold = 57;
-    elseif ww == 162
-        threshold = 69;
     end
         
     if exist('HS1','var')
@@ -1985,6 +1871,7 @@ end
         jointi.knee.r,jointi.knee.l,...
         jointi.ankle.r,jointi.ankle.l,...
         jointi.subt.r,jointi.subt.l,...
+        jointi.mtp.r,jointi.mtp.l,...
         jointi.trunk.ext,...
         jointi.sh_flex.r:jointi.sh_rot.r,...
         jointi.sh_flex.l:jointi.sh_rot.l,...
@@ -2002,46 +1889,47 @@ end
         jointi.knee.r,jointi.knee.l,...
         jointi.ankle.r,jointi.ankle.l,...
         jointi.subt.r,jointi.subt.l,...
+        jointi.mtp.r,jointi.mtp.l,...
         jointi.trunk.ext,...
         jointi.sh_flex.r:jointi.sh_rot.r,...
         jointi.sh_flex.l:jointi.sh_rot.l,...
         jointi.elb.r,jointi.elb.l]; 
     
     % Qs
-    Qs_opt = zeros(N*2,size(q_opt_unsc.deg,2));
-    Qs_opt(1:N-IC1i+1,:) = q_opt_unsc.deg(IC1i:end,:);   
-    Qs_opt(N-IC1i+2:N-IC1i+1+N,QsSymA) = q_opt_unsc.deg(1:end,QsSymB);
-    Qs_opt(N-IC1i+2:N-IC1i+1+N,QsOpp) = -q_opt_unsc.deg(1:end,QsOpp);    
-    Qs_opt(N-IC1i+2:N-IC1i+1+N,jointi.pelvis.tx) = ...
+    Qs_GC = zeros(N*2,size(q_opt_unsc.deg,2));
+    Qs_GC(1:N-IC1i+1,:) = q_opt_unsc.deg(IC1i:end,:);   
+    Qs_GC(N-IC1i+2:N-IC1i+1+N,QsSymA) = q_opt_unsc.deg(1:end,QsSymB);
+    Qs_GC(N-IC1i+2:N-IC1i+1+N,QsOpp) = -q_opt_unsc.deg(1:end,QsOpp);    
+    Qs_GC(N-IC1i+2:N-IC1i+1+N,jointi.pelvis.tx) = ...
         q_opt_unsc.deg(1:end,jointi.pelvis.tx) + ...
         q_opt_unsc_all.deg(end,jointi.pelvis.tx);        
-    Qs_opt(N-IC1i+2+N:2*N,:) = q_opt_unsc.deg(1:IC1i-1,:);    
-    Qs_opt(N-IC1i+2+N:2*N,jointi.pelvis.tx) = ...
+    Qs_GC(N-IC1i+2+N:2*N,:) = q_opt_unsc.deg(1:IC1i-1,:);    
+    Qs_GC(N-IC1i+2+N:2*N,jointi.pelvis.tx) = ...
         q_opt_unsc.deg(1:IC1i-1,jointi.pelvis.tx) + ...
         2*q_opt_unsc_all.deg(end,jointi.pelvis.tx);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')         
-        Qs_opt(:,QsSymA_ptx)  = Qs_opt(:,QsSymB_ptx);
-        Qs_opt(:,QsOpp)       = -Qs_opt(:,QsOpp);    
+        Qs_GC(:,QsSymA_ptx)  = Qs_GC(:,QsSymB_ptx);
+        Qs_GC(:,QsOpp)       = -Qs_GC(:,QsOpp);    
     end  
-    temp_Qs_opt_pelvis_tx = Qs_opt(1,jointi.pelvis.tx);
-    Qs_opt(:,jointi.pelvis.tx) = Qs_opt(:,jointi.pelvis.tx)-...
-        temp_Qs_opt_pelvis_tx;
+    temp_Qs_GC_pelvis_tx = Qs_GC(1,jointi.pelvis.tx);
+    Qs_GC(:,jointi.pelvis.tx) = Qs_GC(:,jointi.pelvis.tx)-...
+        temp_Qs_GC_pelvis_tx;
     
     % Qdots
-    Qdots_opt = zeros(N*2,size(Qs_opt,2));
-    Qdots_opt(1:N-IC1i+1,:) = qdot_opt_unsc.deg(IC1i:end,:);
-    Qdots_opt(N-IC1i+2:N-IC1i+1+N,QsSymA_ptx) = ...
+    Qdots_GC = zeros(N*2,size(Qs_GC,2));
+    Qdots_GC(1:N-IC1i+1,:) = qdot_opt_unsc.deg(IC1i:end,:);
+    Qdots_GC(N-IC1i+2:N-IC1i+1+N,QsSymA_ptx) = ...
         qdot_opt_unsc.deg(1:end,QsSymB_ptx);
-    Qdots_opt(N-IC1i+2:N-IC1i+1+N,QsOpp) = ...
+    Qdots_GC(N-IC1i+2:N-IC1i+1+N,QsOpp) = ...
         -qdot_opt_unsc.deg(1:end,QsOpp);
-    Qdots_opt(N-IC1i+2+N:2*N,:) = qdot_opt_unsc.deg(1:IC1i-1,:);
+    Qdots_GC(N-IC1i+2+N:2*N,:) = qdot_opt_unsc.deg(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        Qdots_opt(:,QsSymA_ptx) = Qdots_opt(:,QsSymB_ptx);
-        Qdots_opt(:,QsOpp) = -Qdots_opt(:,QsOpp);    
+        Qdots_GC(:,QsSymA_ptx) = Qdots_GC(:,QsSymB_ptx);
+        Qdots_GC(:,QsOpp) = -Qdots_GC(:,QsOpp);    
     end
 
 %     % Qdotdots
@@ -2093,26 +1981,26 @@ end
 
     % Muscle-Tendon Forces
     orderMusInv = [NMuscle/2+1:NMuscle,1:NMuscle/2];
-    FTtilde_opt_GC = zeros(N*2,NMuscle);
-    FTtilde_opt_GC(1:N-IC1i+1,:) = FTtilde_opt_unsc(IC1i:end,:);
-    FTtilde_opt_GC(N-IC1i+2:N-IC1i+1+N,:) = ...
+    FTtilde_GC = zeros(N*2,NMuscle);
+    FTtilde_GC(1:N-IC1i+1,:) = FTtilde_opt_unsc(IC1i:end,:);
+    FTtilde_GC(N-IC1i+2:N-IC1i+1+N,:) = ...
         FTtilde_opt_unsc(1:end,orderMusInv);
-    FTtilde_opt_GC(N-IC1i+2+N:2*N,:) = FTtilde_opt_unsc(1:IC1i-1,:);
+    FTtilde_GC(N-IC1i+2+N:2*N,:) = FTtilde_opt_unsc(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        FTtilde_opt_GC(:,:) = FTtilde_opt_GC(:,orderMusInv);
+        FTtilde_GC(:,:) = FTtilde_GC(:,orderMusInv);
     end
 
     % Muscle activations
-    Acts_opt = zeros(N*2,NMuscle);
-    Acts_opt(1:N-IC1i+1,:) = a_opt_unsc(IC1i:end,:);
-    Acts_opt(N-IC1i+2:N-IC1i+1+N,:) = a_opt_unsc(1:end,orderMusInv);
-    Acts_opt(N-IC1i+2+N:2*N,:) = a_opt_unsc(1:IC1i-1,:);
+    Acts_GC = zeros(N*2,NMuscle);
+    Acts_GC(1:N-IC1i+1,:) = a_opt_unsc(IC1i:end,:);
+    Acts_GC(N-IC1i+2:N-IC1i+1+N,:) = a_opt_unsc(1:end,orderMusInv);
+    Acts_GC(N-IC1i+2+N:2*N,:) = a_opt_unsc(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        Acts_opt(:,:) = Acts_opt(:,orderMusInv);
+        Acts_GC(:,:) = Acts_GC(:,orderMusInv);
     end
 
 %     % Time derivative of muscle-tendon force
@@ -2128,16 +2016,16 @@ end
 %     end
 
     % Muscle excitations
-    vA_opt_GC = zeros(N*2,NMuscle);
-    vA_opt_GC(1:N-IC1i+1,:) = vA_opt_unsc(IC1i:end,:);
-    vA_opt_GC(N-IC1i+2:N-IC1i+1+N,:) = vA_opt_unsc(1:end,orderMusInv);
-    vA_opt_GC(N-IC1i+2+N:2*N,:) = vA_opt_unsc(1:IC1i-1,:);
+    vA_GC = zeros(N*2,NMuscle);
+    vA_GC(1:N-IC1i+1,:) = vA_opt_unsc(IC1i:end,:);
+    vA_GC(N-IC1i+2:N-IC1i+1+N,:) = vA_opt_unsc(1:end,orderMusInv);
+    vA_GC(N-IC1i+2+N:2*N,:) = vA_opt_unsc(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        vA_opt_GC(:,:) = vA_opt_GC(:,orderMusInv);
+        vA_GC(:,:) = vA_GC(:,orderMusInv);
     end
-    e_opt_GC = computeExcitationRaasch(Acts_opt,vA_opt_GC,...
+    e_GC = computeExcitationRaasch(Acts_GC,vA_GC,...
         ones(1,NMuscle)*tdeact,ones(1,NMuscle)*tact);   
     
     % Arm activations
@@ -2145,25 +2033,25 @@ end
             jointi.sh_flex.l:jointi.sh_rot.l,...
             jointi.elb.r:jointi.elb.r,...
             jointi.elb.l:jointi.elb.l]-jointi.sh_flex.l+1; 
-    a_a_opt_GC = zeros(N*2,nq.arms);
-    a_a_opt_GC(1:N-IC1i+1,:) = a_a_opt_unsc(IC1i:end,:);
-    a_a_opt_GC(N-IC1i+2:N-IC1i+1+N,:) = a_a_opt_unsc(1:end,orderArmInv);
-    a_a_opt_GC(N-IC1i+2+N:2*N,:) = a_a_opt_unsc(1:IC1i-1,:);
+    a_a_GC = zeros(N*2,nq.arms);
+    a_a_GC(1:N-IC1i+1,:) = a_a_opt_unsc(IC1i:end,:);
+    a_a_GC(N-IC1i+2:N-IC1i+1+N,:) = a_a_opt_unsc(1:end,orderArmInv);
+    a_a_GC(N-IC1i+2+N:2*N,:) = a_a_opt_unsc(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        a_a_opt_GC(:,:) = a_a_opt_GC(:,orderArmInv);
+        a_a_GC(:,:) = a_a_GC(:,orderArmInv);
     end
     
     % Arm excitations
-    e_a_opt_GC = zeros(N*2,nq.arms);
-    e_a_opt_GC(1:N-IC1i+1,:) = e_a_opt_unsc(IC1i:end,:);
-    e_a_opt_GC(N-IC1i+2:N-IC1i+1+N,:) = e_a_opt_unsc(1:end,orderArmInv);
-    e_a_opt_GC(N-IC1i+2+N:2*N,:) = e_a_opt_unsc(1:IC1i-1,:);
+    e_a_GC = zeros(N*2,nq.arms);
+    e_a_GC(1:N-IC1i+1,:) = e_a_opt_unsc(IC1i:end,:);
+    e_a_GC(N-IC1i+2:N-IC1i+1+N,:) = e_a_opt_unsc(1:end,orderArmInv);
+    e_a_GC(N-IC1i+2+N:2*N,:) = e_a_opt_unsc(1:IC1i-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        e_a_opt_GC(:,:) = e_a_opt_GC(:,orderArmInv);
+        e_a_GC(:,:) = e_a_GC(:,orderArmInv);
     end  
 
 %     % Passive joint torques
@@ -2184,7 +2072,7 @@ end
     q_opt_GUI_GC(1:N-IC1i+1,1) = tgrid(:,IC1i:end-1)';
     q_opt_GUI_GC(N-IC1i+2:N-IC1i+1+N,1)  = tgrid(:,1:end-1)' + tgrid(end);
     q_opt_GUI_GC(N-IC1i+2+N:2*N,1) = tgrid(:,1:IC1i-1)' + 2*tgrid(end);    
-    q_opt_GUI_GC(:,2:end-2) = Qs_opt;
+    q_opt_GUI_GC(:,2:end-2) = Qs_GC;
     q_opt_GUI_GC(:,end-1:end) = 1.51*180/pi*ones(2*N,2); % pro_sup (locked)
     q_opt_GUI_GC(:,1) = q_opt_GUI_GC(:,1)-q_opt_GUI_GC(1,1);   
     if writeIKmotion
@@ -2195,7 +2083,7 @@ end
         'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
         'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
         'knee_angle_l','knee_angle_r','ankle_angle_l','ankle_angle_r',...
-        'subtalar_angle_l','subtalar_angle_r',...
+        'subtalar_angle_l','subtalar_angle_r','mtp_angle_l','mtp_angle_r',...
         'lumbar_extension','lumbar_bending','lumbar_rotation',...
         'arm_flex_l','arm_add_l','arm_rot_l',...
         'arm_flex_r','arm_add_r','arm_rot_r',...
@@ -2211,9 +2099,9 @@ end
             q_opt_GUI_GC_2(2*N+1:4*N,jointi.pelvis.tx+1) + ...
             2*q_opt_unsc_all.deg(end,jointi.pelvis.tx);
         % Muscle activations (to have muscles turning red when activated).
-        Acts_opt_GUI = [Acts_opt;Acts_opt];
+        Acts_GC_GUI = [Acts_GC;Acts_GC];
         % Combine data joint angles and muscle activations
-        JointAngleMuscleAct.data = [q_opt_GUI_GC_2,Acts_opt_GUI];
+        JointAngleMuscleAct.data = [q_opt_GUI_GC_2,Acts_GC_GUI];
         % Get muscle labels
         muscleNamesAll = cell(1,NMuscle);
         for i = 1:NMuscle/2
@@ -2234,7 +2122,7 @@ end
     %% Metabolic cost of transport
 %     Qs_opt_rad = Qs_opt;
 %     Qs_opt_rad(:,roti) = Qs_opt_rad(:,roti).*pi/180;
-%     qdot_opt_GC_rad = Qdots_opt;
+%     qdot_opt_GC_rad = Qdots_GC;
 %     qdot_opt_GC_rad(:,roti)= qdot_opt_GC_rad(:,roti).*pi/180;   
 %     % Pre-allocations
 %     e_mo_opt = zeros(2*N,1);     
@@ -2291,7 +2179,7 @@ end
 %         [Hilldiff_optt,FT_optt,Fce_optt,Fpass_optt,Fiso_optt,...
 %             vMmax_optt,massM_optt] = ...
 %                 f_forceEquilibrium_FtildeState_all_tendon(...
-%                 Acts_opt(nn,:)',FTtilde_opt_GC(nn,:)',...
+%                 Acts_GC(nn,:)',FTtilde_opt_GC(nn,:)',...
 %                 dFTtilde_opt_GC(nn,:)',full(lMTk_lr_opt),...
 %                 full(vMTk_lr_opt),tensions,aTendon,shift);             
 %         [~,lMtilde_opt] = f_FiberLength_TendonForce_tendon(...
@@ -2304,15 +2192,15 @@ end
 %         vMtilde_opt_all(nn,:) = full(vMtilde_opt)';    
 %         if mE == 0 % Bhargava et al. (2004)
 %         [~,~,~,~,~,e_mot] = ...
-%             fgetMetabolicEnergySmooth2004all(Acts_opt(nn,:)',...
-%                 Acts_opt(nn,:)',full(lMtilde_opt),full(vM_opt),...
+%             fgetMetabolicEnergySmooth2004all(Acts_GC(nn,:)',...
+%                 Acts_GC(nn,:)',full(lMtilde_opt),full(vM_opt),...
 %                 full(Fce_optt),full(Fpass_optt),full(massM_optt),pctsts,...
 %                 full(Fiso_optt),MTparameters_m(1,:)',body_mass,10);           
 %         elseif mE == 1 % Umberger et al. (2003)
 %             % vMtilde defined for this model as vM/lMopt
 %             vMtildeUmbk_opt = full(vM_opt)./(MTparameters_m(2,:)');
 %             [~,~,~,~,e_mot] = fgetMetabolicEnergySmooth2003all(...
-%                 Acts_opt(nn,:)',Acts_opt(nn,:)',full(lMtilde_opt),...
+%                 Acts_GC(nn,:)',Acts_GC(nn,:)',full(lMtilde_opt),...
 %                 vMtildeUmbk_opt,full(vM_opt),full(Fce_optt)',...
 %                 full(massM_optt)',pctsts,full(vMmax_optt)',...
 %                 full(Fiso_optt)',body_mass,10); 
@@ -2320,7 +2208,7 @@ end
 %             % vMtilde defined for this model as vM/lMopt
 %             vMtildeUmbk_opt = full(vM_opt)./(MTparameters_m(2,:)');
 %             [~,~,~,~,e_mot] = fgetMetabolicEnergySmooth2010all(...
-%                 Acts_opt(nn,:)',Acts_opt(nn,:)',full(lMtilde_opt),...
+%                 Acts_GC(nn,:)',Acts_GC(nn,:)',full(lMtilde_opt),...
 %                 vMtildeUmbk_opt,full(vM_opt),full(Fce_optt)',...
 %                 full(massM_optt)',pctsts,full(vMmax_optt)',...
 %                 full(Fiso_optt)',body_mass,10); 
@@ -2328,7 +2216,7 @@ end
 %             % vMtilde defined for this model as vM/lMopt
 %             vMtildeUmbk_opt = full(vM_opt)./(MTparameters_m(2,:)');
 %             [~,~,~,~,e_mot] = fgetMetabolicEnergySmooth2016all(...
-%                 Acts_opt(nn,:)',Acts_opt(nn,:)',full(lMtilde_opt),...
+%                 Acts_GC(nn,:)',Acts_GC(nn,:)',full(lMtilde_opt),...
 %                 vMtildeUmbk_opt,full(vM_opt),full(Fce_optt)',...
 %                 full(massM_optt)',pctsts,full(vMmax_optt)',...
 %                 full(Fiso_optt)',body_mass,10); 
@@ -2337,7 +2225,7 @@ end
 %             % vMtilde defined for this model as vM/lMopt
 %             vMtildeUmbk_opt = full(vM_opt)./(MTparameters_m(2,:)');
 %             [~,~,~,~,e_mot] = fgetMetabolicEnergySmooth2010all_hl(...
-%                 Acts_opt(nn,:)',Acts_opt(nn,:)',full(lMtilde_opt),...
+%                 Acts_GC(nn,:)',Acts_GC(nn,:)',full(lMtilde_opt),...
 %                 vMtildeUmbk_opt,full(vM_opt),full(Fce_optt)',...
 %                 full(massM_optt)',pctsts,full(vMmax_optt)',...
 %                 full(Fiso_optt)',body_mass,10); 
@@ -2346,7 +2234,7 @@ end
 %             % vMtilde defined for this model as vM/lMopt
 %             vMtildeUmbk_opt = full(vM_opt)./(MTparameters_m(2,:)');
 %             [~,~,~,~,e_mot] = fgetMetabolicEnergySmooth2010all_neg(...
-%                 Acts_opt(nn,:)',Acts_opt(nn,:)',full(lMtilde_opt),...
+%                 Acts_GC(nn,:)',Acts_GC(nn,:)',full(lMtilde_opt),...
 %                 vMtildeUmbk_opt,full(vM_opt),full(Fce_optt)',...
 %                 full(massM_optt)',pctsts,full(vMmax_optt)',...
 %                 full(Fiso_optt)',body_mass,10);             
@@ -2354,8 +2242,8 @@ end
 %         e_mo_opt(nn,:) = full(e_mot)';   
 %         % Bhargava et al. (2004)
 %         [~,~,~,~,~,e_motb] = ...
-%             fgetMetabolicEnergySmooth2004all(Acts_opt(nn,:)',...
-%             Acts_opt(nn,:)',full(lMtilde_opt),full(vM_opt),...
+%             fgetMetabolicEnergySmooth2004all(Acts_GC(nn,:)',...
+%             Acts_GC(nn,:)',full(lMtilde_opt),full(vM_opt),...
 %             full(Fce_optt),full(Fpass_optt),full(massM_optt),pctsts,...
 %             full(Fiso_optt),MTparameters_m(1,:)',body_mass,10);
 %         e_mo_optb(nn,:) = full(e_motb)'; 
@@ -2419,7 +2307,7 @@ end
             (['Number_MeshIntervals_',num2str(N)]). ...
             (['MaximumContractionVelocity_',num2str(vMax_s)]). ...
             (['CoContraction_',num2str(coCont)]).Qs_opt = ...
-            Qs_opt;
+            Qs_GC;
         Results_all.(['Speed_',num2str(v_tgt_id*100)]). ...  
             (['W_MetabolicEnergyRate_',num2str(W.E)]). ...
             (['W_MuscleActivity_',num2str(W.A)]). ...            
@@ -2437,7 +2325,7 @@ end
             (['Number_MeshIntervals_',num2str(N)]). ...
             (['MaximumContractionVelocity_',num2str(vMax_s)]). ...
             (['CoContraction_',num2str(coCont)]). ...
-            Qdots_opt = Qdots_opt;
+            Qdots_opt = Qdots_GC;
 %         Results_all.(['Speed_',num2str(v_tgt_id*100)]). ...  
 %             (['W_MetabolicEnergyRate_',num2str(W.E)]). ...
 %             (['W_MuscleActivity_',num2str(W.A)]). ...            
@@ -2491,7 +2379,7 @@ end
             (['Number_MeshIntervals_',num2str(N)]). ...
             (['MaximumContractionVelocity_',num2str(vMax_s)]). ...
             (['CoContraction_',num2str(coCont)]).Acts_opt =...
-            Acts_opt;
+            Acts_GC;
 %         Results_all.(['Speed_',num2str(v_tgt_id*100)]). ...  
 %             (['W_MetabolicEnergyRate_',num2str(W.E)]). ...
 %             (['W_MuscleActivity_',num2str(W.A)]). ...            

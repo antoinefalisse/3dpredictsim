@@ -9,35 +9,21 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = 7; 
+idx_ww  = 20; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;
 body_weight = body_mass*9.81;
-settings = [10,1,1,10,1,50,100,50,4,6; ...
-    10,1,1,10,1,50,100,50,4,5; ...
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5;
-    10,1,1,10,1,50,100,50,4,5];
-settings_trials(1).ww = {'14','15'};
-settings_trials(2).ww = {'14'};
-settings_trials(3).ww = {'14'};
-settings_trials(4).ww = {'14'};
-settings_trials(5).ww = {'14'};
-settings_trials(6).ww = {'14'};
-settings_trials(7).ww = {'14'};
-settings_trials(8).ww = {'14'};
-settings_trials(9).ww = {'14'};
-settings_trials(10).ww = {'14'};
+pathmain = pwd;
+[pathRepo,~,~] = fileparts(pathmain);
+pathOCP = [pathRepo,'/OCP'];
+addpath(genpath(pathOCP));
+trackSim_mtp_settings_all
+
 setup.derivatives = 'AD';
 showtrackplotsonly = 0;
 showlegend = 0;
-writeModel = 1;
+writeModel = 0;
 
 %% Load results
 % Pre-allocation structures
@@ -52,6 +38,7 @@ GRMs_toTrack    = struct('ww',[]);
 ParamsCM_opt    = struct('ww',[]);
 ParamsCM_gen    = struct('ww',[]);
 dev_cm          = struct('ww',[]);
+bounds          = struct('ww',[]);
 trials          = struct('ww',[]);
 % Loop over cases
 pathmain = pwd;
@@ -73,6 +60,7 @@ for www = 1:length(idx_ww)
         GRFs_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).GRFs_toTrack;
         GRMs_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).GRMs_toTrack; 
         ParamsCM_opt(ww).ww(p).p = Results_tracking(ww).ww(p).ParamsCM_opt;
+        bounds(ww).ww(p).p = Results_tracking(ww).ww(p).bounds;
         ParamsCM_gen(ww).ww(p).p = Results_tracking(ww).ww(p).ParamsCM_gen;
         dev_cm(ww).ww(p).p  = Results_tracking(ww).ww(p).dev_cm; 
     end       
@@ -142,7 +130,7 @@ NumTicks_GRF = 2;
 GRF_str = {'Fore-aft R','Vertical R','Lateral R',...
     'Fore-aft L','Vertical L','Lateral L'};
 pos_GRM = [4:6,10:12];
-ylim_GRM = [-20,200;-50 50;-250 250;-20,200;-50 50;-250 250];
+ylim_GRM = [-250,150;-50 50;-150 200;-150,200;-50 50;-250 300];
 for p = 1:length(trials(ww).ww)      
     figure()
     for i = 1:length(GRF_str)
@@ -271,23 +259,73 @@ for k = 1:length(idx_ww)
     subplot(1,2,1)
     scatter(1:2*cs,ParamsCM_opt(ww).ww(p).p(1:2*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
     scatter(1:2*cs,ParamsCM_gen(ww).ww(p).p(1:2*cs),'k','linewidth',2);        
-    params_bounds_upper = ParamsCM_gen(ww).ww(p).p(1:2*cs) + dev_cm(ww).ww(p).p.loc/1000;
-    params_bounds_lower = ParamsCM_gen(ww).ww(p).p(1:2*cs) - dev_cm(ww).ww(p).p.loc/1000;
-    scatter(1:2*cs,params_bounds_upper,'b','linewidth',2);
-    scatter(1:2*cs,params_bounds_lower,'r','linewidth',2);
+%     params_bounds_upper = bounds(ww).ww(p).p(1:2*cs) + dev_cm(ww).ww(p).p.loc/1000;
+%     params_bounds_lower = ParamsCM_gen(ww).ww(p).p(1:2*cs) - dev_cm(ww).ww(p).p.loc/1000;
+    scatter(1:2*cs,bounds(ww).ww(p).p.params.upper(1:2*cs),'b','linewidth',2);
+    scatter(1:2*cs,bounds(ww).ww(p).p.params.lower(1:2*cs),'r','linewidth',2);
     l = legend('Optimal','Generic');
     set(l,'Fontsize',16);
     subplot(1,2,2)
     scatter(1:cs,ParamsCM_opt(ww).ww(p).p(2*cs+1:3*cs),'filled','MarkerFaceColor',color_all(2,:),'linewidth',2); hold on
     scatter(1:cs,ParamsCM_gen(ww).ww(p).p(2*cs+1:3*cs),'k','linewidth',2);    
-    radii = 0.032*ones(1,cs);
-    params_bounds_upper = radii + dev_cm(ww).ww(p).p.rad/100*radii; 
-    params_bounds_lower = radii - dev_cm(ww).ww(p).p.rad/100*radii;
-    scatter(1:cs,params_bounds_upper,'b','linewidth',2);
-    scatter(1:cs,params_bounds_lower,'r','linewidth',2);
+%     radii = 0.032*ones(1,cs);
+%     params_bounds_upper = radii + dev_cm(ww).ww(p).p.rad/100*radii; 
+%     params_bounds_lower = radii - dev_cm(ww).ww(p).p.rad/100*radii;
+%     scatter(1:cs,params_bounds_upper,'b','linewidth',2);
+%     scatter(1:cs,params_bounds_lower,'r','linewidth',2);
+    scatter(1:cs,bounds(ww).ww(p).p.params.upper(2*cs+1:3*cs),'b','linewidth',2);
+    scatter(1:cs,bounds(ww).ww(p).p.params.lower(2*cs+1:3*cs),'r','linewidth',2);
     l = legend('Optimal','Generic');
     set(l,'Fontsize',16);
-    if length(ParamsCM_opt(ww).ww(p).p) == 15        
+    if length(ParamsCM_opt(ww).ww(p).p) == 12        
+        if writeModel
+            pathVariousFunctions = [pathRepo,'\VariousFunctions'];
+            addpath(genpath(pathVariousFunctions));    
+            pathData = [pathRepo,'\OpenSimModel\',subject];    
+            ModelSetup = xml_read([pathData,'\',subject,'_mtp_ContactsAsForces.osim']);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(1) = ParamsCM_opt(ww).ww(p).p(1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(3) = ParamsCM_opt(ww).ww(p).p(2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(1) = ParamsCM_opt(ww).ww(p).p(3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(3) = ParamsCM_opt(ww).ww(p).p(4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(1) = ParamsCM_opt(ww).ww(p).p(5);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(3) = ParamsCM_opt(ww).ww(p).p(6);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(1) = ParamsCM_opt(ww).ww(p).p(7);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(3) = ParamsCM_opt(ww).ww(p).p(8); 
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(1) = ParamsCM_opt(ww).ww(p).p(1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(3) = -ParamsCM_opt(ww).ww(p).p(2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(1) = ParamsCM_opt(ww).ww(p).p(3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(3) = -ParamsCM_opt(ww).ww(p).p(4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(1) = ParamsCM_opt(ww).ww(p).p(5);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(3) = -ParamsCM_opt(ww).ww(p).p(6);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(1) = ParamsCM_opt(ww).ww(p).p(7);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(3) = -ParamsCM_opt(ww).ww(p).p(8);       
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).radius = ParamsCM_opt(ww).ww(p).p(2*cs+1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).radius = ParamsCM_opt(ww).ww(p).p(2*cs+2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).radius = ParamsCM_opt(ww).ww(p).p(2*cs+3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).radius = ParamsCM_opt(ww).ww(p).p(2*cs+4);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).radius = ParamsCM_opt(ww).ww(p).p(2*cs+1);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).radius = ParamsCM_opt(ww).ww(p).p(2*cs+2);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(2*cs+3);
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(2*cs+4);             
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5) = [];
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6-1) = []; % -1 cause we already removed one
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11-2) = []; % -2 cause we already removed two
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12-3) = []; % -3 cause we already removed three
+            if settings(ww,11) == 2
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).body_name = 'toes_r';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(2) = -0.0214476;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).body_name = 'toes_l';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(2) = -0.0214476;
+            end
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(5) = [];
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(6-1) = []; % -1 cause we already removed one
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(11-2) = []; % -2 cause we already removed two
+            ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(12-3) = []; % -3 cause we already removed three
+            
+            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_c',num2str(ww),'.osim'];
+            xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
+        end
+    elseif length(ParamsCM_opt(ww).ww(p).p) == 15        
         if writeModel
             pathVariousFunctions = [pathRepo,'\VariousFunctions'];
             addpath(genpath(pathVariousFunctions));    
@@ -322,7 +360,13 @@ for k = 1:length(idx_ww)
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).radius = ParamsCM_opt(ww).ww(p).p(2*cs+2);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(2*cs+3);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(2*cs+4);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(2*cs+5);              
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(2*cs+5);               
+            if settings(ww,11) == 2
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).body_name = 'toes_r';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(2) = -0.0214476;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).body_name = 'toes_l';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(2) = -0.0214476;
+            end                        
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6) = [];
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12-1) = []; % -1 cause we already removed one
             ModelSetup.Model.ForceSet.objects.HuntCrossleyForce(6) = [];
