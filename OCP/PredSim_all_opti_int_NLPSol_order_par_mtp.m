@@ -24,7 +24,7 @@ close all;
 % and visualize the results in the OpenSim GUI.
 
 num_set = [1,1,1,1,0,1]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,1]; % This configuration analyzes the results
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -1354,8 +1354,9 @@ if analyseResults
     e_opt_unsc = computeExcitationRaasch(a_opt_unsc,vA_opt_unsc,...
         ones(1,NMuscle)*tdeact,ones(1,NMuscle)*tact);
     % Arm excitations
-    e_a_opt_unsc = e_a_opt.*repmat(scaling.e_a,size(e_a_opt,1),...
-        size(e_a_opt,2));
+    e_a_opt_unsc = e_a_opt;
+    % Mtp excitations
+    e_mtp_opt_unsc = e_mtp_opt;
     % States at collocation points
     % Qs
     q_col_opt_unsc.rad = Qs_col_opt.*repmat(scaling.Qs,size(Qs_col_opt,1),1); 
@@ -1388,7 +1389,7 @@ if analyseResults
     % Time derivative of muscle-tendon forces
     dFTtilde_col_opt_unsc = dFTtilde_col_opt.*repmat(...
         scaling.dFTtilde,size(dFTtilde_col_opt,1),size(dFTtilde_col_opt,2));   
-    dFTtilde_opt_unsc = dFTtilde_col_opt_unsc.rad(d:d:end,:);
+    dFTtilde_opt_unsc = dFTtilde_col_opt_unsc(d:d:end,:);
     
     %% Time grid    
     % Mesh points
@@ -2059,15 +2060,15 @@ if analyseResults
     end
 
     % Time derivative of muscle-tendon force
-    dFTtilde_opt_GC = zeros(N*2,NMuscle);
-    dFTtilde_opt_GC(1:N-IC1i_c+1,:) = dFTtilde_opt_unsc(IC1i_c:end,:);
-    dFTtilde_opt_GC(N-IC1i_c+2:N-IC1i_c+1+N,:) = ...
+    dFTtilde_GC = zeros(N*2,NMuscle);
+    dFTtilde_GC(1:N-IC1i_c+1,:) = dFTtilde_opt_unsc(IC1i_c:end,:);
+    dFTtilde_GC(N-IC1i_c+2:N-IC1i_c+1+N,:) = ...
         dFTtilde_opt_unsc(1:end,orderMusInv);
-    dFTtilde_opt_GC(N-IC1i_c+2+N:2*N,:) = dFTtilde_opt_unsc(1:IC1i_c-1,:);
+    dFTtilde_GC(N-IC1i_c+2+N:2*N,:) = dFTtilde_opt_unsc(1:IC1i_c-1,:);
     % If the first heel strike was on the left foot then we invert so that
     % we always start with the right foot, for analysis purpose
     if strcmp(HS1,'l')
-        dFTtilde_opt_GC(:,:) = dFTtilde_opt_GC(:,orderMusInv);
+        dFTtilde_GC(:,:) = dFTtilde_GC(:,orderMusInv);
     end
 
     % Muscle excitations
@@ -2267,15 +2268,15 @@ if analyseResults
         [Hilldiff_optt,FT_optt,Fce_optt,Fpass_optt,Fiso_optt,...
             vMmax_optt,massM_optt] = ...
                 f_forceEquilibrium_FtildeState_all_tendon(...
-                Acts_GC(nn,:)',FTtilde_opt_GC(nn,:)',...
-                dFTtilde_opt_GC(nn,:)',full(lMTk_lr_opt),...
+                Acts_GC(nn,:)',FTtilde_GC(nn,:)',...
+                dFTtilde_GC(nn,:)',full(lMTk_lr_opt),...
                 full(vMTk_lr_opt),tensions,aTendon,shift);             
         [~,lMtilde_opt] = f_FiberLength_TendonForce_tendon(...
-            FTtilde_opt_GC(nn,:)',full(lMTk_lr_opt),aTendon,shift);         
+            FTtilde_GC(nn,:)',full(lMTk_lr_opt),aTendon,shift);         
         lMtilde_opt_all(nn,:) = full(lMtilde_opt)';   
         [vM_opt,vMtilde_opt] = ...
-            f_FiberVelocity_TendonForce_tendon(FTtilde_opt_GC(nn,:)',...
-            dFTtilde_opt_GC(nn,:)',full(lMTk_lr_opt),full(vMTk_lr_opt),...
+            f_FiberVelocity_TendonForce_tendon(FTtilde_GC(nn,:)',...
+            dFTtilde_GC(nn,:)',full(lMTk_lr_opt),full(vMTk_lr_opt),...
             aTendon,shift);        
         vMtilde_opt_all(nn,:) = full(vMtilde_opt)';    
         if mE == 0 % Bhargava et al. (2004)
