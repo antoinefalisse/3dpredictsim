@@ -29,7 +29,7 @@ num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [4]; % Index row in matrix settings (1:198)
+idx_ww = [6]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
@@ -78,18 +78,7 @@ writeIKmotion   = num_set(6); % set to 1 to write .mot file
 % settings(18): co-contraction identifier: 0 lower bound activation = 0.05,
 % 1 lower bound activation = 0.1, 2 lower bound activation = 0.15,
 % 3 lower bound activation = 0.2
-settings = [    
-    % A. Varying prescribed gait speed
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 1  
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 2
-    % C. Subject-specific contact model
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0;    % 3
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0;    % 4   
-];
+predSim_settings_all_mtp
 
 %% Select settings
 for www = 1:length(idx_ww)
@@ -117,7 +106,7 @@ mE          = settings(ww,17);   % metabolic energy model identifier
 coCont      = settings(ww,18);   % co-contraction identifier
 % Fixed parameter
 W.u = 0.001;
-W.Mtp = 1000;
+W.Mtp = 1000000;
 % The filename used to save the results depends on the settings 
 v_tgt_id = round(v_tgt,2);
 savename = ['_c',num2str(ww),'_v',num2str(v_tgt_id*100),...
@@ -186,6 +175,11 @@ if ispc
                 F = external('F','PredSim_mtp_cm1.dll');   
                 if analyseResults
                     F1 = external('F','PredSim_mtp_pp_cm1.dll');
+                end
+            elseif cm == 3
+                F = external('F','PredSim_mtpPin_cm2.dll');   
+                if analyseResults
+                    F1 = external('F','PredSim_mtpPin_pp_cm2.dll');
                 end
             end
     end
@@ -2203,6 +2197,16 @@ if analyseResults
                 '/IK',savename,'.mot'];
         write_motionFile(JointAngleMuscleAct, filenameJointAngles)
     end
+    
+    %% MTP torque components
+    figure()
+    plot(Ts_opt(:,jointi.mtp.r)*body_mass, 'k', 'linewidth', 3)
+    hold on
+    plot(a_mtp_GC(:,2)*scaling.MtpTau, 'r', 'linewidth', 3)
+    plot(Tau_pass_opt_GC(:,jointi.mtp.r-nq.abs), 'b', 'linewidth', 3)
+    plot(Tau_pass_opt_GC(:,jointi.mtp.r-nq.abs) + a_mtp_GC(:,2)*scaling.MtpTau, 'm:', 'linewidth', 3)
+    l = legend('ID','Active','Passive','Sum (Active + Passive)');
+    set(l,'Fontsize',16)    
         
     %% Metabolic cost of transport for a gait cycle
     Qs_opt_rad = Qs_GC;

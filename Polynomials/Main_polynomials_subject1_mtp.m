@@ -18,14 +18,13 @@ saveQdot = 0;
 savePolynomials = 1;
 
 %% Extract time and angles from dummy motion
-subject = 'subject1_mtp';
+subject = 'subject1_mtpPin';
 pathmain = pwd;
 name_dummymotion = 'dummy_motion_mtp.mot';
 path_dummymotion = [pathmain,'/MuscleAnalysis/dummy_motion/'];
 path_resultsMA = [pathmain,'/MuscleAnalysis/ResultsMA/ResultsMA_',subject,'/'];
 
 dummy_motion = importdata([path_dummymotion,name_dummymotion]);
-% 15 dofs (mtp locked)
 % Order of dofs: hip flex r, hip add r, hip rot r, knee flex r, ankle flex
 % r, hip flex l, hip add l, hip rot l, knee flex l, ankle flex l, lumbar
 % ext, lumbar bend, lumbar rot, subtalar r, subtalar l, mtp_r, mtp_l

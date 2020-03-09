@@ -234,7 +234,17 @@ if cs == 4 && csc == 2
     B_locSphere_s6_r = [0.045, 0.0618569567549652];
     guess.params = [guess.params, B_locSphere_s6_r];
 end
-if cs == 5 && csc == 2
+if (cs == 4 && csc == 3)
+    B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
+    guess.params = B_locSphere_s1_r;
+    B_locSphere_s3_r = [0.130, 0.035];
+    guess.params = [guess.params, B_locSphere_s3_r];
+    B_locSphere_s4_r = [0.05, -0.015];   
+    guess.params = [guess.params, B_locSphere_s4_r]; 
+    B_locSphere_s6_r = [0.0125, 0.0175];
+    guess.params = [guess.params,B_locSphere_s6_r];
+end
+if (cs == 5 && csc == 2) || (cs == 5 && csc == 3)
     B_locSphere_s1_r = [0.00190115788407966, -0.00382630379623308];
     guess.params = B_locSphere_s1_r;
     B_locSphere_s5_r = [0.0662346661991635, 0.026];

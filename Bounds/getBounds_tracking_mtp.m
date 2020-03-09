@@ -549,7 +549,33 @@ if cs == 5
         B_locSphere_s5_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
         B_locSphere_s5_r_dev_lb = [0, B_locSphere_s4_r(2)];
         radius_s5_ub = 0.032 + 0.50*0.032;
-        radius_s5_lb = 0.032 - 0.50*0.032;        
+        radius_s5_lb = 0.032 - 0.50*0.032;  
+    elseif csc == 3
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = B_locSphere_s1_r + 0.005;
+        B_locSphere_s1_r_dev_lb = B_locSphere_s1_r - 0.005;
+        radius_s1_ub = 0.032 + 0.05*0.032;
+        radius_s1_lb = 0.032 - 0.05*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [B_locSphere_s5_r(1) + 0.01, B_locSphere_s5_r(2)];
+        B_locSphere_s2_r_dev_lb = [B_locSphere_s5_r(1) - 0.01, -0.02];
+        radius_s2_ub = 0.032 + 0.05*0.032;
+        radius_s2_lb = 0.032 - 0.05*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [0.160, 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, -0.03];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.50*0.032;
+        % Sphere 4
+        B_locSphere_s4_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s4_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.50*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+        B_locSphere_s5_r_dev_lb = [0, B_locSphere_s4_r(2)];
+        radius_s5_ub = 0.032 + 0.50*0.032;
+        radius_s5_lb = 0.032 - 0.50*0.032; 
     end    
     params_loc_IG_upper = [B_locSphere_s1_r_dev_ub,B_locSphere_s2_r_dev_ub,...
         B_locSphere_s3_r_dev_ub,B_locSphere_s4_r_dev_ub,...
@@ -561,6 +587,34 @@ if cs == 5
         radius_s5_ub];
     radii_lower = [radius_s1_lb,radius_s2_lb,radius_s3_lb,radius_s4_lb,...
         radius_s5_lb];
+end
+if cs == 4 && csc == 3
+    % Sphere 1
+    B_locSphere_s1_r_dev_ub = B_locSphere_s1_r + 0.005;
+    B_locSphere_s1_r_dev_lb = B_locSphere_s1_r - 0.005;
+    radius_s1_ub = 0.032 + 0.05*0.032;
+    radius_s1_lb = 0.032 - 0.05*0.032;
+    % Sphere 2 
+    B_locSphere_s2_r_dev_ub = [0.160, 0.04];
+    B_locSphere_s2_r_dev_lb = [0.11, -0.03];
+    radius_s2_ub = 0.032 + 0.50*0.032;
+    radius_s2_lb = 0.032 - 0.50*0.032;
+    % Sphere 3
+    B_locSphere_s3_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+    B_locSphere_s3_r_dev_lb = [0, B_locSphere_s4_r(2)];
+    radius_s3_ub = 0.032 + 0.50*0.032;
+    radius_s3_lb = 0.032 - 0.50*0.032;
+    % Sphere 4
+    B_locSphere_s4_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
+    B_locSphere_s4_r_dev_lb = [0, B_locSphere_s4_r(2)];
+    radius_s4_ub = 0.032 + 0.50*0.032;
+    radius_s4_lb = 0.032 - 0.50*0.032; 
+    params_loc_IG_upper = [B_locSphere_s1_r_dev_ub,B_locSphere_s2_r_dev_ub,...
+        B_locSphere_s3_r_dev_ub,B_locSphere_s4_r_dev_ub];
+    params_loc_IG_lower = [B_locSphere_s1_r_dev_lb,B_locSphere_s2_r_dev_lb,...
+        B_locSphere_s3_r_dev_lb,B_locSphere_s4_r_dev_lb];
+    radii_upper = [radius_s1_ub,radius_s2_ub,radius_s3_ub,radius_s4_ub];
+    radii_lower = [radius_s1_lb,radius_s2_lb,radius_s3_lb,radius_s4_lb];
 end
 bounds.params.upper = [params_loc_IG_upper,radii_upper];
 bounds.params.lower = [params_loc_IG_lower,radii_lower];
