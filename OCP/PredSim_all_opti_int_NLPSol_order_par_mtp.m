@@ -29,7 +29,7 @@ num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [14]; % Index row in matrix settings (1:198)
+idx_ww = [12,14]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
@@ -367,14 +367,14 @@ tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_',mtp_jointTy
 aTendon = 35*ones(NMuscle,1);
 shift = zeros(NMuscle,1);
 if pf_t_stiff == 2
+    tendon_stiffness = 20;
     idx_GL = find(strcmp(muscleNames,'lat_gas_r'));
     idx_GM = find(strcmp(muscleNames,'med_gas_r'));
     idx_SO = find(strcmp(muscleNames,'soleus_r'));    
     idx_pf = [idx_GL,idx_GM,idx_SO];
     idx_pf_all = [idx_pf,idx_pf+NMuscle/2];        
-    aTendon(idx_pf_all,1) = 20;
-    shift20 = getShift(20);
-    shift(idx_pf_all,1) = shift20;    
+    aTendon(idx_pf_all,1) = tendon_stiffness;
+    shift(idx_pf_all,1) = getShift(tendon_stiffness);    
 end    
 
 % Adjust the maximal isometric force of the hip actuators if needed.
