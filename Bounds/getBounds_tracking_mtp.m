@@ -510,7 +510,100 @@ if cs == 6
         B_locSphere_s6_r_dev_ub = [B_locSphere_s4_r(1), 0.035];
         B_locSphere_s6_r_dev_lb = [0, B_locSphere_s4_r(2)];
         radius_s6_ub = 0.032 + 0.50*0.032;
-        radius_s6_lb = 0.032 - 0.50*0.032;        
+        radius_s6_lb = 0.032 - 0.50*0.032;   
+    elseif csc == 4
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = [0.005, 0.005];
+        B_locSphere_s1_r_dev_lb = [-0.005, -0.005];
+        radius_s1_ub = 0.032 + 0.01*0.032;
+        radius_s1_lb = 0.032 - 0.50*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [0.07, 0.03];
+        B_locSphere_s2_r_dev_lb = [-0.005, -0.02];
+        radius_s2_ub = 0.032 + 0.01*0.032;
+        radius_s2_lb = 0.032 - 0.50*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [0.165, 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, -0.03];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.50*0.032;
+        % Sphere 4 
+        B_locSphere_s4_r_dev_ub = [0.165, 0.04];
+        B_locSphere_s4_r_dev_lb = [0.11, -0.03];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.50*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s5_r_dev_lb = [0, -0.03];
+        radius_s5_ub = 0.032 + 0.50*0.032;
+        radius_s5_lb = 0.032 - 0.50*0.032;
+        % Sphere 6
+        B_locSphere_s6_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s6_r_dev_lb = [0, -0.03];
+        radius_s6_ub = 0.032 + 0.50*0.032;
+        radius_s6_lb = 0.032 - 0.50*0.032;
+    elseif csc == 5
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = [0.005, 0.005];
+        B_locSphere_s1_r_dev_lb = [-0.005, -0.005];
+        radius_s1_ub = 0.032 + 0.01*0.032;
+        radius_s1_lb = 0.032 - 0.50*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [0.07, 0.03];
+        B_locSphere_s2_r_dev_lb = [-0.06, 0.02];
+        radius_s2_ub = 0.032 + 0.01*0.032;
+        radius_s2_lb = 0.032 - 0.50*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [0.165, 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, -0.03];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.50*0.032;
+        % Sphere 4 
+        B_locSphere_s4_r_dev_ub = [0.165, -0.01];
+        B_locSphere_s4_r_dev_lb = [0.145, -0.03];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.50*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s5_r_dev_lb = [0, -0.03];
+        radius_s5_ub = 0.032 + 0.50*0.032;
+        radius_s5_lb = 0.032 - 0.50*0.032;
+        % Sphere 6
+        B_locSphere_s6_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s6_r_dev_lb = [0, -0.03];
+        radius_s6_ub = 0.032 + 0.50*0.032;
+        radius_s6_lb = 0.032 - 0.50*0.032;
+    elseif csc == 6
+        % Sphere 1
+        B_locSphere_s1_r_dev_ub = [0.005, 0.005];
+        B_locSphere_s1_r_dev_lb = [-0.005, -0.005];
+        radius_s1_ub = 0.032 + 0.01*0.032;
+        radius_s1_lb = 0.032 - 0.90*0.032;
+        % Sphere 2
+        B_locSphere_s2_r_dev_ub = [0.07, 0.03];
+        B_locSphere_s2_r_dev_lb = [0.06, 0.02];
+        radius_s2_ub = 0.032 + 0.01*0.032;
+        radius_s2_lb = 0.032 - 0.90*0.032;
+        % Sphere 3 
+        B_locSphere_s3_r_dev_ub = [0.165, 0.04];
+        B_locSphere_s3_r_dev_lb = [0.11, -0.03];
+        radius_s3_ub = 0.032 + 0.50*0.032;
+        radius_s3_lb = 0.032 - 0.90*0.032;
+        % Sphere 4 
+        B_locSphere_s4_r_dev_ub = [0.165, -0.01];
+        B_locSphere_s4_r_dev_lb = [0.145, -0.03];
+        radius_s4_ub = 0.032 + 0.50*0.032;
+        radius_s4_lb = 0.032 - 0.90*0.032;
+        % Sphere 5
+        B_locSphere_s5_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s5_r_dev_lb = [0, -0.03];
+        radius_s5_ub = 0.032 + 0.50*0.032;
+        radius_s5_lb = 0.032 - 0.90*0.032;
+        % Sphere 6
+        B_locSphere_s6_r_dev_ub = [0.06, 0.04];
+        B_locSphere_s6_r_dev_lb = [0, -0.03];
+        radius_s6_ub = 0.032 + 0.50*0.032;
+        radius_s6_lb = 0.032 - 0.90*0.032;
     end    
     params_loc_IG_upper = [B_locSphere_s1_r_dev_ub,B_locSphere_s2_r_dev_ub,...
         B_locSphere_s3_r_dev_ub,B_locSphere_s4_r_dev_ub,...

@@ -10,13 +10,17 @@ clc
 
 %% Settings
 % Select trials, for example
-ww  = [6]; 
+ww  = [10]; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;
 body_weight = 62*9.81;
 setup.derivatives = 'AD';
 % Load pre-defined settings
+pathmain = pwd;
+[pathrepo,~,~] = fileparts(pathmain);
+pathOCP = [pathrepo,'/OCP'];
+addpath(genpath(pathOCP));
 predSim_settings_all_mtp;
 % user choice
 showMainPlots = 1; % 0 to also see joint velocities and left m activations
@@ -69,8 +73,6 @@ muscleNames = {'Glut med 1','Glut med 2','Glut med 3',...
 GRF_str = {'Fore-aft','Vertical','Lateral'};
 
 %% Load reference data
-pathmain = pwd;
-[pathrepo,~,~] = fileparts(pathmain);
 pathReferenceData = [pathrepo,'/ExperimentalData'];
 load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 

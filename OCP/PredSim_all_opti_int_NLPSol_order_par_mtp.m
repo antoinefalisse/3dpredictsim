@@ -29,7 +29,7 @@ num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [6]; % Index row in matrix settings (1:198)
+idx_ww = [10]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
@@ -181,6 +181,11 @@ if ispc
                 if analyseResults
                     F1 = external('F','PredSim_mtpPin_pp_cm2.dll');
                 end
+            elseif cm == 4
+                F = external('F','PredSim_mtpPin_cm3.dll');   
+                if analyseResults
+                    F1 = external('F','PredSim_mtpPin_pp_cm3.dll');
+                end
             end
     end
 elseif ismac
@@ -285,6 +290,11 @@ tibiaOr.r   = 44:45;
 tibiaOr.l   = 46:47;
 tibiaOr.all = [tibiaOr.r,tibiaOr.l];
 NtibiaOr    = length(tibiaOr.all);
+% Toes
+toesOr.r   = 48:49;
+toesOr.l   = 50:51;
+toesOr.all = [toesOr.r,toesOr.l];
+NtoesOr    = length(toesOr.all);
 % External function: F1 (post-processing purpose only)
 % Ground reaction forces (GRFs)
 GRFi.r      = 32:34;
@@ -654,7 +664,8 @@ if solveProblem
     ineq_constr2 = {}; % Initialize inequality constraint vector 2
     ineq_constr3 = {}; % Initialize inequality constraint vector 3
     ineq_constr4 = {}; % Initialize inequality constraint vector 4
-    ineq_constr5 = {}; % Initialize inequality constraint vector 5    
+    ineq_constr5 = {}; % Initialize inequality constraint vector 5  
+    ineq_constr6 = {}; % Initialize inequality constraint vector 6   
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
     % Time step
     h = tfk/N; 
@@ -1067,6 +1078,8 @@ if solveProblem
         ineq_constr4{end+1} = f_Jnn2(Tj(femurOr.l,1) - Tj(handOr.l,1));
         % Origins tibia (transv plane) at minimum 11 cm from each other.   
         ineq_constr5{end+1} = f_Jnn2(Tj(tibiaOr.r,1) - Tj(tibiaOr.l,1));  
+        % Origins toes (transv plane) at minimum 10 cm from each other.   
+        ineq_constr6{end+1} = f_Jnn2(Tj(toesOr.r,1) - Tj(toesOr.l,1));
     end % End loop over collocation points
     eq_constr = vertcat(eq_constr{:});
     ineq_constr1 = vertcat(ineq_constr1{:});
@@ -1074,13 +1087,14 @@ if solveProblem
     ineq_constr3 = vertcat(ineq_constr3{:});
     ineq_constr4 = vertcat(ineq_constr4{:});
     ineq_constr5 = vertcat(ineq_constr5{:});
+    ineq_constr6 = vertcat(ineq_constr6{:});
     f_coll = Function('f_coll',{tfk,ak,aj,FTtildek,FTtildej,Qsk,Qsj,Qdotsk,...
         Qdotsj,a_ak,a_aj,a_mtpk,a_mtpj,vAk,e_ak,e_mtpk,dFTtildej,Aj},...
         {eq_constr,ineq_constr1,ineq_constr2,ineq_constr3,ineq_constr4,...
-        ineq_constr5,J});
+        ineq_constr5,ineq_constr6,J});
     f_coll_map = f_coll.map(N,parallelMode,NThreads);
     [coll_eq_constr, coll_ineq_constr1, coll_ineq_constr2, coll_ineq_constr3,...
-        coll_ineq_constr4, coll_ineq_constr5, Jall] = f_coll_map(tf,...
+        coll_ineq_constr4, coll_ineq_constr5, coll_ineq_constr6, Jall] = f_coll_map(tf,...
         a(:,1:end-1), a_col, FTtilde(:,1:end-1), FTtilde_col, Qs(:,1:end-1), ...
         Qs_col, Qdots(:,1:end-1), Qdots_col, a_a(:,1:end-1), a_a_col, ...
         a_mtp(:,1:end-1), a_mtp_col, vA, e_a, e_mtp, dFTtilde_col, A_col);
@@ -1090,6 +1104,7 @@ if solveProblem
     opti.subject_to(0.0081 < coll_ineq_constr3(:) < 4);
     opti.subject_to(0.0324 < coll_ineq_constr4(:) < 4);
     opti.subject_to(0.0121 < coll_ineq_constr5(:) < 4);  
+    opti.subject_to(0.01   < coll_ineq_constr6(:) < 4); 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Loop over mesh points
     for k=1:N

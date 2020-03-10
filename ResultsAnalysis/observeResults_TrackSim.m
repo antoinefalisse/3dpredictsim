@@ -9,7 +9,7 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = 21; 
+idx_ww  = 25; 
 mtp_pin = 1; % the mtp joint is a pin rather than a custom joint
 % Fixed settings
 subject = 'subject1';
@@ -469,7 +469,25 @@ for k = 1:length(idx_ww)
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(15);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(16);
             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(17);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).radius = ParamsCM_opt(ww).ww(p).p(18);                   
+            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).radius = ParamsCM_opt(ww).ww(p).p(18);
+            if settings(ww,11) == 4 || settings(ww,11) == 5 || settings(ww,11) == 6
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(2) = -0.01;
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).body_name = 'calcn_r';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).body_name = 'calcn_l';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).body_name = 'toes_r';
+                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).body_name = 'toes_l';
+            end
             PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_c',num2str(ww),'.osim'];
             xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
         end

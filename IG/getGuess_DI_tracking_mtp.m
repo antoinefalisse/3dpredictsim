@@ -270,6 +270,20 @@ if (cs == 6 && csc == 2) || (cs == 6 && csc == 3)
     B_locSphere_s6_r = [0.0125, 0.0175];
     guess.params = [guess.params,B_locSphere_s6_r];
 end
+if (cs == 6 && csc == 4) || (cs == 6 && csc == 6)
+    B_locSphere_s1_r = [0, 0];
+    guess.params = B_locSphere_s1_r;
+    B_locSphere_s2_r = [0.065, 0.025];
+    guess.params = [guess.params,B_locSphere_s2_r];
+    B_locSphere_s3_r = [0.130, 0.035];
+    guess.params = [guess.params, B_locSphere_s3_r];
+    B_locSphere_s4_r = [0.15, -0.025];
+    guess.params = [guess.params, B_locSphere_s4_r];
+    B_locSphere_s5_r = [0.05, -0.015];   
+    guess.params = [guess.params, B_locSphere_s5_r]; 
+    B_locSphere_s6_r = [0.015, 0.035];
+    guess.params = [guess.params,B_locSphere_s6_r];
+end
 IG_rad = 0.032*ones(1,cs);
 guess.params = [guess.params,IG_rad];
 

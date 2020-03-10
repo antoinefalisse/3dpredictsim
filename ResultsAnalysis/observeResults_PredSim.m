@@ -5,7 +5,7 @@
 % Date: 1/7/2019
 
 clear all
-% close all
+close all
 clc
 
 %% Settings
