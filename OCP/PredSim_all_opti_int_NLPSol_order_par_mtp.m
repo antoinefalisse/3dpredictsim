@@ -29,7 +29,7 @@ num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [10]; % Index row in matrix settings (1:198)
+idx_ww = [12]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
@@ -104,6 +104,14 @@ vMax_s      = settings(ww,15);   % maximal contraction velocity identifier
 pf_weak     = settings(ww,16);   % weakness ankle plantaflexors
 mE          = settings(ww,17);   % metabolic energy model identifier
 coCont      = settings(ww,18);   % co-contraction identifier
+mtpc        = settings(ww,19);   % mtpcase
+
+if mtpc == 1
+     mtp_jointType = 'mtp';    
+else
+    mtp_jointType = 'mtpPin';   
+end
+
 % Fixed parameter
 W.u = 0.001;
 W.Mtp = 1000000;
@@ -345,12 +353,12 @@ NMuscle = length(muscleNames(1:end-3))*2;
 % Muscle-tendon parameters. Row 1: maximal isometric forces; Row 2: optimal
 % fiber lengths; Row 3: tendon slack lengths; Row 4: optimal pennation 
 % angles; Row 5: maximal contraction velocities
-load([pathmusclemodel,'/MTparameters_',subject,'_mtp.mat']);
+load([pathmusclemodel,'/MTparameters_',subject,'_',mtp_jointType,'.mat']);
 MTparameters_m = [MTparameters(:,musi),MTparameters(:,musi)];
 % Indices of the muscles actuating the different joints for later use
 pathpolynomial = [pathRepo,'/Polynomials'];
 addpath(genpath(pathpolynomial));
-tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_mtp.mat']);
+tl = load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_',mtp_jointType,'.mat']);
 [~,mai] = MomentArmIndices(muscleNames(1:end-3),...
     tl.muscle_spanning_joint_INFO(1:end-3,:));
 
@@ -410,8 +418,8 @@ pctsts = [pctst;pctst];
 pathCasADiFunctions = [pathRepo,'/CasADiFunctions'];
 addpath(genpath(pathCasADiFunctions));
 % We load some variables for the polynomial approximations
-load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_mtp.mat']);
-load([pathpolynomial,'/MuscleInfo_',subject,'_mtp.mat']);
+load([pathpolynomial,'/muscle_spanning_joint_INFO_',subject,'_',mtp_jointType,'.mat']);
+load([pathpolynomial,'/MuscleInfo_',subject,'_',mtp_jointType,'.mat']);
 % For the polynomials, we want all independent muscles. So we do not need 
 % the muscles from both legs, since we assume bilateral symmetry, but want
 % all muscles from the back (indices 47:49).
