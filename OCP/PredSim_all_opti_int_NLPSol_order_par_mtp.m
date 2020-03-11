@@ -357,9 +357,9 @@ shift = zeros(NMuscle,1);
 if pf_t_stiff ~= 1
     if pf_t_stiff == 2
         tendon_stiffness = 20;
-    elseif pf_t_stiff == 2
-        tendon_stiffness = 15;
     elseif pf_t_stiff == 3
+        tendon_stiffness = 15;
+    elseif pf_t_stiff == 4
         tendon_stiffness = 10;
     end
     idx_GL = find(strcmp(muscleNames,'lat_gas_r'));
