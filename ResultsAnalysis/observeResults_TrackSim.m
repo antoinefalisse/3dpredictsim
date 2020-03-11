@@ -9,7 +9,7 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = 25; 
+idx_ww  = 26; 
 mtp_pin = 1; % the mtp joint is a pin rather than a custom joint
 % Fixed settings
 subject = 'subject1';
