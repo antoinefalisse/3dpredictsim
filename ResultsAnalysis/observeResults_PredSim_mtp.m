@@ -10,7 +10,7 @@ clc
 
 %% Settings
 % Select trials, for example
-ww  = [12,14]; 
+ww  = [12,14,15,16]; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;

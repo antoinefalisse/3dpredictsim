@@ -29,7 +29,7 @@ num_set = [1,1,1,1,0,1]; % This configuration solves the problem
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
 % can select which row of parameters will be used.
-idx_ww = [15,16]; % Index row in matrix settings (1:198)
+idx_ww = [17]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*
@@ -361,6 +361,8 @@ if pf_t_stiff ~= 1
         tendon_stiffness = 15;
     elseif pf_t_stiff == 4
         tendon_stiffness = 10;
+    elseif pf_t_stiff == 5
+        tendon_stiffness = 5;
     end
     idx_GL = find(strcmp(muscleNames,'lat_gas_r'));
     idx_GM = find(strcmp(muscleNames,'med_gas_r'));
@@ -2384,8 +2386,9 @@ if analyseResults
     %% Save results       
     if saveResults
         if (exist([pathresults,'/',namescript,...
-                '/Results_all.mat'],'file')==2) 
-            load([pathresults,'/',namescript,'/Results_all.mat']);
+                '/Results_all_opti_int_NLPSol_order_par.mat'],'file')==2) 
+            load([pathresults,'/',namescript,...
+                '/Results_all_opti_int_NLPSol_order_par.mat']);
         else
             Results_all.(['Case_',num2str(ww)]) = struct('Qs_opt',[]);
         end    
