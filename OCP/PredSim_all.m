@@ -24,8 +24,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,1,0,1,0,1,0]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
+% num_set = [1,1,0,1,0,1,0]; % This configuration solves the problem
+num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -2543,12 +2543,18 @@ end
         end   
         e_mo_opt(nn,:) = full(e_mot)';   
         % Bhargava et al. (2004)
-        [~,~,~,~,~,e_motb] = ...
+        [~,adot,mdot,sdot,wdot,e_motb] = ...
             fgetMetabolicEnergySmooth2004all(Acts_opt(nn,:)',...
             Acts_opt(nn,:)',full(lMtilde_opt),full(vM_opt),...
             full(Fce_optt),full(Fpass_optt),full(massM_optt),pctsts,...
-            full(Fiso_optt),MTparameters_m(1,:)',body_mass,10);
+            full(Fiso_optt),MTparameters_m(1,:)',body_mass,100000000000000);
         e_mo_optb(nn,:) = full(e_motb)'; 
+        adot_optb(nn,:) = full(adot)';
+        mdot_optb(nn,:) = full(mdot)';
+        sdot_optb(nn,:) = full(sdot)';
+        wdot_optb(nn,:) = full(wdot)';
+        lMtilde_optb(nn,:) = full(lMtilde_opt)';
+        vM_optb(nn,:) = full(vM_opt)';
     end       
     % Get COT
     dist_trav_opt_GC = Qs_opt_rad(end,jointi.pelvis.tx) - ...
