@@ -17,7 +17,7 @@ close all
 clc
 
 %% User inputs
-runPolynomialEstimation = 1; % set to 1 to estimate the polynomial coefficients.
+runPolynomialCoefficientEstimation = 1; % set to 1 to estimate the polynomial coefficients.
 saveQdot = 0; % set to 1 to generate and save random joint velocities.
 saveResults = 1; % set to 1 to save the estimated polynomial coefficients.
 evaluateResults = 1; % set to 1 to observe some results of the approximation.
@@ -96,7 +96,7 @@ lMT = importdata([path_resultsMA,'subject01_MuscleAnalysis_Length.sto']);
 for i = 1:length(coordinates)
     MA.([coordinates{i}]) = importdata([path_resultsMA,['subject01_MuscleAnalysis_MomentArm_',coordinates{i},'.sto']]);
 end
-if runPolynomialEstimation
+if runPolynomialCoefficientEstimation
     MuscleData.dof_names = dummy_motion.colheaders(idx_coordinates);     
     MuscleData.muscle_names = muscleNames;
     for m = 1:length(muscleNames)
@@ -110,8 +110,8 @@ if runPolynomialEstimation
 end
 
 %% Estimate polynomial coefficents
-if runPolynomialEstimation
-    [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit(MuscleData);
+if runPolynomialCoefficientEstimation
+    [muscle_spanning_joint_INFO,MuscleInfo] = polynomialCoefficientEstimation(MuscleData);
     if saveResults
         save(['MuscleData_',subjectName,'.mat'], 'MuscleData');
         save(['muscle_spanning_joint_INFO_',subjectName,'.mat'], 'muscle_spanning_joint_INFO');

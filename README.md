@@ -65,7 +65,7 @@ Folder with scripts and data describing muscle-tendon lengths, velocities, and m
 1. Scripts:
     1. polynomialCoefficientEstimation_main.m
         - Script that sets the process of calibrating the polynomial coefficients.
-    2. PolynomialFit.m
+    2. polynomialCoefficientEstimation.m
         - Function that calibrates the polynomial coefficients.
     3. n_art_mat_3.m and n_art_mat_3_cas_SX.m
         - Functions that provide the polynomials based on the number of degrees of freedom and the polynomial order.
