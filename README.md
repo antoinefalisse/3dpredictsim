@@ -63,7 +63,7 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
 Folder with scripts and data describing muscle-tendon lengths, velocities, and moment arms using polynomial expressions of joint positions and velocities.
 
 1. Scripts:
-    1. Main_polynomials.m
+    1. polynomialCoefficientEstimation_main.m
         - Script that sets the process of calibrating the polynomial coefficients.
     2. PolynomialFit.m
         - Function that calibrates the polynomial coefficients.
