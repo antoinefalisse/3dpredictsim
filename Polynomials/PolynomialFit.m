@@ -1,5 +1,5 @@
-% This function computes the polynomials to approximate muscle-tendon 
-% lengths, velocities and moment arms. 
+% This function estimates polynomial coefficients to approximate muscle-tendon
+% lengths and moment arms. 
 %
 % Authors: Original code from Wouter Aerts, adapted by Antoine Falisse
 % Date: 12/19/2018
@@ -92,14 +92,16 @@ function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit(MuscleData)
     plot(xlimits, [threshold, threshold], 'r', 'linewidth', 2)
     suptitle('RMS error on the approximated muscle-tendon length')
     ylabel('RMS error (m)')
+    xlabel('Muscle index')
     
     figure();
     hold on;
     plot(max(DM_all_error, [], 2))
     xlimits = get(gca, 'XLim');
     plot(xlimits, [threshold, threshold], 'r', 'linewidth', 2)
-    suptitle('maximal RMS error on the approximated muscle moment arm')
+    suptitle('Maximal RMS error on the approximated muscle moment-arm')
     ylabel('RMS error (m)')
+    xlabel('Muscle index')
 
     figure();
     hold on;
@@ -109,6 +111,7 @@ function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit(MuscleData)
     plot(xlimits, [max_order, max_order], 'r', 'linewidth', 2)
     suptitle('Order of the polynomial approximation')
     ylabel('Order')
+    xlabel('Muscle index')
     
 end
 
