@@ -6,9 +6,9 @@
 %
 % This script estimates the polynomial coefficients based on given input data.
 %
-% Author: Wouter Aerts and Antoine Falisse
+% Authors: Wouter Aerts and Antoine Falisse
 %
-% Datum: v1 - 03/04/2018, v2 - 25/03/2020
+% Date: v1 - 03/04/2018, v2 - 25/03/2020
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
