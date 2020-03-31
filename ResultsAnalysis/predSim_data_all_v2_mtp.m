@@ -24,8 +24,8 @@ coCont      = settings(ww(k),18);   % co-contraction identifier
 % load results
 pathmain = pwd;
 [pathrepo,~,~] = fileparts(pathmain);
-pathresults = [pathrepo,'/Results/PredSim_all_opti_int_NLPSol_order_par'];
-load([pathresults,'/Results_all_opti_int_NLPSol_order_par.mat']);
+pathresults = [pathrepo,'/Results/PredSim_all_v2_mtp'];
+load([pathresults,'/Results_all_v2_mtp.mat']);
 v_tgt_id = round(v_tgt,2);
 
 Qs_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).Qs_opt;
@@ -34,16 +34,8 @@ Acts_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).Acts_opt;
 Ts_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).Ts_opt;
 GRFs_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).GRFs_opt;
 COT_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).COT_opt;
-StrideLength_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).StrideLength_opt;
-StepWidth_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).StepWidth_opt;
-Cost(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]).stats.iterations.obj(end);
-t_proc_solver =  Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_nlp_f + ...
-    Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_nlp_g + ...
-    Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_nlp_grad + ...
-    Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_nlp_grad_f + ...
-    Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_nlp_jac_g;
-t_proc_nlp = Results_all.(['Case_',num2str(ww(k))]).stats.t_proc_total - ...
-    t_proc_solver;
-CPU_NLP(ww(k)).m = t_proc_nlp;
-CPU_IPOPT(ww(k)).m = t_proc_solver;
+StrideLength_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]). ...
+    StrideLength_opt;
+StepWidth_opt(ww(k)).m = Results_all.(['Case_',num2str(ww(k))]). ...
+    StepWidth_opt;
     

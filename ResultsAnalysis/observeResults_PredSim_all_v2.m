@@ -2,7 +2,7 @@
 % torques, powers, ground reaction forces, all muscle activations, COT, 
 % stride lengths, step, widths, CPU times, and optimal costs)
 % Author: Antoine Falisse
-% Date: 1/7/2019
+% Date: 3/31/2020
 
 clear all
 close all
@@ -10,18 +10,18 @@ clc
 
 %% Settings
 % Select trials, for example
-ww  = [12,14,15,16,17]; 
+% 1:    nominal cost function
+% 109:  metabolic energy rate at the first instead of second power wrt nominal cost function
+% 104:  no metabolic energy rate term wrt nominal cost function
+% 106:  no muscle activity term wrt nominal cost function
+ww  = [22]; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;
 body_weight = 62*9.81;
 setup.derivatives = 'AD';
 % Load pre-defined settings
-pathmain = pwd;
-[pathrepo,~,~] = fileparts(pathmain);
-pathOCP = [pathrepo,'/OCP'];
-addpath(genpath(pathOCP));
-settings = getSettings_predSim_all_mtp();
+settings = getSettings_predSim_all();
 % user choice
 showMainPlots = 1; % 0 to also see joint velocities and left m activations
 
@@ -41,21 +41,21 @@ CPU_NLP             = struct('m',[]);
 legend_case         = cell(1,length(ww));
 % Loop over cases
 for k = 1:length(ww)
-    predSim_data_mtp;
+    predSim_data_all_v2;
     legend_case{k} = ['Case: ',num2str(ww(k))];
 end
 
 %% Helper names
 joints_ref = {'pelvis_tilt','pelvis_list','pelvis_rotation',...
     'hip_flexion','hip_adduction','hip_rotation',...
-    'knee_angle','ankle_angle','subtalar_angle','mtp_angle',...
+    'knee_angle','ankle_angle','subtalar_angle',...
     'lumbar_extension','lumbar_bending','lumbar_rotation',...
     'arm_flex','arm_add','arm_rot','elbow_flex'};
 joints_tit = {'Pelvis tilt','Pelvis list','Pelvis rotation','Pelvis tx',...
     'Pelvis ty','Pelvis tz','Hip flexion L','Hip adduction L',...
     'Hip rotation L','Hip flexion R','Hip adduction R','Hip rotation R',...
     'Knee L','Knee R','Ankle L','Ankle R',...
-    'Subtalar L','Subtalar R','MTP L','MTP R',...
+    'Subtalar L','Subtalar R',...
     'Lumbar extension','Lumbar bending','Lumbar rotation',...
     'Arm flexion L','Arm adduction L','Arm rotation L',...
     'Arm flexion R','Arm adduction R','Arm rotation R',...
@@ -73,6 +73,8 @@ muscleNames = {'Glut med 1','Glut med 2','Glut med 3',...
 GRF_str = {'Fore-aft','Vertical','Lateral'};
 
 %% Load reference data
+pathmain = pwd;
+[pathrepo,~,~] = fileparts(pathmain);
 pathReferenceData = [pathrepo,'/ExperimentalData'];
 load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 
@@ -84,11 +86,11 @@ col = hsv(length(ww));
 
 %% Plot joint angles
 Qref = ExperimentalData.Q;
-idx_Qs = [1,2,3,10,11,12,14,16,18,20,21,22,23,27,28,29,31];
+idx_Qs = [1,2,3,10,11,12,14,16,18,19,20,21,25,26,27,29];
 NumTicks = 2;
 figure()
 for i = 1:length(idx_Qs)
-    subplot(3,6,i)
+    subplot(4,4,i)
     p = gobjects(1,length(ww));
     % Simulation results
     for k = 1:length(ww)
@@ -98,19 +100,17 @@ for i = 1:length(idx_Qs)
         hold on;    
     end
     % Experimental data
-    if ~(strcmp(joints_ref{i},'mtp_angle'))
-        idx_jref = strcmp(Qref.(subject).Qs.colheaders,joints_ref{i});
-        meanPlusSTD = Qref.(subject).Qs.mean(:,idx_jref) + 2*Qref.(subject).Qs.std(:,idx_jref);
-        meanMinusSTD = Qref.(subject).Qs.mean(:,idx_jref) - 2*Qref.(subject).Qs.std(:,idx_jref);          
-        stepQ = (size(Qs_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
-        intervalQ = 1:stepQ:size(Qs_opt(ww(k)).m,1);
-        sampleQ = 1:size(Qs_opt(ww(k)).m,1);
-        meanPlusSTD = interp1(intervalQ,meanPlusSTD,sampleQ);
-        meanMinusSTD = interp1(intervalQ,meanMinusSTD,sampleQ);
-        hold on
-        fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
-        alpha(.25);
-    end
+    idx_jref = strcmp(Qref.(subject).Qs.colheaders,joints_ref{i});
+    meanPlusSTD = Qref.(subject).Qs.mean(:,idx_jref) + 2*Qref.(subject).Qs.std(:,idx_jref);
+    meanMinusSTD = Qref.(subject).Qs.mean(:,idx_jref) - 2*Qref.(subject).Qs.std(:,idx_jref);          
+    stepQ = (size(Qs_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
+    intervalQ = 1:stepQ:size(Qs_opt(ww(k)).m,1);
+    sampleQ = 1:size(Qs_opt(ww(k)).m,1);
+    meanPlusSTD = interp1(intervalQ,meanPlusSTD,sampleQ);
+    meanMinusSTD = interp1(intervalQ,meanMinusSTD,sampleQ);
+    hold on
+    fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
+    alpha(.25);
     % Plot settings 
     set(gca,'Fontsize',label_fontsize);        
     title(joints_tit{idx_Qs(i)},'Fontsize',label_fontsize);
@@ -234,7 +234,7 @@ set(sp,'Fontsize',sup_fontsize);
 IDref = ExperimentalData.Torques;
 figure()
 for i = 1:length(idx_Qs)-3
-    subplot(3,6,i)
+    subplot(4,4,i)
     % Simulation results
     p = gobjects(1,length(ww));
     for k = 1:length(ww)
@@ -244,19 +244,17 @@ for i = 1:length(idx_Qs)-3
         hold on;    
     end
     % Experimental data
-    if ~(strcmp(joints_ref{i+3},'mtp_angle'))
-        idx_jref = strcmp(IDref.(subject).colheaders,joints_ref{i+3});
-        meanPlusSTD = IDref.(subject).mean(:,idx_jref) + 2*IDref.(subject).std(:,idx_jref);
-        meanMinusSTD = IDref.(subject).mean(:,idx_jref) - 2*IDref.(subject).std(:,idx_jref);  
-        stepID = (size(Ts_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
-        intervalID = 1:stepID:size(Ts_opt(ww(k)).m,1);
-        sampleID = 1:size(Ts_opt(ww(k)).m,1);
-        meanPlusSTD = interp1(intervalID,meanPlusSTD,sampleID);
-        meanMinusSTD = interp1(intervalID,meanMinusSTD,sampleID); 
-        hold on
-        fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
-        alpha(.25);
-    end
+    idx_jref = strcmp(IDref.(subject).colheaders,joints_ref{i+3});
+    meanPlusSTD = IDref.(subject).mean(:,idx_jref) + 2*IDref.(subject).std(:,idx_jref);
+    meanMinusSTD = IDref.(subject).mean(:,idx_jref) - 2*IDref.(subject).std(:,idx_jref);  
+    stepID = (size(Ts_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
+    intervalID = 1:stepID:size(Ts_opt(ww(k)).m,1);
+    sampleID = 1:size(Ts_opt(ww(k)).m,1);
+    meanPlusSTD = interp1(intervalID,meanPlusSTD,sampleID);
+    meanMinusSTD = interp1(intervalID,meanMinusSTD,sampleID); 
+    hold on
+    fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
+    alpha(.25);
     % Plot settings 
     set(gca,'Fontsize',label_fontsize);   
     title(joints_tit{idx_Qs(i+3)},'Fontsize',label_fontsize);
@@ -294,19 +292,17 @@ for i = 1:length(idx_Qs)-3
         hold on;    
     end
     % Experimental data
-    if ~(strcmp(joints_ref{i+3},'mtp_angle'))
-        idx_jref = strcmp(Pref.(subject).colheaders,joints_ref{i+3});
-        meanPlusSTD = Pref.(subject).mean(:,idx_jref) + 2*Pref.(subject).std(:,idx_jref);
-        meanMinusSTD = Pref.(subject).mean(:,idx_jref) - 2*Pref.(subject).std(:,idx_jref);          
-        stepQ = (size(Qdots_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
-        intervalQ = 1:stepQ:size(Qdots_opt(ww(k)).m,1);
-        sampleQ = 1:size(Qdots_opt(ww(k)).m,1);
-        meanPlusSTD = interp1(intervalQ,meanPlusSTD,sampleQ);
-        meanMinusSTD = interp1(intervalQ,meanMinusSTD,sampleQ);
-        hold on
-        fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
-        alpha(.25);
-    end
+    idx_jref = strcmp(Pref.(subject).colheaders,joints_ref{i+3});
+    meanPlusSTD = Pref.(subject).mean(:,idx_jref) + 2*Pref.(subject).std(:,idx_jref);
+    meanMinusSTD = Pref.(subject).mean(:,idx_jref) - 2*Pref.(subject).std(:,idx_jref);          
+    stepQ = (size(Qdots_opt(ww(k)).m,1)-1)/(size(meanPlusSTD,1)-1);
+    intervalQ = 1:stepQ:size(Qdots_opt(ww(k)).m,1);
+    sampleQ = 1:size(Qdots_opt(ww(k)).m,1);
+    meanPlusSTD = interp1(intervalQ,meanPlusSTD,sampleQ);
+    meanMinusSTD = interp1(intervalQ,meanMinusSTD,sampleQ);
+    hold on
+    fill([x fliplr(x)],[meanPlusSTD fliplr(meanMinusSTD)],'k');
+    alpha(.25);
     % Plot settings 
     set(gca,'Fontsize',label_fontsize);   
     title(joints_tit{idx_Qs(i+3)},'Fontsize',label_fontsize);
@@ -495,26 +491,26 @@ set(gca,'Fontsize',label_fontsize);
 title('Step width','Fontsize',label_fontsize);
 ylabel('(m)','Fontsize',label_fontsize);
 
-% subplot(2,3,4)
-% p = gobjects(1,length(ww));
-% for k = 1:length(ww)
-%     p(k) = scatter(k,(CPU_IPOPT(ww(k)).m+CPU_NLP(ww(k)).m),...
-%         40,col(k,:),'filled');
-%     hold on;    
-% end
-% set(gca,'Fontsize',label_fontsize);
-% title('Computational time','Fontsize',label_fontsize);
-% ylabel('(s)','Fontsize',label_fontsize);
-% 
-% subplot(2,3,5)
-% p = gobjects(1,length(ww));
-% for k = 1:length(ww)
-%     p(k) = scatter(k,(Cost(ww(k)).m),...
-%         40,col(k,:),'filled');
-%     hold on;    
-% end
-% set(gca,'Fontsize',label_fontsize);
-% title('Optimal cost','Fontsize',label_fontsize);
-% ylabel('(-)','Fontsize',label_fontsize);
-% l = legend(p,legend_case);
-% set(l,'Fontsize',label_fontsize)
+subplot(2,3,4)
+p = gobjects(1,length(ww));
+for k = 1:length(ww)
+    p(k) = scatter(k,(CPU_IPOPT(ww(k)).m+CPU_NLP(ww(k)).m),...
+        40,col(k,:),'filled');
+    hold on;    
+end
+set(gca,'Fontsize',label_fontsize);
+title('Computational time','Fontsize',label_fontsize);
+ylabel('(s)','Fontsize',label_fontsize);
+
+subplot(2,3,5)
+p = gobjects(1,length(ww));
+for k = 1:length(ww)
+    p(k) = scatter(k,(Cost(ww(k)).m),...
+        40,col(k,:),'filled');
+    hold on;    
+end
+set(gca,'Fontsize',label_fontsize);
+title('Optimal cost','Fontsize',label_fontsize);
+ylabel('(-)','Fontsize',label_fontsize);
+l = legend(p,legend_case);
+set(l,'Fontsize',label_fontsize)
