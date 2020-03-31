@@ -16,7 +16,7 @@ pathresults = [pathrepo,'/Results'];
 %% PredSim_all
 % All trials
 ww = 1:198;
-predSim_settings_all;
+settings = getSettings_predSim_all();
 % Load results
 load([pathresults,'/PredSim_all/Results_all.mat']);
 CPU_IPOPT_all.all   = zeros(1,length(ww));

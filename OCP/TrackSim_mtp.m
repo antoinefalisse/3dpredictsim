@@ -46,7 +46,7 @@ checkBoundsIG   = num_set(5); % set to 1 to visualize guess-bounds
 writeIKmotion   = num_set(6); % set to 1 to write .mot file
 
 % settings describes the parameters used in the optimal control problem.
-trackSim_mtp_settings_all
+[settings, settings_trials] = getSettings_trackSim_mtp();
 
 %% Select settings
 for www = 1:length(idx_ww)

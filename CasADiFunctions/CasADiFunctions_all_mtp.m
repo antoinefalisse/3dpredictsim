@@ -214,11 +214,12 @@ K_pass      = SX.sym('K_pass',4);
 theta_pass  = SX.sym('theta_pass',2);
 qin_pass    = SX.sym('qin_pass',1);
 qdotin_pass = SX.sym('qdotin_pass',1);
+damp_pass   = SX.sym('damp_pass',1);
 % theta_pass 1 and 2 are inverted on purpose.
 Tau_pass = K_pass(1,1)*exp(K_pass(2,1)*(qin_pass-theta_pass(2,1))) + ...
     K_pass(3,1)*exp(K_pass(4,1)*(qin_pass-theta_pass(1,1))) ...
-    - 0.1*qdotin_pass;
-f_PassiveMoments = Function('f_PassiveMoments',{K_pass,theta_pass,...
+    - damp_pass*qdotin_pass;
+f_PassiveMoments = Function('f_PassiveMoments',{K_pass,theta_pass,damp_pass,...
     qin_pass,qdotin_pass},{Tau_pass});
 
 %% Passive torque actuated joint torques

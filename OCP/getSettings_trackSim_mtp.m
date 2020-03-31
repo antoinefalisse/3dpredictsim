@@ -1,3 +1,9 @@
+% This file contains the settings used for the tracking simulations and 
+% is loaded in the different files that are processing and analyzing the
+% results
+
+function [settings, settings_trials] = getSettings_trackSim_mtp()
+
 settings = [...
     10,1,1,10,1,50,100,50,4,5,1,1;
     10,1,1,10,1,50,100,50,4,4,1,1;  % Tmax is 10
@@ -51,3 +57,5 @@ settings_trials(23).ww = {'14','15'};
 settings_trials(24).ww = {'14','15'};
 settings_trials(25).ww = {'14','15'};
 settings_trials(26).ww = {'14','15'};
+
+end

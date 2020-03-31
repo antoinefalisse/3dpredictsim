@@ -19,7 +19,7 @@ pathmain = pwd;
 [pathRepo,~,~] = fileparts(pathmain);
 pathOCP = [pathRepo,'/OCP'];
 addpath(genpath(pathOCP));
-trackSim_mtp_settings_all
+[settings, settings_trials] = getSettings_trackSim_mtp();
 
 setup.derivatives = 'AD';
 showtrackplotsonly = 0;

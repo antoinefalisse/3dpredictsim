@@ -21,7 +21,7 @@ body_mass = 62;
 body_weight = 62*9.81;
 setup.derivatives = 'AD';
 % Load pre-defined settings
-predSim_settings_all;
+settings = getSettings_predSim_all();
 % user choice
 showMainPlots = 1; % 0 to also see joint velocities and left m activations
 
