@@ -1251,8 +1251,8 @@ if solveProblem
                 Tau_passj.trunk.rot);
         % Torque-driven joint torques for the arms
         % Arms
-        eq_constr{end+1} = Tj(armsi,1)/scaling.ArmTau - a_akj(:,j+1) + ...
-            (Tau_passj.arm)'/scaling.ArmTau;
+        eq_constr{end+1} = Tj(armsi,1)/scaling.ArmTau - (a_akj(:,j+1) + ...
+            (Tau_passj.arm)'/scaling.ArmTau);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Activation dynamics (implicit formulation)            
         act1 = vAk_nsc + akj(:,j+1)./(ones(size(akj(:,j+1),1),1)*tdeact);
