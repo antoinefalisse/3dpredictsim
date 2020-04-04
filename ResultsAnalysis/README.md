@@ -12,7 +12,7 @@ Scripts to plot results:
 4. observeResults_PredSim_all.m
     - Script used to plot results (not presented in the paper) generated with PredSim_all.m.
 5. predSim_data_all.m
-    - Script used to load results from simulations generated with PredSim_all.m..
+    - Script used to load results from simulations generated with PredSim_all.m.
 6. predSim_data_all_v2.m
     - Script used to load results from simulations generated with PredSim_all_v2.m.
 7. predSim_data_all_v2_mtp.m
