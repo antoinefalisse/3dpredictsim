@@ -48,6 +48,8 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
         - Helper function that returns indices for use with the moment arms.        
     8. MuscleIndices.m
         - Helper function that returns indices for use with the muscles. 
+    9. saveSubjectMTParameters.m
+        - Script to extract and save muscle-tendon parameters based on a given OpenSim model.
         
 2. Data:
     1. Faparam.mat
@@ -69,9 +71,9 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
 Folder with scripts and data describing muscle-tendon lengths, velocities, and moment arms using polynomial expressions of joint positions and velocities.
 
 1. Scripts:
-    1. Main_polynomials_subject1.m
+    1. polynomialCoefficientEstimation_main.m
         - Script that sets the process of calibrating the polynomial coefficients.
-    2. PolynomialFit.m
+    2. polynomialCoefficientEstimation.m
         - Function that calibrates the polynomial coefficients.
     3. n_art_mat_3.m and n_art_mat_3_cas_SX.m
         - Functions that provide the polynomials based on the number of degrees of freedom and the polynomial order.
