@@ -46,8 +46,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-% num_set = [1,0,0,0,0,0]; % This configuration solves the problem
-num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+num_set = [1,0,0,0,0,0]; % This configuration solves the problem
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -146,46 +146,41 @@ if ispc
     switch setup.derivatives
         case {'AD'}   
             if cm == 1
-                F = external('F','PredSim.dll');   
+                F = external('F','PredSim_v2.dll');   
                 if analyseResults
                     F1 = external('F','PredSim_pp.dll');
                 end
-            elseif cm == 2
-                F = external('F','PredSim_SSCM.dll');   
-                if analyseResults
-                    F1 = external('F','PredSim_SSCM_pp.dll');
-                end
-            end
-    end
-elseif ismac
-    switch setup.derivatives
-        case {'AD'}   
-            if cm == 1
-                F = external('F','PredSim.dylib');   
-                if analyseResults
-                    F1 = external('F','PredSim_pp.dylib');
-                end
-            elseif cm == 2
-                F = external('F','PredSim_SSCM.dylib');   
-                if analyseResults
-                    F1 = external('F','PredSim_SSCM_pp.dylib');
-                end
+            else
+                error('Not supported in this version')
             end
     end
 else
-    disp('Platform not supported')
+    error('Platform not supported')
 end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
-% vec1 = -ones(87,1);
-% res1 = full(F(vec1));
+vec1 = -ones(93,1);
+res1 = full(F(vec1));
 % res2 = full(F1(vec1));
 
 %% Indices external function
-% Indices of the elements in the external functions
-% External function: F
-% First, joint torques. 
+% The external functions take as inputs joint positions, velocities, and
+% accelerations. Joint positions and velocities are intertwined (q1, qdot1,
+% q2, qdot2, etc.). Joint accelerations come after. The inputs to F and F1
+% are thus two vectors (e.g., QsQdots and Qdotdots).
+% For this particular model, two joints are locked (radioulnar_r and _l).
+% Yet this is not taken into account in the external functions, we should
+% therefore pass constant values as inputs so that the joints are
+% "implicitly" locked
+Qs_radioulnar = 1.51; Qdots_radioulnar = 0; 
+QsQdots_radioulnar =  [Qs_radioulnar;Qdots_radioulnar];
+QsQdots_radioulnar_lr = [QsQdots_radioulnar;QsQdots_radioulnar];
+Qdotdot_radioulnar = 0;
+Qdotdots_radioulnar_lr = [Qdotdot_radioulnar;Qdotdot_radioulnar];
+
+% The external functions (F and F1) have as outputs joint torques in the
+% following order: 
 jointi.pelvis.tilt  = 1; 
 jointi.pelvis.list  = 2; 
 jointi.pelvis.rot   = 3; 
@@ -215,6 +210,8 @@ jointi.sh_add.r     = 26;
 jointi.sh_rot.r     = 27;
 jointi.elb.l        = 28;
 jointi.elb.r        = 29;
+jointi.radioulnar.l = 30; % locked joint
+jointi.radioulnar.r = 31; % locked joint
 % Vectors of indices for later use
 residualsi          = jointi.pelvis.tilt:jointi.elb.r; % all 
 ground_pelvisi      = jointi.pelvis.tilt:jointi.pelvis.tz; % ground-pelvis
@@ -222,43 +219,47 @@ trunki              = jointi.trunk.ext:jointi.trunk.rot; % trunk
 armsi               = jointi.sh_flex.l:jointi.elb.r; % arms
 residuals_noarmsi   = jointi.pelvis.tilt:jointi.trunk.rot; % all but arms
 roti                = [jointi.pelvis.tilt:jointi.pelvis.rot,...
-    jointi.hip_flex.l:jointi.elb.r];
+                       jointi.hip_flex.l:jointi.elb.r];
+lockedi             = [jointi.radioulnar.l,jointi.radioulnar.r]; % locked
 % Number of degrees of freedom for later use
 nq.all      = length(residualsi); % all 
 nq.abs      = length(ground_pelvisi); % ground-pelvis
 nq.trunk    = length(trunki); % trunk
 nq.arms     = length(armsi); % arms
+nq.locked   = length(lockedi); % locked
 nq.leg      = 9; % #joints needed for polynomials
-% Second, origins bodies. 
+% The external function (F only) also has as outputs the coordinates of the
+% origin of several bodies. 
 % Calcaneus
-calcOr.r    = 30:31;
-calcOr.l    = 32:33;
+calcOr.r    = 32:33;
+calcOr.l    = 34:35;
 calcOr.all  = [calcOr.r,calcOr.l];
 NcalcOr     = length(calcOr.all);
 % Femurs
-femurOr.r   = 34:35;
-femurOr.l   = 36:37;
+femurOr.r   = 36:37;
+femurOr.l   = 38:39;
 femurOr.all = [femurOr.r,femurOr.l];
 NfemurOr    = length(femurOr.all);
 % Hands
-handOr.r    = 38:39;
-handOr.l    = 40:41;
+handOr.r    = 40:41;
+handOr.l    = 42:43;
 handOr.all  = [handOr.r,handOr.l];
 NhandOr     = length(handOr.all);
 % Tibias
-tibiaOr.r   = 42:43;
-tibiaOr.l   = 44:45;
+tibiaOr.r   = 44:45;
+tibiaOr.l   = 46:47;
 tibiaOr.all = [tibiaOr.r,tibiaOr.l];
 NtibiaOr    = length(tibiaOr.all);
-% External function: F1 (post-processing purpose only)
+% The external function (F1 only) also has as outputs the ground reaction forces
+% and the coordinates of the origin of the calcaneus: 
 % Ground reaction forces (GRFs)
-GRFi.r      = 30:32;
-GRFi.l      = 33:35;
+GRFi.r      = 32:33;
+GRFi.l      = 34:35;
 GRFi.all    = [GRFi.r,GRFi.l];
 NGRF        = length(GRFi.all);
 % Origins calcaneus (3D)
-calcOrall.r     = 36:38;
-calcOrall.l     = 39:41;
+calcOrall.r     = 36:37;
+calcOrall.l     = 38:39;
 calcOrall.all   = [calcOrall.r,calcOrall.l];
 NcalcOrall      = length(calcOrall.all);
 
@@ -886,7 +887,8 @@ if solveProblem
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Call external function (run inverse dynamics)
-        [Tj] = F([QsQdotskj_nsc(:,j+1);Aj_nsc(:,j)]);  
+        [Tj] = F([[QsQdotskj_nsc(:,j+1);QsQdots_radioulnar_lr];...
+            [Aj_nsc(:,j);Qdotdots_radioulnar_lr]]);  
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Add path constraints
         % Null pelvis residuals
@@ -1303,7 +1305,7 @@ if analyseResults
     Xk_Qs_Qdots_opt(:,1:2:end)  = q_opt_unsc_all.rad(2:end,:);
     Xk_Qs_Qdots_opt(:,2:2:end)  = qdot_opt_unsc_all.rad(2:end,:);
     Xk_Qdotdots_opt             = qdotdot_col_opt_unsc.rad(d:d:end,:);
-    Foutk_opt = zeros(N,nq.all+NGRF+NcalcOrall);
+    Foutk_opt = zeros(N,nq.all+nq.locked+NGRF+NcalcOrall);
     Tau_passk_opt_all = zeros(N,nq.all-nq.abs);
     for i = 1:N
         [res] = F1([Xk_Qs_Qdots_opt(i,:)';Xk_Qdotdots_opt(i,:)']);
@@ -1422,7 +1424,7 @@ if analyseResults
     Xj_Qs_Qdots_opt(:,1:2:end)  = q_col_opt_unsc.rad;
     Xj_Qs_Qdots_opt(:,2:2:end)  = qdot_col_opt_unsc.rad;
     Xj_Qdotdots_opt             = qdotdot_col_opt_unsc.rad;
-    Foutj_opt = zeros(d*N,nq.all+NGRF+NcalcOrall);
+    Foutj_opt = zeros(d*N,nq.all+nq.locked+NGRF+NcalcOrall);
     Tau_passj_opt_all = zeros(d*N,nq.all-nq.abs);
     for i = 1:d*N
         [res] = F1([Xj_Qs_Qdots_opt(i,:)';Xj_Qdotdots_opt(i,:)']);
@@ -1545,7 +1547,7 @@ if analyseResults
     % We just want to extract the positions of the calcaneus origins so we
     % do not really care about Qdotdot that we set to 0
     Xk_Qdotdots_opt_all = zeros(N+1,size(q_opt_unsc_all.rad,2));
-    out_res_opt_all = zeros(N+1,nq.all+NGRF+NcalcOrall);
+    out_res_opt_all = zeros(N+1,nq.all+nq.locked+NGRF+NcalcOrall);
     for i = 1:N+1
         [res] = F1([Xk_Qs_Qdots_opt_all(i,:)';Xk_Qdotdots_opt_all(i,:)']);
         out_res_opt_all(i,:) = full(res);    
