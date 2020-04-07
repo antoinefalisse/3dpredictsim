@@ -19,4 +19,6 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
     - Helper function that returns indices for use with the moment arms.        
 8. MuscleIndices.m
     - Helper function that returns indices for use with the muscles. 
+9. saveSubjectMTParameters.m
+    - Script to extract and save muscle-tendon parameters based on a given OpenSim model.
     
