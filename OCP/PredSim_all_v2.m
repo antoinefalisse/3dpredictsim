@@ -25,6 +25,12 @@
 %       NThreads (line 61).
 %   - Reformulation constraint inital position pelvis (line 508).
 %       - This prevents redundancy as in the previous formulation.
+%   - Model in external function built programmatically through MATLAB (see
+%   buildModelCpp.m). Some values are now rounded. The locked joints are
+%   included in the model but instead of having constant values set in the
+%   external function (v1.0), the values are set from this script
+%   (e.g., Qs_radioulnar, etc.). We believe it is more transparent to work in
+%   such a way.
 %
 clear all;
 clc
@@ -148,7 +154,7 @@ if ispc
             if cm == 1
                 F = external('F','PredSim_v2.dll');   
                 if analyseResults
-                    F1 = external('F','PredSim_pp.dll');
+                    F1 = external('F','PredSim_v2_pp.dll');
                 end
             else
                 error('Not supported in this version')
@@ -160,8 +166,8 @@ end
 cd(pathmain);
 % This is an example of how to call an external function with some
 % numerical values.
-vec1 = -ones(93,1);
-res1 = full(F(vec1));
+% vec1 = -ones(93,1);
+% res1 = full(F(vec1));
 % res2 = full(F1(vec1));
 
 %% Indices external function
@@ -253,13 +259,13 @@ NtibiaOr    = length(tibiaOr.all);
 % The external function (F1 only) also has as outputs the ground reaction forces
 % and the coordinates of the origin of the calcaneus: 
 % Ground reaction forces (GRFs)
-GRFi.r      = 32:33;
-GRFi.l      = 34:35;
+GRFi.r      = 32:34;
+GRFi.l      = 35:37;
 GRFi.all    = [GRFi.r,GRFi.l];
 NGRF        = length(GRFi.all);
 % Origins calcaneus (3D)
-calcOrall.r     = 36:37;
-calcOrall.l     = 38:39;
+calcOrall.r     = 38:40;
+calcOrall.l     = 41:43;
 calcOrall.all   = [calcOrall.r,calcOrall.l];
 NcalcOrall      = length(calcOrall.all);
 
@@ -1123,7 +1129,7 @@ if solveProblem
     diary([pathresults,'/',namescript,'/D',savename]);  
     % Data-informed (full solution at closest speed) initial guess    
     if IGm == 4   
-        disp('Not supported')
+        error('Initial guess not supported')
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Solve problem
@@ -1185,7 +1191,7 @@ if analyseResults
     qdotdot_col_opt =reshape(w_opt(starti:starti+nq.all*(d*N)-1),nq.all,(d*N))';
     starti = starti + nq.all*(d*N);
     if starti - 1 ~= length(w_opt)
-        disp('error when extracting results')
+        error('error when extracting results')
     end
     % Combine results at mesh and collocation points
     a_mesh_col_opt=zeros(N*(d+1)+1,NMuscle);
@@ -1308,7 +1314,8 @@ if analyseResults
     Foutk_opt = zeros(N,nq.all+nq.locked+NGRF+NcalcOrall);
     Tau_passk_opt_all = zeros(N,nq.all-nq.abs);
     for i = 1:N
-        [res] = F1([Xk_Qs_Qdots_opt(i,:)';Xk_Qdotdots_opt(i,:)']);
+        [res] = F1([[Xk_Qs_Qdots_opt(i,:)';QsQdots_radioulnar_lr];...
+            [Xk_Qdotdots_opt(i,:)';Qdotdots_radioulnar_lr]]);
         Foutk_opt(i,:) = full(res);  
         
         Tau_passk_opt.hip.flex.l = full(f_PassiveMoments(k_pass.hip.flex,...
@@ -1415,7 +1422,7 @@ if analyseResults
     assertArmTmaxk = max(max(abs(Foutk_opt(:,armsi)/scaling.ArmTau - ...
         (a_a_opt_unsc_all(2:end,:) + Tau_passk_opt.arm/scaling.ArmTau)))); 
     if assertArmTmaxk > 1*10^(-tol_ipopt)
-        disp(['Issue when reconstructing arm residual forces: mesh points; '...
+        error(['Issue when reconstructing arm residual forces: mesh points; '...
             'max error: ', num2str(assertArmTmaxk)])
     end 
 
@@ -1427,7 +1434,8 @@ if analyseResults
     Foutj_opt = zeros(d*N,nq.all+nq.locked+NGRF+NcalcOrall);
     Tau_passj_opt_all = zeros(d*N,nq.all-nq.abs);
     for i = 1:d*N
-        [res] = F1([Xj_Qs_Qdots_opt(i,:)';Xj_Qdotdots_opt(i,:)']);
+        [res] = F1([[Xj_Qs_Qdots_opt(i,:)';QsQdots_radioulnar_lr];...
+            [Xj_Qdotdots_opt(i,:)';Qdotdots_radioulnar_lr]]);
         Foutj_opt(i,:) = full(res); 
         
         Tau_passj_opt.hip.flex.l = full(f_PassiveMoments(k_pass.hip.flex,...
@@ -1534,7 +1542,7 @@ if analyseResults
     assertArmTmaxj = max(max(abs(Foutj_opt(:,armsi)/scaling.ArmTau - ...
         (a_a_col_opt_unsc + Tau_passj_opt.arm/scaling.ArmTau)))); 
     if assertArmTmaxj > 1*10^(-tol_ipopt)
-        disp(['Issue when reconstructing arm residual forces: collocation '...
+        error(['Issue when reconstructing arm residual forces: collocation '...
             'points; max error: ', num2str(assertArmTmaxj)])
     end 
 
@@ -1549,7 +1557,8 @@ if analyseResults
     Xk_Qdotdots_opt_all = zeros(N+1,size(q_opt_unsc_all.rad,2));
     out_res_opt_all = zeros(N+1,nq.all+nq.locked+NGRF+NcalcOrall);
     for i = 1:N+1
-        [res] = F1([Xk_Qs_Qdots_opt_all(i,:)';Xk_Qdotdots_opt_all(i,:)']);
+        [res] = F1([[Xk_Qs_Qdots_opt_all(i,:)';QsQdots_radioulnar_lr];...
+            [Xk_Qdotdots_opt_all(i,:)';Qdotdots_radioulnar_lr]]);
         out_res_opt_all(i,:) = full(res);    
     end
     % The stride length is the distance covered by the calcaneus origin
@@ -1576,7 +1585,7 @@ if analyseResults
     % assert_v_tg should be 0
     assert_v_tg = abs(vel_aver_opt-v_tgt);
     if assert_v_tg > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing average speed')
+        error('Issue when reconstructing average speed')
     end 
     
     %% Decompose optimal cost
@@ -1759,10 +1768,10 @@ if analyseResults
         QdotdotArm_costf);
     assertCost2 = stats.iterations.obj(end) - J_optf;
     if assertCost > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing optimal cost wrt sum of terms')
+        error('Issue when reconstructing optimal cost wrt sum of terms')
     end 
     if assertCost2 > 1*10^(-tol_ipopt)
-        disp('Issue when reconstructing optimal cost wrt stats')
+        error('Issue when reconstructing optimal cost wrt stats')
     end
 
     %% Reconstruct full gait cycle
@@ -1839,7 +1848,7 @@ if analyseResults
     IC1i_s = IC1i + 1;
     
     if isempty(phase_tran_tgridi)
-        disp('No heel strike detected, consider increasing the threshold');
+        error('No heel strike detected, consider increasing the threshold');
         continue;
     end
 
@@ -2062,17 +2071,7 @@ if analyseResults
     if writeIKmotion
         pathOpenSim = [pathRepo,'/OpenSim'];
         addpath(genpath(pathOpenSim));
-        JointAngle.labels = {'time','pelvis_tilt','pelvis_list',...
-        'pelvis_rotation','pelvis_tx','pelvis_ty','pelvis_tz',...
-        'hip_flexion_l','hip_adduction_l','hip_rotation_l',...
-        'hip_flexion_r','hip_adduction_r','hip_rotation_r',...
-        'knee_angle_l','knee_angle_r','ankle_angle_l','ankle_angle_r',...
-        'subtalar_angle_l','subtalar_angle_r',...
-        'lumbar_extension','lumbar_bending','lumbar_rotation',...
-        'arm_flex_l','arm_add_l','arm_rot_l',...
-        'arm_flex_r','arm_add_r','arm_rot_r',...
-        'elbow_flex_l','elbow_flex_r',...
-        'pro_sup_l','pro_sup_r'};        
+        JointAngle.labels = ['time',joints,'pro_sup_l','pro_sup_r'];  
         % Two gait cycles
         % Joint angles
         q_opt_GUI_GC_2 = [q_opt_GUI_GC;q_opt_GUI_GC];

@@ -2,10 +2,14 @@
 % external function in C++. The user is therefore left with the tedious
 % task of building the model from scratch, which is annoying and prone to
 % error. This file aims to facilitate this process by writing a txt file with
-% part of the C++ code required 
-% to build a model form scratch. Note that this script has not been tested
-% extensively so you should always double check the output to make sure
-% everything makes senses. Please report any bugs so that we can progress.
+% part of the C++ code required to build a model form scratch.
+%
+% Note that this script has not been tested extensively so you should always
+% double check the output to make sure everything makes senses. It is
+% indeed very likely that not all cases are accounted for. For instance, at
+% this stage coordinates that are locked will not be locked in the C++ file.
+%
+% Please report any bugs so that we can make progress.
 % 
 % Author: Echo (Wei) Wang and Antoine Falisse
 % Date: 06/04/2020
@@ -32,15 +36,17 @@ strBreak='//';
 % the following order: ground_pelvis (tilt, list, rot, tx, ty, tz), hip_l
 % (flex, add, rot), hip_r (flex, add, rot), knee_l, knee_r, ankle_l, ankle_r,
 % subtalar_l, subtalar_r, back, shoulder_l (flex, add, rot), shoulder_r (flex,
-% add, rot), elbow_l, elbow_r. See section "Indices external function".
+% add, rot), elbow_l, elbow_r, radioulnar_l, radioulnar_r. See section "Indices
+% external function".
 %
-% This list does not include the locked joints. At this moment, there is no 
-% simple way to deal with them. A workaround is to include those joints in your
-% model (unlocked) and pass constant values as input to the external function.
+% This list includes locked joints (radioulnars) but the joints are not
+% actually locked in the C++ file (external function). A workaround is to
+% pass constant values as input to the external function so that the locked
+% coordinates do not change.
 %
-% WeldJoints are also not included in the list above, since the coordinate
-% values and speeds do not change. Yet you should still include those
-% joints in your model.
+% WeldJoints are not included in the list above, since the coordinate
+% values and speeds do not change. Yet you should include those
+% joints in your model, as done in the osim file.
 %
 % JointNames contains the names of the joints in the order found in the
 % osim file. Please adjust this order by filling out JointOrder as you
@@ -63,7 +69,6 @@ for i = 1:length(JointOrder)
         error([JointOrder{i} ' is not the model']);
     end
 end
-
 
 %% Create model components
 fprintf(fid,'%s\n', '// OpenSim: create components');
