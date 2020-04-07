@@ -7,7 +7,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 % 
-function guess = getGuess_DI_opti_int_mtp(Qs,nq,N,time_IC,NMuscle,jointi,scaling,...
+function guess = getGuess_DI_v2(Qs,nq,N,time_IC,NMuscle,jointi,scaling,...
     v_tgt,d)
 
 %% Spline approximation of Qs to get Qdots and Qdotdots
@@ -55,9 +55,6 @@ guess.Qs_all.data(:,jointi.ankle.r) = Qs_spline.data(:,strcmp(Qs.colheaders(1,:)
 % Subtalar
 guess.Qs_all.data(:,jointi.subt.l) = Qs_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_l'));
 guess.Qs_all.data(:,jointi.subt.r) = Qs_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_r'));
-% Mtp
-guess.Qs_all.data(:,jointi.mtp.l) = zeros(size(guess.Qs_all.data(:,jointi.subt.l),1),1);
-guess.Qs_all.data(:,jointi.mtp.r) = zeros(size(guess.Qs_all.data(:,jointi.subt.l),1),1);
 % Trunk extension
 guess.Qs_all.data(:,jointi.trunk.ext) = Qs_spline.data(:,strcmp(Qs.colheaders(1,:),'lumbar_extension'));
 % Trunk bending
@@ -117,9 +114,6 @@ guess.Qdots_all.data(:,jointi.ankle.r) = Qdots_spline.data(:,strcmp(Qs.colheader
 % Subtalar
 guess.Qdots_all.data(:,jointi.subt.l) = Qdots_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_l'));
 guess.Qdots_all.data(:,jointi.subt.r) = Qdots_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_r'));
-% Mtp
-guess.Qdots_all.data(:,jointi.mtp.l) = zeros(size(guess.Qdots_all.data(:,jointi.subt.l),1),1);
-guess.Qdots_all.data(:,jointi.mtp.r) = zeros(size(guess.Qdots_all.data(:,jointi.subt.l),1),1);
 % Trunk extension
 guess.Qdots_all.data(:,jointi.trunk.ext) = Qdots_spline.data(:,strcmp(Qs.colheaders(1,:),'lumbar_extension'));
 % Trunk bending
@@ -178,9 +172,6 @@ guess.Qdotdots_all.data(:,jointi.ankle.r) = Qdotdots_spline.data(:,strcmp(Qs.col
 % Subtalar
 guess.Qdotdots_all.data(:,jointi.subt.l) = Qdotdots_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_l'));
 guess.Qdotdots_all.data(:,jointi.subt.r) = Qdotdots_spline.data(:,strcmp(Qs.colheaders(1,:),'subtalar_angle_r'));
-% Mtp
-guess.Qdotdots_all.data(:,jointi.mtp.l) = zeros(size(guess.Qdotdots_all.data(:,jointi.subt.l),1),1);
-guess.Qdotdots_all.data(:,jointi.mtp.r) = zeros(size(guess.Qdotdots_all.data(:,jointi.subt.l),1),1);
 % Trunk extension
 guess.Qdotdots_all.data(:,jointi.trunk.ext) = Qdotdots_spline.data(:,strcmp(Qs.colheaders(1,:),'lumbar_extension'));
 % Trunk bending
@@ -213,10 +204,6 @@ guess.dFTtilde = 0.01*ones(N,NMuscle);
 guess.a_a = 0.1*ones(N,nq.arms);
 guess.e_a = 0.1*ones(N,nq.arms);
 
-%% Mtp activations
-guess.a_mtp = 0.1*ones(N,nq.mtp);
-guess.e_mtp = 0.1*ones(N,nq.mtp);
-
 %% Final time
 % The final time is function of the imposed speed
 all_speeds = 0.73:0.1:2.73;
@@ -244,8 +231,6 @@ orderQsInv = [jointi.pelvis.tilt:2*jointi.pelvis.tz,...
     2*jointi.ankle.l-1:2*jointi.ankle.l,...
     2*jointi.subt.r-1:2*jointi.subt.r,...
     2*jointi.subt.l-1:2*jointi.subt.l,...
-    2*jointi.mtp.r-1:2*jointi.mtp.r,...
-    2*jointi.mtp.l-1:2*jointi.mtp.l,...
     2*jointi.trunk.ext-1:2*jointi.trunk.rot,...
     2*jointi.sh_flex.r-1:2*jointi.sh_rot.r,...
     2*jointi.sh_flex.l-1:2*jointi.sh_rot.l,...
@@ -276,8 +261,6 @@ orderArmInv = [jointi.sh_flex.r:jointi.sh_rot.r,...
     jointi.elb.l:jointi.elb.l]-jointi.sh_flex.l+1;
 guess.a_a = [guess.a_a; guess.a_a(1,orderArmInv)];
 
-guess.a_mtp = [guess.a_mtp; guess.a_mtp(1,:)];
-
 %% Scaling
 guess.QsQdots = guess.QsQdots./repmat(scaling.QsQdots,N+1,1);
 guess.Qdotdots = guess.Qdotdots./repmat(scaling.Qdotdots,N,1);
@@ -292,7 +275,6 @@ guess.dFTtilde  = (guess.dFTtilde)./repmat(scaling.dFTtilde,N,...
     guess.FTtilde_col = zeros(d*N,NMuscle);
     guess.QsQdots_col = zeros(d*N,2*nq.all);
     guess.a_a_col = zeros(d*N,nq.arms);
-    guess.a_mtp_col = zeros(d*N,nq.mtp);
     guess.dFTtilde_col = zeros(d*N,NMuscle);
     guess.Qdotdots_col = zeros(d*N,nq.all);
 for k=1:N
@@ -300,7 +282,6 @@ for k=1:N
     guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(k,:),d,1);
     guess.QsQdots_col((k-1)*d+1:k*d,:) = repmat(guess.QsQdots(k,:),d,1);
     guess.a_a_col((k-1)*d+1:k*d,:) = repmat(guess.a_a(k,:),d,1);
-    guess.a_mtp_col((k-1)*d+1:k*d,:) = repmat(guess.a_mtp(k,:),d,1);
     guess.dFTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.dFTtilde(k,:),d,1);
     guess.Qdotdots_col((k-1)*d+1:k*d,:) = repmat(guess.Qdotdots(k,:),d,1);
 end

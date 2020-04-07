@@ -449,11 +449,11 @@ end
 pathIG = [pathRepo,'/IG'];
 addpath(genpath(pathIG));
 if IGsel == 1 % Quasi-random initial guess  
-    guess = getGuess_QR_opti_int(N,nq,NMuscle,scaling,v_tgt,jointi,d);
+    guess = getGuess_QR_v2(N,nq,NMuscle,scaling,v_tgt,jointi,d);
 elseif IGsel == 2 % Data-informed initial guess
     if IGm == 1 % Data from average walking motion
         time_IC = [Qs_walk.time(1),Qs_walk.time(end)];
-        guess = getGuess_DI_opti_int(Qs_walk,nq,N,time_IC,NMuscle,jointi,...
+        guess = getGuess_DI_v2(Qs_walk,nq,N,time_IC,NMuscle,jointi,...
             scaling,v_tgt,d);   
     elseif IGm == 2 % Data from average runing motion    
         time_IC = [Qs_run.time(1),Qs_run.time(end)];

@@ -8,7 +8,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 % 
-function guess = getGuess_QR_opti(N,nq,NMuscle,scaling,v_tgt,jointi,d)
+function guess = getGuess_QR_v2(N,nq,NMuscle,scaling,v_tgt,jointi,d)
 
 %% Final time
 % The final time is function of the imposed speed
@@ -110,9 +110,13 @@ guess.dFTtilde  = (guess.dFTtilde)./repmat(scaling.dFTtilde,N,...
     guess.FTtilde_col = zeros(d*N,NMuscle);
     guess.QsQdots_col = zeros(d*N,2*nq.all);
     guess.a_a_col = zeros(d*N,nq.arms);
+    guess.dFTtilde_col = zeros(d*N,NMuscle);
+    guess.Qdotdots_col = zeros(d*N,nq.all);
 for k=1:N
     guess.a_col((k-1)*d+1:k*d,:) = repmat(guess.a(k,:),d,1); 
     guess.FTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.FTtilde(k,:),d,1);
     guess.QsQdots_col((k-1)*d+1:k*d,:) = repmat(guess.QsQdots(k,:),d,1);
     guess.a_a_col((k-1)*d+1:k*d,:) = repmat(guess.a_a(k,:),d,1);
+    guess.dFTtilde_col((k-1)*d+1:k*d,:) = repmat(guess.dFTtilde(k,:),d,1);
+    guess.Qdotdots_col((k-1)*d+1:k*d,:) = repmat(guess.Qdotdots(k,:),d,1);
 end
