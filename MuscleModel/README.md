@@ -6,15 +6,15 @@ Folder with scripts and data describing muscle activation dynamics, muscle contr
 1. ArmActivationDynamics.m
     - Function that describes the dynamics of the arms, which are driven by torque actuators.        
 2. computeExcitationRaasch.m
-    - Function that computes muscle excitations from time derivative of muscle activations. The muscle activation model is based on Raasch et al. (1991). More info in [De Groote et al. (2009)](10.1080/10255840902788587).       
+    - Function that computes muscle excitations from time derivative of muscle activations. The muscle activation model is based on Raasch et al. (1991). More info in [De Groote et al. (2009)](https://doi.org/10.1080/10255840902788587).       
 3. FiberLength_TendonForce_tendon.m
-    - Function that computes fiber lengths from muscle-tendon forces. The muscle model is based on [De Groote et al. (2016)](10.1007/s10439-016-1591-9).         
+    - Function that computes fiber lengths from muscle-tendon forces. The muscle model is based on [De Groote et al. (2016)](https://link.springer.com/article/10.1007/s10439-016-1591-9).         
 4. FiberVelocity_TendonForce_tendon.m
-    - Function that computes fiber velocities from muscle-tendon forces. The muscle model is based on [De Groote et al. (2016)](10.1007/s10439-016-1591-9).         
+    - Function that computes fiber velocities from muscle-tendon forces. The muscle model is based on [De Groote et al. (2016)](https://link.springer.com/article/10.1007/s10439-016-1591-9).         
 5. ForceEquilibrium_FtildeState_all.m
-    - Function that derives the Hill-equilibrium. The muscle model is based on [De Groote et al. (2016)](10.1007/s10439-016-1591-9).        
+    - Function that derives the Hill-equilibrium. The muscle model is based on [De Groote et al. (2016)](https://link.springer.com/article/10.1007/s10439-016-1591-9).        
 6. ForceEquilibrium_FtildeState_all_tendon.m
-    - Function that derives the Hill-equilibrium with tendon stiffness as parameter. The muscle model is based on [De Groote et al. (2016)](10.1007/s10439-016-1591-9).          
+    - Function that derives the Hill-equilibrium with tendon stiffness as parameter. The muscle model is based on [De Groote et al. (2016)](https://link.springer.com/article/10.1007/s10439-016-1591-9).          
 7. MomentArmIndices.m        
     - Helper function that returns indices for use with the moment arms.        
 8. MuscleIndices.m
