@@ -7,7 +7,7 @@ F = opti.f;
 Fguess=opti.debug.value(F,opti.initial);
 G = opti.g;
 Gguess=opti.debug.value(G,opti.initial);
-% Sparsity pattern of the constraint jacobian (with respect to the variables)
+% Sparsity pattern of the constraint Jacobian (with respect to the variables)
 % i.e. on which variables does each constraint depend
 sp = sparse(DM(sparsity(jacobian(opti.g,opti.x)),1));
 
@@ -24,7 +24,7 @@ is_simple = is_single & is_linear;
 % referring to
 [col,~] = find(sp(is_simple,:)');
 
-% Read out the values of the contraints from the opti instance
+% Read out the values of the constraints from the opti instance
 lbg = opti.lbg;
 lbg = opti.value(lbg);
 ubg = opti.ubg;
@@ -72,7 +72,7 @@ new_g = g(find(~is_simple));
 llb = lbg(find(~is_simple));
 uub = ubg(find(~is_simple));
 
-% Generate problem structure and intialize NLP solver
+% Generate problem structure and initialize NLP solver
 prob = struct('f', opti.f, 'x', opti.x, 'g',new_g );
 solver = nlpsol('solver', 'ipopt',prob,optionssol);
 
