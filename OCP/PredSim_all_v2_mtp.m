@@ -31,7 +31,7 @@ num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 % can select which row of parameters will be used. You can loop over a
 % series of formulations by stacking mulitple indices in idx_ww (e.g.,
 % idx_ww = [1:198]).
-idx_ww = [17]; % Index row in matrix settings (1:198)
+idx_ww = [12]; % Index row in matrix settings (1:198)
 
 %% Settings
 import casadi.*

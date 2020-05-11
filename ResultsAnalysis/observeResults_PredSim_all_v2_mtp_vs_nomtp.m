@@ -114,7 +114,8 @@ load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 label_fontsize  = 16;
 sup_fontsize  = 24;
 line_linewidth  = 3;
-col = hsv(length(ww_mtp) + length(ww_nomtp));
+% col = hsv(length(ww_mtp) + length(ww_nomtp));
+col = [0,153,0;255,102,0]./255;
 
 %% Plot joint angles
 Qref = ExperimentalData.Q;
