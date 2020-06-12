@@ -23,8 +23,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-% num_set = [1,1,1,1,0,1]; % This configuration solves the problem
-num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+num_set = [1,1,1,1,0,1]; % This configuration solves the problem
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimal control problems. Through the variable idx_ww, the user  
@@ -659,9 +659,9 @@ if solveProblem
     for j=1:d            
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Unscale variables        
-        Qskj_nsc = Qskj.*(scaling.QsQdots(1:2:end)'*ones(1,size(Qskj,2)/2));
+        Qskj_nsc = Qskj.*(scaling.QsQdots(1:2:end)'*ones(1,size(Qskj,2)));
         Qdotskj_nsc = Qdotskj.*(scaling.QsQdots(2:2:end)'*...
-            ones(1,size(Qdotskj,2)/2));
+            ones(1,size(Qdotskj,2)));
         FTtildekj_nsc = FTtildekj.*(scaling.FTtilde'*ones(1,size(FTtildekj,2)));
         dFTtildej_nsc = dFTtildej.*scaling.dFTtilde;
         Aj_nsc = Aj.*(scaling.Qdotdots'*ones(1,size(Aj,2)));  
