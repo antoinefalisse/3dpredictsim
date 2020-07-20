@@ -4,7 +4,7 @@
 % Author: Antoine Falisse
 % Date: 12/19/2018
 % 
-function [err, FT, Fce, Fpass, Fiso, vMmax, massM] = ...
+function [err, FT, Fce, Fpass, Fiso, vMmax_norm, massM] = ...
     ForceEquilibrium_FtildeState_all_tendon(a,fse,dfse,lMT,vMT,params,...
     Fvparam,Fpparam,Faparam,tension,aTendon,shift)
 
@@ -13,6 +13,7 @@ lMo = ones(size(a,1),1)*params(2,:);
 lTs = ones(size(a,1),1)*params(3,:);
 alphao = ones(size(a,1),1)*params(4,:);
 vMmax = ones(size(a,1),1)*params(5,:);
+vMmax_norm = vMmax./lMo;
 Atendonsc = aTendon;
 Atendon = ones(size(a,1),1)*Atendonsc;
 volM = FMo.*lMo;
