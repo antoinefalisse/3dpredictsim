@@ -19,7 +19,7 @@
 %   musclemass: mass of muscle, mass = PCSA*rho*lMopt, PCSA = Fmax/sigma
 %       Note: rho is density (1058.7 kg/m³) and sigma is tension
 %   pctst: percentage of slow twitch fibers (0-1)
-%   vcemax: maximal muscle fiber velocities (default is 10*lMopt)
+%   vcemax: maximal muscle fiber contraction velocities (default is 10)
 %   Fiso: normalized muscle forces from active f-l relationship (FMltilde)
 %   modelmass: mass of the musculoskeletal model
 %   b: parameter determining transition smoothness for tanh approximations
