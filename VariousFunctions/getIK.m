@@ -6,7 +6,11 @@
 % 
 function Qs = getIK(pathIK,joints)
 
-load(pathIK,'Qsall');
+if strcmp(pathIK(end-2:end),'mot')
+    Qsall = importdata(pathIK);
+else
+    load(pathIK,'Qsall');
+end
 
 Qs.time = Qsall.data(:,strcmp(Qsall.colheaders,{'time'}));
 Qs.all(:,1) = Qs.time;
