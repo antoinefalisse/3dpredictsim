@@ -14,7 +14,7 @@ clc
 % 109:  metabolic energy rate at the first instead of second power wrt nominal cost function
 % 104:  no metabolic energy rate term wrt nominal cost function
 % 106:  no muscle activity term wrt nominal cost function
-ww  = [1]; 
+ww  = [1,109,104,106]; 
 % Fixed settings
 subject = 'subject1';
 body_mass = 62;
