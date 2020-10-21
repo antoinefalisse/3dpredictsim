@@ -16,6 +16,10 @@ body_mass = 62;
 body_weight = 62*9.81;
 setup.derivatives = 'AD';
 % Load pre-defined settings
+pathmain = pwd;
+[pathrepo,~,~] = fileparts(pathmain);
+pathOCP = [pathrepo,'/OCP'];
+addpath(genpath(pathOCP));
 settings = getSettings_predSim_all();
 
 %% Load results

@@ -16,6 +16,8 @@ pathresults = [pathrepo,'/Results'];
 %% PredSim_all
 % All trials
 ww = 1:198;
+pathOCP = [pathrepo,'/OCP'];
+addpath(genpath(pathOCP));
 settings = getSettings_predSim_all();
 % Load results
 load([pathresults,'/PredSim_all/Results_all.mat']);
