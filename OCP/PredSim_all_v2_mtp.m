@@ -1198,7 +1198,7 @@ if solveProblem
     opti.minimize(Jall_sc);
     options.ipopt.hessian_approximation = 'limited-memory';
     options.ipopt.mu_strategy      = 'adaptive';
-    options.ipopt.max_iter = 10000;
+    options.ipopt.max_iter = 50;
     options.ipopt.tol = 1*10^(-tol_ipopt);
     opti.solver('ipopt', options);  
     % Create and save diary

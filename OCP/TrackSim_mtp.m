@@ -27,12 +27,12 @@ close all;
 % and visualize the results in the OpenSim GUI.
 
 % num_set = [1,1,0,1,0,1]; % This configuration solves the problem
-num_set = [0,1,1,1,0,0]; % This configuration analyzes the results
+num_set = [0,1,1,0,0,0]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
 % select which row of parameters will be used.
-idx_ww = 26; % Index row in matrix settings
+idx_ww = 25; % Index row in matrix settings
 
 %% Settings
 import casadi.*
