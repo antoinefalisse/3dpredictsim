@@ -6,11 +6,11 @@
 % Changes with respect to v1.0:
 %   - Collocation scheme revisited.
 %       - Slack controls (dF/dt (muscle-tendon force derivatives) and dv/dt 
-%       (joint accelertions)) not constant within mesh intervals but new
+%       (joint accelerations)) not constant within mesh intervals but new
 %       variable for each collocation point.
 %       - Controls (da/dt (muscle activation derivatives) and e_a (arm 
 %       excitations)) constant within mesh intervals.
-%       - Constraints applied at collocation points
+%       - Constraints applied at collocation points.
 %       - This formulation makes mathematically more sense. Yet it
 %       increases the problem size. It might be possible to reduce the number of
 %       mesh intervals, since the constraints are now applied at the
@@ -31,6 +31,8 @@
 %   external function (v1.0), the values are set from this script
 %   (e.g., Qs_radioulnar, etc.). We believe it is more transparent to work in
 %   such a way.
+%   - Slight changes in cost function / passive torques. Damping is now part
+%   of the passive torque term of the cost function.
 %
 clear all;
 clc
@@ -52,21 +54,21 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,0,0,0,0,0]; % This configuration solves the problem
-% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
+% num_set = [1,0,0,0,0,0]; % This configuration solves the problem
+num_set = [1,1,1,1,0,1]; % This configuration analyzes the results
 
-% The variable settings in the following section will set some parameters 
-% of the optimal control problems. Through the variable idx_ww, the user  
-% can select which row of parameters will be used. You can loop over a
-% series of formulations by stacking mulitple indices in idx_ww (e.g.,
-% idx_ww = [1:198]).
-idx_ww = 22; % Index row in matrix settings (1:198)
+% settings describes the parameters used in the optimal control problems.
+settings = getSettings_predSim_all();
+% Through the variable idx_ww, the user can select which row of parameters will
+% be used. Look at getSettings_predSim_all() for more details. You can loop over
+% a series of formulations by stacking mulitple indices in idx_ww (e.g.,[1:20]).
+idx_ww = 22; % Index row in matrix settings
 
 %% Settings
 import casadi.*
 subject = 'subject1';
 parallelMode = 'thread';
-NThreads = 8;
+NThreads = 8; % Number of threads used in parallel.
 
 solveProblem    = num_set(1); % set to 1 to solve problem
 analyseResults  = num_set(2); % set to 1 to analyze results
@@ -74,9 +76,6 @@ loadResults     = num_set(3); % set to 1 to load results
 saveResults     = num_set(4); % set to 1 to save sens. results
 checkBoundsIG   = num_set(5); % set to 1 to visualize guess-bounds 
 writeIKmotion   = num_set(6); % set to 1 to write .mot file
-
-% settings describes the parameters used in the optimal control problems.
-settings = getSettings_predSim_all();
 
 %% Select settings
 for www = 1:length(idx_ww)
@@ -110,7 +109,7 @@ savename = ['_c',num2str(ww)];
 
 % In some cases, the inital guess depends on results from other simulations
 if IGm == 3 || IGm == 4    
-ww_ig          = IGcase;               % Case identifier used as IG       
+ww_ig          = IGcase;               % case identifier used as IG       
 v_tgt_ig       = settings(ww_ig,1);    % average speed
 tol_ipopt_ig   = settings(ww_ig,2);    % tolerance (means 1e-(tol_ipopt))
 N_ig           = settings(ww_ig,3);    % number of mesh intervals
@@ -147,25 +146,20 @@ pathmain = pwd;
 pathExternalFunctions = [pathRepo,'/ExternalFunctions'];
 % Loading external functions. 
 cd(pathExternalFunctions);
-setup.derivatives =  'AD'; % Algorithmic differentiation
-if ispc    
-    switch setup.derivatives
-        case {'AD'}   
-            if cm == 1
-                F = external('F','PredSim_v2.dll');   
-                if analyseResults
-                    F1 = external('F','PredSim_v2_pp.dll');
-                end
-            else
-                error('Not supported in this version')
-            end
+if ispc     
+    if cm == 1
+        F = external('F','PredSim_v2.dll');   
+        if analyseResults
+            F1 = external('F','PredSim_v2_pp.dll');
+        end
+    else
+        error('Not supported with this version (v2) - check PredSim_all.m')
     end
 else
-    error('Platform not supported')
+    error('Platform not supported with this version (v2)')
 end
 cd(pathmain);
-% This is an example of how to call an external function with some
-% numerical values.
+% This is an example of how to call an external function with numerical values.
 % vec1 = -ones(93,1);
 % res1 = full(F(vec1));
 % res2 = full(F1(vec1));

@@ -9,8 +9,13 @@
 % indeed very likely that not all cases are accounted for. For instance, at
 % this stage coordinates that are locked will not be locked in the C++ file.
 %
+% Note that this code assumes the .osim file to follow the OpenSim 3.3 syntax.
+% Things have changed from OpenSim 4.0 but this script has not been
+% adjusted yet. But importantly the resulting cpp code matches >=4.0
+% conventions.
+%
 % Please report any bugs so that we can make progress.
-% 
+%
 % Author: Echo (Wei) Wang and Antoine Falisse
 % Date: 06/04/2020
 
