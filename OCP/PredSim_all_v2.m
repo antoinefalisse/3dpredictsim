@@ -54,8 +54,8 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-% num_set = [1,0,0,0,0,0]; % This configuration solves the problem
-num_set = [1,1,1,1,0,1]; % This configuration analyzes the results
+num_set = [1,1,0,1,0,1]; % This configuration solves the problem
+% num_set = [0,1,1,1,0,1]; % This configuration analyzes the results
 
 % settings describes the parameters used in the optimal control problems.
 settings = getSettings_predSim_all();
