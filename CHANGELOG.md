@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-0.1 (in development) 
+2.0
 ----------------------
 - 2020-07-20: corrected bug in metabolic energy models (Umberger2003, Umberger2010, Uchida2016); 10*lmopt had been used as normalized maximal muscle fiber contraction velocity rather than 10. Thanks Tim van der Zee for reporting. This suggests that the results obtained in the paper when comparing the different metabolic energy models might be incorrect.
 
