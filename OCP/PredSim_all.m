@@ -24,13 +24,15 @@ close all;
 % Note that you should re-run the simulations to write out the .mot files
 % and visualize the results in the OpenSim GUI.
 
-num_set = [1,1,0,1,0,1,0]; % This configuration solves the problem
-% num_set = [0,1,1,0,0,1,1]; % This configuration analyzes the results
+num_set = [1,1,0,0,0,1,1]; % This configuration solves the problem
+% num_set = [0,1,1,0,0,0,1]; % This configuration analyzes the results
 
-% The variable settings in the following section will set some parameters 
-% of the optimal control problems. Through the variable idx_ww, the user  
-% can select which row of parameters will be used.
-idx_ww = 1; % Index row in matrix settings (1:198)
+% settings describes the parameters used in the optimal control problems.
+settings = getSettings_predSim_all();
+% Through the variable idx_ww, the user can select which row of parameters will
+% be used. Look at getSettings_predSim_all() for more details. You can loop over
+% a series of formulations by stacking mulitple indices in idx_ww (e.g.,[1:20]).
+idx_ww = 1; % Index row in matrix settings
 
 %% Settings
 import casadi.*
@@ -43,308 +45,6 @@ saveResults     = num_set(4); % set to 1 to save sens. results
 checkBoundsIG   = num_set(5); % set to 1 to visualize guess-bounds 
 writeIKmotion   = num_set(6); % set to 1 to write .mot file
 decomposeCost   = num_set(7); % set to 1 to decompose cost
-
-% settings describes the parameters used in the optimal control problems.
-% settings(1): average speed: max 2 digits.
-% settings(2): NLP error tolerance: 1*10^(-settings(2)).
-% settings(3): number of mesh intervals
-% settings(4): weight metabolic energy rate
-% settings(5): weight joint accelerations
-% settings(6): weight arm excitations
-% settings(7): weight passive torques
-% settings(8): weight muscle activations
-% settings(9): power metabolic energy rate
-% settings(10): initial guess identifier: 1 quasi-random, 2 data-informed
-% settings(11): contact model identifier: 1 generic, 2 subject-specific
-% settings(12): initial guess mode identifier for data-informed guesses
-%   1 data from average walking motion, 2 data from average running motion 
-%   3 partial solution from motion specified in settings(13)
-%   4 full solution from motion specified in settings(13)
-%   if 1-3 then settings(10) should be 2
-%   if 4 then settings(10) does not matter
-% settings(13): initial guess case identifier: row number in "settings" of
-% the motion used as initial guess when settings(12)=3 || settings(12)=4
-% settings(14): weakness hip muscles, 0 no weakness, 50 weakened by 50%,
-% 75 weakened by 75%, 90 weakened by 90%,
-% settings(15): maximal contraction velocity identifier
-%   0 generic values, 1 values*2
-% settings(16): weakness ankle plantarflexors, 0 no weakness, 50 weakened 
-% by 50%, 75 weakened by 75%, 90 weakened by 90%,
-% settings(17): metabolic energy model identifier: 0 Bhargava et al. (2004)
-% 1 Umberger et al. (2003), 2 Umberger (2010), 3 Uchida et al. (2016), 
-% 4 Umberger (2010) treating muscle lengthening heat rate as 
-% Umberger et al. (2003), 5 Umberger (2010) treating negative mechanical 
-% work as Umberger et al. (2003)
-% settings(18): co-contraction identifier: 0 lower bound activation = 0.05,
-% 1 lower bound activation = 0.1, 2 lower bound activation = 0.15,
-% 3 lower bound activation = 0.2
-settings = [    
-    % A. Varying prescribed gait speed
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 1
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 2
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 3
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 4
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 5
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 6
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 7
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 8
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 9
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 10
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 11
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 12
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 13
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 14
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 15
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 16
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 17
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 18
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 19
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 20
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;    % 21    
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 22
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 23
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 24
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 25
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 26
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 27
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 28
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 29
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 30
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 31
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 32
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 33
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 34
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 35
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 36
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 37
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 38
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 39
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 40
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 41
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;    % 42
-    % Data-informed (running) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 43
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 44
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 45
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 46
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 47
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 48
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 49
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 50
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 51
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 52
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 53
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 54
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 55
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 56
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 57
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 58
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 59
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 60
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 61
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 62
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 0, 0, 0, 0;    % 63
-    % Data-informed (full solution at closest speed) initial guess
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 1, 0, 0, 0, 0, 0;    % 64
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 64, 0, 0, 0, 0, 0;   % 65
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 65, 0, 0, 0, 0, 0;   % 66
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 66, 0, 0, 0, 0, 0;   % 67
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 67, 0, 0, 0, 0, 0;   % 68
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 68, 0, 0, 0, 0, 0;   % 69
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 1, 0, 0, 0, 0, 0;    % 70
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 70, 0, 0, 0, 0, 0;   % 71
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 71, 0, 0, 0, 0, 0;   % 72
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 72, 0, 0, 0, 0, 0;   % 73
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 73, 0, 0, 0, 0, 0;   % 74
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 74, 0, 0, 0, 0, 0;   % 75
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 75, 0, 0, 0, 0, 0;   % 76
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 76, 0, 0, 0, 0, 0;   % 77
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 77, 0, 0, 0, 0, 0;   % 78
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 78, 0, 0, 0, 0, 0;   % 79
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 79, 0, 0, 0, 0, 0;   % 80
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 80, 0, 0, 0, 0, 0;   % 81
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 81, 0, 0, 0, 0, 0;   % 82
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 82, 0, 0, 0, 0, 0;   % 83 
-    % Data-informed (partial solution at closest speed) initial guess
-    1.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 1, 0, 0, 0, 0, 0;    % 84
-    1.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 84, 0, 0, 0, 0, 0;   % 85
-    1.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 85, 0, 0, 0, 0, 0;   % 86
-    0.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 86, 0, 0, 0, 0, 0;   % 87
-    0.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 87, 0, 0, 0, 0, 0;   % 88
-    0.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 88, 0, 0, 0, 0, 0;   % 89
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 1, 0, 0, 0, 0, 0;    % 90
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 90, 0, 0, 0, 0, 0;   % 91
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 91, 0, 0, 0, 0, 0;   % 92
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 92, 0, 0, 0, 0, 0;   % 93
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 93, 0, 0, 0, 0, 0;   % 94
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 94, 0, 0, 0, 0, 0;   % 95
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 95, 0, 0, 0, 0, 0;   % 96
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 96, 0, 0, 0, 0, 0;   % 97
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 97, 0, 0, 0, 0, 0;   % 98
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 98, 0, 0, 0, 0, 0;   % 99
-    2.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 99, 0, 0, 0, 0, 0;   % 100
-    2.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 100, 0, 0, 0, 0, 0;  % 101
-    2.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 101, 0, 0, 0, 0, 0;  % 102
-    2.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 102, 0, 0, 0, 0, 0;  % 103    
-    % B. Altering cost function
-    % No metabolic energy rate term
-    % Quasi-random initial guess
-    1.33, 4, 50, 0, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;      % 104
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 0, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;      % 105
-    % No muscle activity term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;       % 106
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 0, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;       % 107
-    % Not squaring metabolic energy rate term
-    % Quasi-random initial guess
-    1.33, 4, 50, 1000, 50000, 1000000, 1000, 2000, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0;   % 108
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 1000, 50000, 1000000, 1000, 2000, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0;   % 109
-    % No passive torque term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 0, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;       % 110
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 0, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;       % 111
-    % Very low weight on joint acceleration term
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 1, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;        % 112
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 1, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;        % 113    
-    % C. Subject-specific contact model
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0;    % 114
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 2, 1, 0, 0, 0, 0, 0, 0;    % 115      
-    % D. More mesh points
-    % Quasi-random initial guess
-    1.33, 4, 100, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0;   % 116
-    % Data-informed (walking) initial guess
-    1.33, 4, 100, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0;   % 117    
-    % E. Weak hip muscles
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 50, 0, 0, 0, 0;   % 118
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 50, 0, 0, 0, 0;   % 119
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 75, 0, 0, 0, 0;   % 120
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 75, 0, 0, 0, 0;   % 121
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 90, 0, 0, 0, 0;   % 122
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 90, 0, 0, 0, 0;   % 123         
-    % F. Increased maximum muscle contraction velocities
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 124
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 125
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 126
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 127
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 128
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 129
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 130
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 131
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 132
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 133
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 1, 0, 0, 0;    % 134
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 135
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 136
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 137
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 138
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 139
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 140
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 141
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 142
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 143
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 144
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 1, 0, 0, 0;    % 145    
-    % Data-informed (running) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 146
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 147
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 148
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 149
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 150
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 151
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 152
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 153
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 154
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 155
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 2, 0, 0, 1, 0, 0, 0;    % 156
-    % Data-informed (full solution at closest speed) initial guess
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 124, 0, 1, 0, 0, 0;  % 157
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 157, 0, 1, 0, 0, 0;  % 158
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 158, 0, 1, 0, 0, 0;  % 159
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 159, 0, 1, 0, 0, 0;  % 160
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 160, 0, 1, 0, 0, 0;  % 161
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 161, 0, 1, 0, 0, 0;  % 162
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 162, 0, 1, 0, 0, 0;  % 163
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 163, 0, 1, 0, 0, 0;  % 164
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 164, 0, 1, 0, 0, 0;  % 165
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 4, 165, 0, 1, 0, 0, 0;  % 166
-    % Data-informed (partial solution at closest speed) initial guess
-    1.43, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 124, 0, 1, 0, 0, 0;  % 167
-    1.53, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 167, 0, 1, 0, 0, 0;  % 168
-    1.63, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 168, 0, 1, 0, 0, 0;  % 169
-    1.73, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 169, 0, 1, 0, 0, 0;  % 170
-    1.83, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 170, 0, 1, 0, 0, 0;  % 171
-    1.93, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 171, 0, 1, 0, 0, 0;  % 172
-    2.03, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 172, 0, 1, 0, 0, 0;  % 173
-    2.13, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 173, 0, 1, 0, 0, 0;  % 174
-    2.23, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 174, 0, 1, 0, 0, 0;  % 175
-    2.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 3, 175, 0, 1, 0, 0, 0;  % 176    
-    % G. Weakness ankle plantaflexors
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 50, 0, 0;   % 177   
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 75, 0, 0;   % 178   
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 90, 0, 0;   % 179
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 50, 0, 0;   % 180 
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 75, 0, 0;   % 181
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 90, 0, 0;   % 182    
-    % H. Different metabolic energy models
-    % Metabolic energy model from Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 1, 0;    % 183
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 1, 0;    % 184
-    % Metabolic energy model from Umberger (2010)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 2, 0;    % 185
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 2, 0;    % 186
-    % Metabolic energy model from Uchida et al. (2016)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 3, 0;    % 187
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 3, 0;    % 188  
-    % Metabolic energy model from Umberger (2010) treating muscle lengthening heat rate as Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 4, 0;    % 189
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 4, 0;    % 190
-    % Metabolic energy model from Umberger (2010) treating negative mechanical work as Umberger et al. (2003)
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 5, 0;    % 191
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 5, 0;    % 192    
-    % I. Co-contraction
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1;    % 193
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 1;    % 194
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 2;    % 195
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 2;    % 196    
-    % Quasi-random initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 1, 1, 0, 0, 0, 0, 0, 0, 3;    % 197
-    % Data-informed (walking) initial guess
-    1.33, 4, 50, 500, 50000, 1000000, 1000, 2000, 2, 2, 1, 1, 0, 0, 0, 0, 0, 3;    % 198
-];
 
 %% Select settings
 for www = 1:length(idx_ww)
@@ -660,6 +360,7 @@ CasADiFunctions_all
 pathPassiveMoments = [pathRepo,'/PassiveMoments'];
 addpath(genpath(pathPassiveMoments));
 PassiveMomentsData
+dampingPass = 0.001;
 
 %% Experimental data
 % We extract experimental data to set bounds and initial guesses if needed
@@ -1007,49 +708,49 @@ if solveProblem
         end        
         % Get passive joint torques
         Tau_passk.hip.flex.l    = f_PassiveMoments(k_pass.hip.flex,...
-            theta.pass.hip.flex,Xk_nsc(jointi.hip_flex.l*2-1,1),...
+            theta.pass.hip.flex,dampingPass,Xk_nsc(jointi.hip_flex.l*2-1,1),...
             Xk_nsc(jointi.hip_flex.l*2,1));
         Tau_passk.hip.flex.r    = f_PassiveMoments(k_pass.hip.flex,...
-            theta.pass.hip.flex,Xk_nsc(jointi.hip_flex.r*2-1,1),...
+            theta.pass.hip.flex,dampingPass,Xk_nsc(jointi.hip_flex.r*2-1,1),...
             Xk_nsc(jointi.hip_flex.r*2,1));
         Tau_passk.hip.add.l     = f_PassiveMoments(k_pass.hip.add,...
-            theta.pass.hip.add,Xk_nsc(jointi.hip_add.l*2-1,1),...
+            theta.pass.hip.add,dampingPass,Xk_nsc(jointi.hip_add.l*2-1,1),...
             Xk_nsc(jointi.hip_add.l*2,1));
         Tau_passk.hip.add.r     = f_PassiveMoments(k_pass.hip.add,...
-            theta.pass.hip.add,Xk_nsc(jointi.hip_add.r*2-1,1),...
+            theta.pass.hip.add,dampingPass,Xk_nsc(jointi.hip_add.r*2-1,1),...
             Xk_nsc(jointi.hip_add.r*2,1));
         Tau_passk.hip.rot.l     = f_PassiveMoments(k_pass.hip.rot,...
-            theta.pass.hip.rot,Xk_nsc(jointi.hip_rot.l*2-1,1),...
+            theta.pass.hip.rot,dampingPass,Xk_nsc(jointi.hip_rot.l*2-1,1),...
             Xk_nsc(jointi.hip_rot.l*2,1));
         Tau_passk.hip.rot.r     = f_PassiveMoments(k_pass.hip.rot,...
-            theta.pass.hip.rot,Xk_nsc(jointi.hip_rot.r*2-1,1),...
+            theta.pass.hip.rot,dampingPass,Xk_nsc(jointi.hip_rot.r*2-1,1),...
             Xk_nsc(jointi.hip_rot.r*2,1));
         Tau_passk.knee.l        = f_PassiveMoments(k_pass.knee,...
-            theta.pass.knee,Xk_nsc(jointi.knee.l*2-1,1),...
+            theta.pass.knee,dampingPass,Xk_nsc(jointi.knee.l*2-1,1),...
             Xk_nsc(jointi.knee.l*2,1));
         Tau_passk.knee.r        = f_PassiveMoments(k_pass.knee,...
-            theta.pass.knee,Xk_nsc(jointi.knee.r*2-1,1),...
+            theta.pass.knee,dampingPass,Xk_nsc(jointi.knee.r*2-1,1),...
             Xk_nsc(jointi.knee.r*2,1));
         Tau_passk.ankle.l       = f_PassiveMoments(k_pass.ankle,...
-            theta.pass.ankle,Xk_nsc(jointi.ankle.l*2-1,1),...
+            theta.pass.ankle,dampingPass,Xk_nsc(jointi.ankle.l*2-1,1),...
             Xk_nsc(jointi.ankle.l*2,1));
         Tau_passk.ankle.r       = f_PassiveMoments(k_pass.ankle,...
-            theta.pass.ankle,Xk_nsc(jointi.ankle.r*2-1,1),...
+            theta.pass.ankle,dampingPass,Xk_nsc(jointi.ankle.r*2-1,1),...
             Xk_nsc(jointi.ankle.r*2,1));        
         Tau_passk.subt.l       = f_PassiveMoments(k_pass.subt,...
-            theta.pass.subt,Xk_nsc(jointi.subt.l*2-1,1),...
+            theta.pass.subt,dampingPass,Xk_nsc(jointi.subt.l*2-1,1),...
             Xk_nsc(jointi.subt.l*2,1));
         Tau_passk.subt.r       = f_PassiveMoments(k_pass.subt,...
-            theta.pass.subt,Xk_nsc(jointi.subt.r*2-1,1),...
+            theta.pass.subt,dampingPass,Xk_nsc(jointi.subt.r*2-1,1),...
             Xk_nsc(jointi.subt.r*2,1));        
         Tau_passk.trunk.ext     = f_PassiveMoments(k_pass.trunk.ext,...
-            theta.pass.trunk.ext,Xk_nsc(jointi.trunk.ext*2-1,1),...
+            theta.pass.trunk.ext,dampingPass,Xk_nsc(jointi.trunk.ext*2-1,1),...
             Xk_nsc(jointi.trunk.ext*2,1));
         Tau_passk.trunk.ben     = f_PassiveMoments(k_pass.trunk.ben,...
-            theta.pass.trunk.ben,Xk_nsc(jointi.trunk.ben*2-1,1),...
+            theta.pass.trunk.ben,dampingPass,Xk_nsc(jointi.trunk.ben*2-1,1),...
             Xk_nsc(jointi.trunk.ben*2,1));
         Tau_passk.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
-            theta.pass.trunk.rot,Xk_nsc(jointi.trunk.rot*2-1,1),...
+            theta.pass.trunk.rot,dampingPass,Xk_nsc(jointi.trunk.rot*2-1,1),...
             Xk_nsc(jointi.trunk.rot*2,1));        
         Tau_passk_all = [Tau_passk.hip.flex.l,Tau_passk.hip.flex.r,...
             Tau_passk.hip.add.l,Tau_passk.hip.add.r,...
@@ -1855,49 +1556,64 @@ if analyseResults
     Tau_pass_opt_all = zeros(N,15);
     for i = 1:N    
         Tau_pass_opt.hip.flex.l    = f_PassiveMoments(k_pass.hip.flex,...
-           theta.pass.hip.flex,Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2-1),...
+           theta.pass.hip.flex,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_flex.l*2));
         Tau_pass_opt.hip.flex.r    = f_PassiveMoments(k_pass.hip.flex,...
-           theta.pass.hip.flex,Xk_Qs_Qdots_opt(i,jointi.hip_flex.r*2-1),...
+           theta.pass.hip.flex,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_flex.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_flex.r*2));
         Tau_pass_opt.hip.add.l     = f_PassiveMoments(k_pass.hip.add,...
-           theta.pass.hip.add,Xk_Qs_Qdots_opt(i,jointi.hip_add.l*2-1),...
+           theta.pass.hip.add,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_add.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_add.l*2));
         Tau_pass_opt.hip.add.r     = f_PassiveMoments(k_pass.hip.add,...
-           theta.pass.hip.add,Xk_Qs_Qdots_opt(i,jointi.hip_add.r*2-1),...
+           theta.pass.hip.add,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_add.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_add.r*2));
         Tau_pass_opt.hip.rot.l     = f_PassiveMoments(k_pass.hip.rot,...
-           theta.pass.hip.rot,Xk_Qs_Qdots_opt(i,jointi.hip_rot.l*2-1),...
+           theta.pass.hip.rot,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_rot.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_rot.l*2));
         Tau_pass_opt.hip.rot.r     = f_PassiveMoments(k_pass.hip.rot,...
-           theta.pass.hip.rot,Xk_Qs_Qdots_opt(i,jointi.hip_rot.r*2-1),...
+           theta.pass.hip.rot,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.hip_rot.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.hip_rot.r*2));
         Tau_pass_opt.knee.l        = f_PassiveMoments(k_pass.knee,...
-           theta.pass.knee,Xk_Qs_Qdots_opt(i,jointi.knee.l*2-1),...
+           theta.pass.knee,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.knee.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.knee.l*2));
         Tau_pass_opt.knee.r        = f_PassiveMoments(k_pass.knee,...
-           theta.pass.knee,Xk_Qs_Qdots_opt(i,jointi.knee.r*2-1),...
+           theta.pass.knee,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.knee.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.knee.r*2));
         Tau_pass_opt.ankle.l       = f_PassiveMoments(k_pass.ankle,...
-           theta.pass.ankle,Xk_Qs_Qdots_opt(i,jointi.ankle.l*2-1),...
+           theta.pass.ankle,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.ankle.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.ankle.l*2));
         Tau_pass_opt.ankle.r       = f_PassiveMoments(k_pass.ankle,...
-           theta.pass.ankle,Xk_Qs_Qdots_opt(i,jointi.ankle.r*2-1),...
+           theta.pass.ankle,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.ankle.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.ankle.r*2));
         Tau_pass_opt.subt.l       = f_PassiveMoments(k_pass.subt,...
-           theta.pass.subt,Xk_Qs_Qdots_opt(i,jointi.subt.l*2-1),...
+           theta.pass.subt,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.subt.l*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.subt.l*2));
         Tau_pass_opt.subt.r       = f_PassiveMoments(k_pass.subt,...
-           theta.pass.subt,Xk_Qs_Qdots_opt(i,jointi.subt.r*2-1),...
+           theta.pass.subt,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.subt.r*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.subt.r*2));
         Tau_pass_opt.trunk.ext     = f_PassiveMoments(k_pass.trunk.ext,...
-           theta.pass.trunk.ext,Xk_Qs_Qdots_opt(i,jointi.trunk.ext*2-1),...
+           theta.pass.trunk.ext,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.trunk.ext*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.trunk.ext*2));
         Tau_pass_opt.trunk.ben     = f_PassiveMoments(k_pass.trunk.ben,...
-           theta.pass.trunk.ben,Xk_Qs_Qdots_opt(i,jointi.trunk.ben*2-1),...
+           theta.pass.trunk.ben,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.trunk.ben*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.trunk.ben*2));
         Tau_pass_opt.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
-           theta.pass.trunk.rot,Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2-1),...
+           theta.pass.trunk.rot,dampingPass,...
+           Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2-1),...
            Xk_Qs_Qdots_opt(i,jointi.trunk.rot*2));        
         Tau_pass_opt_all(i,:) = full([Tau_pass_opt.hip.flex.l,...
            Tau_pass_opt.hip.add.l,Tau_pass_opt.hip.rot.l,...             
@@ -2088,6 +1804,18 @@ if decomposeCost
     assertCost = J_optf - 1/(dist_trav_opt)*(E_costf+A_costf+Arm_costf+...
         Qdotdot_costf+Pass_costf+vA_costf+dFTtilde_costf+...
         QdotdotArm_costf);
+    contributionCost.absoluteValues = 1/(dist_trav_opt)*[E_costf,A_costf,...
+        Arm_costf,Qdotdot_costf,Pass_costf,vA_costf,dFTtilde_costf,...
+        QdotdotArm_costf];
+    contributionCost.relativeValues = 1/(dist_trav_opt)*[E_costf,A_costf,...
+        Arm_costf,Qdotdot_costf,Pass_costf,vA_costf,dFTtilde_costf,...
+        QdotdotArm_costf]./J_optf*100;
+    contributionCost.relativeValuesRound2 = ...
+        round(contributionCost.relativeValues,2);
+    contributionCost.labels = {'metabolicEnergy','muscleActivation',...
+        'armExcitation','jointAccelerations','passiveTorques','dadt','dFdt',...
+        'armAccelerations'};
+    
 end 
 
     %% Reconstruct full gait cycle

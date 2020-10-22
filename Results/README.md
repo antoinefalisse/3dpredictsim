@@ -3,11 +3,13 @@
 
 The results are divided into:
 
-1. PredSim_all/Results_all.mat
+1. PredSim_all_v2/Results_all.mat
+    - Contains results from the predictive simulations produced with PredSim_all_v2.
+2. PredSim_all/Results_all.mat
     - Contains all results from the predictive simulations except those with the prosthesis.
-2. PredSim_prosthesis/Results_prosthesis.mat
+3. PredSim_prosthesis/Results_prosthesis.mat
     - Contains the results from the predictive simulations with the prosthesis.
-3. TrackSimResults_tracking.mat 
+4. TrackSimResults_tracking.mat 
     - Contains the results from the tracking simulations.
 
 ### Results_all is a nested structure with the following layers:

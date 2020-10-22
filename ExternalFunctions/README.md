@@ -15,4 +15,16 @@ as well as the corresponding dlls. Only the dlls are necessary to run the proble
 
 We developed this code on Windows but provide dylibs for Mac users. We cannot
 guarantee that all will work smooth on Mac. Please report any issues: email me at
-antoine.falisse@kuleuven.be or submit an issue on GitHub.
+afalisse@stanford.edu or submit an issue on GitHub.
+
+From v2.0:
+
+Our framework currently does not allow loading a model (i.e., osim file) through the C++ API.
+As a result, the user has to build the model programmatically. This is tedious and prone to errors.
+To facilitate this process, we wrote a MATLAB script (buildModelCpp.m) that loads the osim file and outputs
+a txt file with part of the C++ code required to build the model programmatically. This feature is still under
+development and does not account for all features of OpenSim. For instance, locked joints in your osim will not be locked
+in your C++ code, so you should carefully check the output and correct if necessary. In addition, only bodies and joints
+will be considered so you should add manually other components (e.g., contact models). Please let us know for any bugs you
+find so that we keep on updating this feature.
+ 

@@ -59,6 +59,14 @@ for i=1:length(etemp21)
 end
 Jtemp21 = Jtemp21/21;
 f_J21 = Function('f_J21',{etemp21},{Jtemp21});
+% Function for 23 elements 
+etemp23 = SX.sym('etemp23',23);
+Jtemp23 = 0;
+for i=1:length(etemp23)
+    Jtemp23 = Jtemp23 + etemp23(i).^2;
+end
+Jtemp23 = Jtemp23/23;
+f_J23 = Function('f_J23',{etemp23},{Jtemp23});
 % Function for 92 elements 
 etemp92 = SX.sym('etemp92',92);
 Jtemp92 = 0;
@@ -199,12 +207,22 @@ K_pass      = SX.sym('K_pass',4);
 theta_pass  = SX.sym('theta_pass',2);
 qin_pass    = SX.sym('qin_pass',1);
 qdotin_pass = SX.sym('qdotin_pass',1);
+damp_pass   = SX.sym('damp_pass',1);
 % theta_pass 1 and 2 are inverted on purpose.
 Tau_pass = K_pass(1,1)*exp(K_pass(2,1)*(qin_pass-theta_pass(2,1))) + ...
     K_pass(3,1)*exp(K_pass(4,1)*(qin_pass-theta_pass(1,1))) ...
-    - 0.001*qdotin_pass;
-f_PassiveMoments = Function('f_PassiveMoments',{K_pass,theta_pass,...
+    - damp_pass*qdotin_pass;
+f_PassiveMoments = Function('f_PassiveMoments',{K_pass,theta_pass,damp_pass, ...
     qin_pass,qdotin_pass},{Tau_pass});
+
+%% Passive torque actuated joint torques
+stiff	= SX.sym('stiff',1);
+damp	= SX.sym('damp',1);
+qin     = SX.sym('qin_pass',1);
+qdotin  = SX.sym('qdotin_pass',1);
+passTATorques = -stiff * qin - damp * qdotin;
+f_passiveTATorques = Function('f_passiveTATorques',{stiff,damp,qin,qdotin}, ...
+    {passTATorques});
 
 %% Metabolic energy models
 act_SX          = SX.sym('act_SX',NMuscle,1); % Muscle activations

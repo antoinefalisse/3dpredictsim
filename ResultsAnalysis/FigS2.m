@@ -1,4 +1,12 @@
 % This script reproduces Fig S2
+%
+% WARNING: after publication, we realized that we made an error in the
+% following models: Umberger2003, Umberger2010, Uchida2016 (see CHANGELOG
+% for details). This bug has been corrected now. If you re-run the simulations
+% and run this script, you might therefore get a different figure than the one
+% in the paper. The results saved in Results_all still contain the original
+% results (except if you overwrote them).
+%
 % Author: Antoine Falisse
 % Date: 1/7/2019
 
@@ -25,7 +33,11 @@ body_mass = 62;
 body_weight = 62*9.81;
 setup.derivatives = 'AD';
 % Load pre-defined settings
-predSim_settings_all;
+pathmain = pwd;
+[pathrepo,~,~] = fileparts(pathmain);
+pathOCP = [pathrepo,'/OCP'];
+addpath(genpath(pathOCP));
+settings = getSettings_predSim_all();
 
 %% Load results
 % Pre-allocation structures
@@ -45,8 +57,6 @@ for k = 1:length(ww)
 end
 
 %% Load reference data
-pathmain = pwd;
-[pathrepo,~,~] = fileparts(pathmain);
 pathReferenceData = [pathrepo,'/ExperimentalData'];
 load([pathReferenceData,'/ExperimentalData.mat'],'ExperimentalData');
 

@@ -6,6 +6,9 @@
 function GRF = getGRF(pathGRF)
 
 load(pathGRF,'GRFall')
+for i = 1:length(GRFall.colheaders)
+    GRFall.colheaders{i} = strtrim(GRFall.colheaders{i});
+end
 GRF.time = GRFall.data(:,strcmp(GRFall.colheaders,{'time'}));
 identifier = {'1_ground_force_v','ground_force_v'};     % Right leg: 1_ground_force_v; Left leg: ground_force_v
 identifierp = {'1_ground_force_p','ground_force_p'};    % Right leg: 1_ground_force_p; Left leg: ground_force_p
