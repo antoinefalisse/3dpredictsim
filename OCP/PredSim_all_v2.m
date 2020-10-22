@@ -22,7 +22,7 @@
 %       still reformulate the problem with bounds after initialization.
 %   - Enable parallel computing.
 %       - Using "thread" with CasADi, number of threads used given by
-%       NThreads (line 61).
+%       NThreads (line 71).
 %   - Reformulation constraint inital position pelvis (line 508).
 %       - This prevents redundancy as in the previous formulation.
 %   - Model in external function built programmatically through MATLAB (see
