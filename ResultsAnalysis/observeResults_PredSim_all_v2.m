@@ -131,7 +131,7 @@ for i = 1:length(idx_Qs)
 end 
 l = legend(p,legend_case);
 set(l,'Fontsize',label_fontsize)
-sp = suptitle('Joint angles');
+sp = sgtitle('Joint angles');
 set(sp,'Fontsize',sup_fontsize);   
 
 %% Plot joint velocities
@@ -177,7 +177,7 @@ for i = 1:length(idx_Qs)
 end 
 l = legend(p,legend_case);
 set(l,'Fontsize',label_fontsize)
-sp = suptitle('Joint velocities');
+sp = sgtitle('Joint velocities');
 set(sp,'Fontsize',sup_fontsize);  
 
 end
@@ -229,7 +229,7 @@ for i = 1:length(GRF_str)
 end
 l = legend(p,legend_case);
 set(l,'Fontsize',16)
-sp = suptitle('Ground reaction forces');
+sp = sgtitle('Ground reaction forces');
 set(sp,'Fontsize',sup_fontsize);
 
 %% Plot joint kinetics
@@ -276,7 +276,7 @@ for i = 1:length(idx_Qs)-3
 end 
 l = legend(p,legend_case);
 set(l,'Fontsize',16)
-sp = suptitle('Joint torques');
+sp = sgtitle('Joint torques');
 set(sp,'Fontsize',sup_fontsize);
 
 %% Plot joint powers
@@ -324,7 +324,7 @@ for i = 1:length(idx_Qs)-3
 end 
 l = legend(p,legend_case);
 set(l,'Fontsize',16)
-sp = suptitle('Joint powers');
+sp = sgtitle('Joint powers');
 set(sp,'Fontsize',sup_fontsize);  
    
 %% Plot muscle activations (right)
@@ -406,7 +406,7 @@ for i = 1:size(Acts_opt(ww(k)).m,2)/2
 end
 l = legend(p,legend_case);
 set(l,'Fontsize',label_fontsize)
-sp = suptitle('Muscle activations: right');
+sp = sgtitle('Muscle activations: right');
 set(sp,'Fontsize',sup_fontsize);
 
 %% Plot muscle activations (left)
@@ -445,7 +445,7 @@ for i = 1:size(Acts_opt(ww(k)).m,2)/2
 end
 l = legend(p,legend_case);
 set(l,'Fontsize',label_fontsize)
-sp = suptitle('Muscle activations: left');
+sp = sgtitle('Muscle activations: left');
 set(sp,'Fontsize',sup_fontsize);
 
 end
