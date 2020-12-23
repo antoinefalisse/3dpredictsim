@@ -10,8 +10,8 @@ We use custom versions of Simbody and OpenSim to enable the use of algorithmic
 differentiation through CasADi. Information about how to install these libraries, compile
 the cpps, and generate the dlls can be found on this page: https://github.com/antoinefalisse/opensim-core/tree/AD-recorder
 
-In this folder, we release the source code of the external functions (cpps)
-as well as the corresponding dlls. Only the dlls are necessary to run the problems.
+In this folder, we share the dlls of the external functions. The corresponding .cpp files can be found in this folder:
+https://github.com/antoinefalisse/opensim-core/tree/AD-recorder/OpenSim/External_Functions
 
 We developed this code on Windows. To get the dylibs (Mac users), follow the instructions on this page:
 https://github.com/antoinefalisse/opensim-core/tree/AD-recorder. Please report any issues: email me at
