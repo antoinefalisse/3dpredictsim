@@ -13,8 +13,8 @@ the cpps, and generate the dlls can be found on this page: https://github.com/an
 In this folder, we release the source code of the external functions (cpps)
 as well as the corresponding dlls. Only the dlls are necessary to run the problems.
 
-We developed this code on Windows but provide dylibs for Mac users. We cannot
-guarantee that all will work smooth on Mac. Please report any issues: email me at
+We developed this code on Windows. To get the dylibs (Mac users), follow the instructions on this page:
+https://github.com/antoinefalisse/opensim-core/tree/AD-recorder. Please report any issues: email me at
 afalisse@stanford.edu or submit an issue on GitHub.
 
 From v2.0:
