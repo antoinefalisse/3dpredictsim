@@ -3,7 +3,7 @@
 
 The results are divided into:
 
-1. PredSim_all_v2/Results_all.mat
+1. PredSim_all_v2/Results_all_v2.mat
     - Contains results from the predictive simulations produced with PredSim_all_v2.
 2. PredSim_all/Results_all.mat
     - Contains all results from the predictive simulations except those with the prosthesis.

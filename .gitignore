@@ -1,8 +1,14 @@
 # Add any directories, files, or patterns you don't want to be tracked by version control
 
-**/Results/
-!/Results/PredSim_all/PredSim_all_v2/Results_all_v2.mat
-!/Results/PredSim_all/PredSim_all/Results_all.mat
-!/Results/PredSim_all/PredSim_prosthesis/Results_prosthesis.mat
-!/Results/PredSim_all/TrackSim/Results_tracking.mat
+Results/*
+!/Results/PredSim_all_v2
+Results/PredSim_all_v2/*
+!/Results/PredSim_all_v2/Results_all_v2.mat
+Results/PredSim_all/*
+!/Results/PredSim_all/Results_all.mat
+Results/PredSim_prosthesis/*
+!/Results/PredSim_prosthesis/Results_prosthesis.mat
+Results/TrackSim/*
+!/Results/TrackSim/Results_tracking.mat
+
 **/Polynomials/MuscleAnalysis/ResultsMA/
