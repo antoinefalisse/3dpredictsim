@@ -132,7 +132,9 @@ if ispc
     switch setup.derivatives
         case {'AD'}   
             if cm == 1
-                F = external('F','PredSim.dll');   
+                F = external('F', 'PredSim_FD.dll', struct('enable_fd',...
+            true,'enable_forward',false,'enable_reverse',false,...
+            'enable_jacobian',false,'fd_method','forward'));  
                 if analyseResults
                     F1 = external('F','PredSim_pp.dll');
                 end
@@ -859,7 +861,7 @@ if solveProblem
             end
         end            
         % Call external function
-        [Tk] = F([Xk_nsc;Ak_nsc]);           
+        [Tk] = F(Xk_nsc,Ak_nsc);           
         % Add path constraints
         % Null pelvis residuals
         g               = {g{:},Tk(ground_pelvisi,1)};
