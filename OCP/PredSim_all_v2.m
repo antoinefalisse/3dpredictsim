@@ -148,7 +148,9 @@ pathExternalFunctions = [pathRepo,'/ExternalFunctions'];
 cd(pathExternalFunctions);
 if ispc     
     if cm == 1
-        F = external('F','PredSim_v2.dll');   
+        F = external('F','PredSim_v2_FD.dll', struct('enable_fd',...
+                    true,'enable_forward',false,'enable_reverse',false,...
+                    'enable_jacobian',false,'fd_method','forward'));   
         if analyseResults
             F1 = external('F','PredSim_v2_pp.dll');
         end
@@ -887,8 +889,8 @@ if solveProblem
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Call external function (run inverse dynamics)
-        [Tj] = F([[QsQdotskj_nsc(:,j+1);QsQdots_radioulnar_lr];...
-            [Aj_nsc(:,j);Qdotdots_radioulnar_lr]]);  
+        [Tj] = F([QsQdotskj_nsc(:,j+1);QsQdots_radioulnar_lr],...
+            [Aj_nsc(:,j);Qdotdots_radioulnar_lr]);  
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Add path constraints
         % Null pelvis residuals
