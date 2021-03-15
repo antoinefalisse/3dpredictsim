@@ -94,7 +94,7 @@ function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit_mtp(MuscleData)
     plot(lMT_all_error)
     xlimits = get(gca, 'XLim');
     plot(xlimits, [threshold, threshold], 'r', 'linewidth', 2)
-    suptitle('RMS error on the approximated muscle-tendon length')
+    sgtitle('RMS error on the approximated muscle-tendon length')
     ylabel('RMS error (m)')
     
     figure();
@@ -102,7 +102,7 @@ function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit_mtp(MuscleData)
     plot(max(DM_all_error, [], 2))
     xlimits = get(gca, 'XLim');
     plot(xlimits, [threshold, threshold], 'r', 'linewidth', 2)
-    suptitle('maximal RMS error on the approximated muscle moment arm')
+    sgtitle('maximal RMS error on the approximated muscle moment arm')
     ylabel('RMS error (m)')
 
     figure();
@@ -111,7 +111,7 @@ function [muscle_spanning_joint_INFO,MuscleInfo] = PolynomialFit_mtp(MuscleData)
     ylim([0 max_order+1])
     xlimits = get(gca, 'XLim');
     plot(xlimits, [max_order, max_order], 'r', 'linewidth', 2)
-    suptitle('Order of the polynomial approximation')
+    sgtitle('Order of the polynomial approximation')
     ylabel('Order')
     
 end

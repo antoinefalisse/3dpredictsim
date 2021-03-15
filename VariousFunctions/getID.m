@@ -7,7 +7,13 @@
 % 
 function ID = getID(pathID,joints)
 
-load(pathID,'IDall')
+if strcmp(pathID(end-2:end),'sto')
+    IDall = importdata(pathID);
+else
+    load(pathID,'IDall')
+end
+
+
 ID.time = IDall.data(:,strcmp(IDall.colheaders,{'time'}));
 ID.all(:,1) = ID.time;
 count = 1;

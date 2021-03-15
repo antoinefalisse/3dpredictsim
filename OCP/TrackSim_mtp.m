@@ -27,16 +27,16 @@ close all;
 % and visualize the results in the OpenSim GUI.
 
 % num_set = [1,1,0,1,0,1]; % This configuration solves the problem
-num_set = [0,1,1,0,0,0]; % This configuration analyzes the results
+num_set = [0,1,1,1,1,1]; % This configuration analyzes the results
 
 % The variable settings in the following section will set some parameters 
 % of the optimization problem. Through the variable idx_ww, the user can 
 % select which row of parameters will be used.
-idx_ww = 25; % Index row in matrix settings
+idx_ww = 27; % Index row in matrix settings
 
 %% Settings
 import casadi.*
-subjectData = 'subject1';
+subjectData = 'subject2';
 
 solveProblem    = num_set(1); % set to 1 to solve problem
 analyseResults  = num_set(2); % set to 1 to analyze results
@@ -64,6 +64,7 @@ tol_ipopt   = settings(ww,9);  % NLP error tolerance: 1*10^(-settings(9))
 cs          = settings(ww,10); % number of contact spheres
 csc         = settings(ww,11); % contact sphere configuration
 sd          = settings(ww,12);  % stiffness and damping
+subject_idx = settings(ww,13);  % subject index
 % Trials
 trials = settings_trials(ww).ww;
 % Fixed parameter
@@ -75,17 +76,18 @@ if (cs == 5 && csc == 3) || (cs == 4 && csc == 3) || (cs == 6 && csc == 4) || (c
 else
     mtp_jointType = 'mtp';
 end
-subject = ['subject1_',mtp_jointType];
+
+subject = ['subject', num2str(subject_idx), '_', mtp_jointType];
 
 for p = 1:length(trials)
-    nametrial(p).id    = ['gait_',trials{p},'_',mtp_jointType]; % Experimental walking trial to track
+    nametrial(p).id    = ['gait_',trials{p}]; % Experimental walking trial to track
     nametrial(p).ID    = ['ID_',nametrial(p).id];
     nametrial(p).GRF   = ['GRF_',nametrial(p).id];
     nametrial(p).IK    = ['IK_',nametrial(p).id];
     switch nametrial(p).id
-        case ['gait_14_',mtp_jointType]
+        case ['gait_14']
             time_opt(p).p = [3.73,4.25];
-        case ['gait_15_',mtp_jointType]
+        case ['gait_15']
             time_opt(p).p = [2.66,3.2];
     end  
 end
@@ -117,13 +119,21 @@ if ispc
         case 'AD'     
             cd(pathExternalFunctions);
             if (cs == 5 && csc == 3) || (cs == 4 && csc == 3) || (cs == 6 && csc == 4) || (cs == 6 && csc == 5) || (cs == 6 && csc == 6)
-                F1 = external('F','TrackSim_mtpPin_1.dll');
+                if subject_idx == 1
+                    F1 = external('F','TrackSim_mtpPin_1.dll');
+                elseif subject_idx == 2
+                    F1 = external('F','s2_TrackSim_mtpPin_1.dll');
+                end                    
             else
                 F1 = external('F','TrackSim_mtp_1.dll');
             end
             if cs == 6
                 if csc == 4 || csc == 5 || csc == 6
-                    F2 = external('F','TrackSim_mtpPin_2_6cs.dll'); 
+                    if subject_idx == 1
+                        F2 = external('F','TrackSim_mtpPin_2_6cs.dll'); 
+                    elseif subject_idx == 2
+                        F2 = external('F','s2_TrackSim_mtpPin_2_6cs.dll'); 
+                    end                        
                 else
                     F2 = external('F','TrackSim_mtp_2.dll'); 
                 end
@@ -427,6 +437,9 @@ elseif sd == 5
 elseif sd == 6
     stiffnessMtp = 1.5/(pi/180)/5;
     dampingMtp = 0.5;
+elseif sd == 7
+    stiffnessMtp = 25;
+    dampingMtp = 0.4;
 end    
 
 %% Experimental data
@@ -446,13 +459,13 @@ addpath(genpath(pathVariousFunctions));
 
 for p = 1:length(trials)
     % Extract joint kinematics
-    pathIK = [pathData,'/IK/',nametrial(p).IK,'.mat'];
+    pathIK = [pathData,'/IK/',nametrial(p).IK,'.mot'];
     Qs(p).p = getIK(pathIK,joints);
     % Extract ground reaction forces and moments
-    pathGRF = [pathData,'/GRF/',nametrial(p).GRF,'.mat'];
+    pathGRF = [pathData,'/GRF/',nametrial(p).GRF,'.mot'];
     GRF(p).p = getGRF(pathGRF);
     % Extract joint kinetics
-    pathID = [pathData,'/ID/',nametrial(p).ID,'.mat'];
+    pathID = [pathData,'/ID/',nametrial(p).ID,'.sto'];
     ID(p).p = getID(pathID,joints);
     % Interpolation experimental data
     time_expi.ID(1) = find(round(ID(p).p.time,4) == time_opt(p).p (1));
@@ -543,18 +556,18 @@ if solveProblem
         lbw             = [lbw; bounds(p).p.a_a.lower'];
         ubw             = [ubw; bounds(p).p.a_a.upper'];
         w0              = [w0;  guess(p).p.a_a(1,:)'];  
-        % Mtp activations
-        a_mtp0          = MX.sym('a_mtp0',nq.mtp);
-        w               = [w {a_mtp0}];
-        lbw             = [lbw; bounds(p).p.a_mtp.lower'];
-        ubw             = [ubw; bounds(p).p.a_mtp.upper'];
-        w0              = [w0;  guess(p).p.a_mtp(1,:)'];  
+%         % Mtp activations
+%         a_mtp0          = MX.sym('a_mtp0',nq.mtp);
+%         w               = [w {a_mtp0}];
+%         lbw             = [lbw; bounds(p).p.a_mtp.lower'];
+%         ubw             = [ubw; bounds(p).p.a_mtp.upper'];
+%         w0              = [w0;  guess(p).p.a_mtp(1,:)'];  
         % "Lift" initial conditions
         ak          = a0;
         FTtildek    = FTtilde0;
         Xk          = X0;
         a_ak        = a_a0;
-        a_mtpk      = a_mtp0;
+%         a_mtpk      = a_mtp0;
         % Time step
         h = (time_opt(p).p (2)-time_opt(p).p (1))/N;
         % Loop over mesh points
@@ -584,12 +597,12 @@ if solveProblem
             lbw                 = [lbw; bounds(p).p.e_a.lower'];
             ubw                 = [ubw; bounds(p).p.e_a.upper'];
             w0                  = [w0; guess(p).p.e_a(k+1,:)'];
-            % Mtp excitations
-            e_mtpk              = MX.sym(['e_mtp_' num2str(k)], nq.mtp);
-            w                   = [w {e_mtpk}];
-            lbw                 = [lbw; bounds(p).p.e_mtp.lower'];
-            ubw                 = [ubw; bounds(p).p.e_mtp.upper'];
-            w0                  = [w0; guess(p).p.e_mtp(k+1,:)'];
+%             % Mtp excitations
+%             e_mtpk              = MX.sym(['e_mtp_' num2str(k)], nq.mtp);
+%             w                   = [w {e_mtpk}];
+%             lbw                 = [lbw; bounds(p).p.e_mtp.lower'];
+%             ubw                 = [ubw; bounds(p).p.e_mtp.upper'];
+%             w0                  = [w0; guess(p).p.e_mtp(k+1,:)'];
             % Define states at collocation points    
             % Muscle activations
             akj = {};
@@ -628,15 +641,15 @@ if solveProblem
                 ubw     = [ubw; bounds(p).p.a_a.upper'];
                 w0      = [w0;  guess(p).p.a_a(k+1,:)'];
             end   
-            % Mtp activations
-            a_mtpkj = {};
-            for j=1:d
-                a_mtpkj{j}= MX.sym(['a_mtp_' num2str(k) '_' num2str(j)], nq.mtp);
-                w       = {w{:}, a_mtpkj{j}};
-                lbw     = [lbw; bounds(p).p.a_mtp.lower'];
-                ubw     = [ubw; bounds(p).p.a_mtp.upper'];
-                w0      = [w0;  guess(p).p.a_mtp(k+1,:)'];
-            end   
+%             % Mtp activations
+%             a_mtpkj = {};
+%             for j=1:d
+%                 a_mtpkj{j}= MX.sym(['a_mtp_' num2str(k) '_' num2str(j)], nq.mtp);
+%                 w       = {w{:}, a_mtpkj{j}};
+%                 lbw     = [lbw; bounds(p).p.a_mtp.lower'];
+%                 ubw     = [ubw; bounds(p).p.a_mtp.upper'];
+%                 w0      = [w0;  guess(p).p.a_mtp(k+1,:)'];
+%             end   
             % Unscale variables for later use
             Xk_nsc          = Xk.*scaling(p).p.QsQdots';
             FTtildek_nsc    = FTtildek.*(scaling(p).p.FTtilde');
@@ -939,7 +952,13 @@ if solveProblem
                 Xk_nsc(jointi.subt.l*2,1));
             Tau_passk.subt.r       = f_PassiveMoments(k_pass.subt,...
                 theta.pass.subt,Xk_nsc(jointi.subt.r*2-1,1),...
-                Xk_nsc(jointi.subt.r*2,1));        
+                Xk_nsc(jointi.subt.r*2,1)); 
+            Tau_passk.mtp.l       = f_PassiveMoments(k_pass.mtp,...
+                theta.pass.mtp,Xk_nsc(jointi.mtp.l*2-1,1),...
+                Xk_nsc(jointi.mtp.l*2,1));
+            Tau_passk.mtp.r       = f_PassiveMoments(k_pass.mtp,...
+                theta.pass.mtp,Xk_nsc(jointi.mtp.r*2-1,1),...
+                Xk_nsc(jointi.mtp.r*2,1));            
             Tau_passk.trunk.ext     = f_PassiveMoments(k_pass.trunk.ext,...
                 theta.pass.trunk.ext,Xk_nsc(jointi.trunk.ext*2-1,1),...
                 Xk_nsc(jointi.trunk.ext*2,1));
@@ -948,7 +967,8 @@ if solveProblem
                 Xk_nsc(jointi.trunk.ben*2,1));
             Tau_passk.trunk.rot     = f_PassiveMoments(k_pass.trunk.rot,...
                 theta.pass.trunk.rot,Xk_nsc(jointi.trunk.rot*2-1,1),...
-                Xk_nsc(jointi.trunk.rot*2,1));        
+                Xk_nsc(jointi.trunk.rot*2,1));
+            Tau_passk.mtp.all = [Tau_passk.mtp.l; Tau_passk.mtp.r];
 
             Tau_passk.sh_flex.l = f_passiveTATorques(stiffnessArm, dampingArm, ...
                 Xk_nsc(jointi.sh_flex.l*2-1,1), Xk_nsc(jointi.sh_flex.l*2,1));
@@ -970,31 +990,31 @@ if solveProblem
                 Tau_passk.sh_rot.l; Tau_passk.sh_flex.r; Tau_passk.sh_add.r; ...
                 Tau_passk.sh_rot.r; Tau_passk.elb.l; Tau_passk.elb.r];       
 
-            Tau_passk.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Tau_pass_link.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_nsc(jointi.mtp.l*2-1,1), Xk_nsc(jointi.mtp.l*2,1));
-            Tau_passk.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Tau_pass_link.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_nsc(jointi.mtp.r*2-1,1), Xk_nsc(jointi.mtp.r*2,1));       
-            Tau_passk.mtp.all = [Tau_passk.mtp.l; Tau_passk.mtp.r];
+            Tau_pass_link.mtp.all = [Tau_pass_link.mtp.l; Tau_pass_link.mtp.r];
 
             % Loop over collocation points
             Xk_nsc_end          = D(1)*Xk_nsc;
             FTtildek_nsc_end    = D(1)*FTtildek_nsc;
             ak_end              = D(1)*ak;
             a_ak_end            = D(1)*a_ak;
-            a_mtpk_end          = D(1)*a_mtpk;
+%             a_mtpk_end          = D(1)*a_mtpk;
             for j=1:d
                 % Expression for the state derivatives at the collocation point
                 xp_nsc          = C(1,j+1)*Xk_nsc;
                 FTtildep_nsc    = C(1,j+1)*FTtildek_nsc;
                 ap              = C(1,j+1)*ak;
                 a_ap            = C(1,j+1)*a_ak;
-                a_mtpp          = C(1,j+1)*a_mtpk;
+%                 a_mtpp          = C(1,j+1)*a_mtpk;
                 for r=1:d
                     xp_nsc       = xp_nsc + C(r+1,j+1)*Xkj_nsc{r};
                     FTtildep_nsc = FTtildep_nsc + C(r+1,j+1)*FTtildekj_nsc{r};
                     ap           = ap + C(r+1,j+1)*akj{r};
                     a_ap         = a_ap + C(r+1,j+1)*a_akj{r};
-                    a_mtpp       = a_mtpp + C(r+1,j+1)*a_mtpkj{r};
+%                     a_mtpp       = a_mtpp + C(r+1,j+1)*a_mtpkj{r};
                 end 
                 % Append collocation equations
                 % Dynamic constraints are scaled using the same scale
@@ -1034,18 +1054,18 @@ if solveProblem
                 g       = {g{:}, (h*dadt - a_ap)./scaling(p).p.a_a};
                 lbg     = [lbg; zeros(nq.arms,1)];
                 ubg     = [ubg; zeros(nq.arms,1)]; 
-                % Mtp activation dynamics (explicit formulation)
-                da_mtpdt    = f_MtpActivationDynamics(e_mtpk,a_mtpkj{j});
-                g           = {g{:}, (h*da_mtpdt - a_mtpp)./scaling(p).p.a_mtp};
-                lbg         = [lbg; zeros(nq.mtp,1)];
-                ubg         = [ubg; zeros(nq.mtp,1)]; 
+%                 % Mtp activation dynamics (explicit formulation)
+%                 da_mtpdt    = f_MtpActivationDynamics(e_mtpk,a_mtpkj{j});
+%                 g           = {g{:}, (h*da_mtpdt - a_mtpp)./scaling(p).p.a_mtp};
+%                 lbg         = [lbg; zeros(nq.mtp,1)];
+%                 ubg         = [ubg; zeros(nq.mtp,1)]; 
 
                 % Add contribution to the end state
                 Xk_nsc_end = Xk_nsc_end + D(j+1)*Xkj_nsc{j};
                 FTtildek_nsc_end = FTtildek_nsc_end + D(j+1)*FTtildekj_nsc{j};
                 ak_end = ak_end + D(j+1)*akj{j};  
                 a_ak_end = a_ak_end + D(j+1)*a_akj{j};   
-                a_mtpk_end = a_mtpk_end + D(j+1)*a_mtpkj{j}; 
+%                 a_mtpk_end = a_mtpk_end + D(j+1)*a_mtpkj{j}; 
                 % Add contribution to quadrature function
                 J = J + ...
                     W.Qs*B(j+1)*(f_J30(Xk(Qsi(residual_bptyi),1)-...
@@ -1057,12 +1077,12 @@ if solveProblem
                         GRF(p).p.MorGF.allinterp(k+1,2:end)'./scaling(p).p.GRM'))*h +...
                     W.ID_act*B(j+1)*(f_J23((Tk(residuals_act_bmtpi,1)./scaling(p).p.T(1)')-...
                         ID(p).p.allinterp(k+1,residuals_act_bmtpi+1)'./scaling(p).p.T(1)))*h +...
-                    W.a*B(j+1)*(f_J92(akj{j}))*h + ...
-                    W.a*B(j+1)*(f_J2(e_mtpk))*h + ...
+                    W.a*B(j+1)*(f_J92(akj{j}))*h + ...                   
                     W.a*B(j+1)*(f_J8(e_ak))*h + ...
                     W.u*B(j+1)*(f_J31(Ak))*h +...
                     W.u*B(j+1)*(f_J92(vAk))*h +...
                     W.u*B(j+1)*(f_J92(dFTtildek))*h;
+%                   W.a*B(j+1)*(f_J2(e_mtpk))*h + ...
             end                              
             % Add path constraints
             % Pelvis residuals (same as from inverse dynamics)
@@ -1181,9 +1201,9 @@ if solveProblem
                 (a_ak + Tau_passk.arm/scaling(p).p.ArmTau)};
             lbg             = [lbg; zeros(nq.arms,1)];
             ubg             = [ubg; zeros(nq.arms,1)];        
-            % Torque-driven joint torques for the mtps
+            % Passive joint torques for the mtps
             g               = {g{:},Tk(mtpi,1)/scaling(p).p.MtpTau - ...
-                (a_mtpk + Tau_passk.mtp.all/scaling(p).p.MtpTau)};
+                ((Tau_passk.mtp.all + Tau_pass_link.mtp.all)/scaling(p).p.MtpTau)};
             lbg             = [lbg; zeros(nq.mtp,1)];
             ubg             = [ubg; zeros(nq.mtp,1)];            
             % Activation dynamics (implicit formulation)
@@ -1229,12 +1249,12 @@ if solveProblem
                 lbw             = [lbw; bounds(p).p.a_a.lower'];
                 ubw             = [ubw; bounds(p).p.a_a.upper'];
                 w0              = [w0;  guess(p).p.a_a(k+2,:)'];
-                % Mtp activations
-                a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
-                w               = {w{:}, a_mtpk};
-                lbw             = [lbw; bounds(p).p.a_mtp.lower'];
-                ubw             = [ubw; bounds(p).p.a_mtp.upper'];
-                w0              = [w0;  guess(p).p.a_mtp(k+2,:)'];
+%                 % Mtp activations
+%                 a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
+%                 w               = {w{:}, a_mtpk};
+%                 lbw             = [lbw; bounds(p).p.a_mtp.lower'];
+%                 ubw             = [ubw; bounds(p).p.a_mtp.upper'];
+%                 w0              = [w0;  guess(p).p.a_mtp(k+2,:)'];
             else
                 % Muscle activations
                 ak              = MX.sym(['a_' num2str(k+1)], NMuscle);
@@ -1260,22 +1280,26 @@ if solveProblem
                 lbw             = [lbw; bounds(p).p.a_a.lower'];
                 ubw             = [ubw; bounds(p).p.a_a.upper'];
                 w0              = [w0;  guess(p).p.a_a(end,:)'];
-                % Mtp activations
-                a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
-                w               = {w{:}, a_mtpk};
-                lbw             = [lbw; bounds(p).p.a_mtp.lower'];
-                ubw             = [ubw; bounds(p).p.a_mtp.upper'];
-                w0              = [w0;  guess(p).p.a_mtp(end,:)'];
+%                 % Mtp activations
+%                 a_mtpk          = MX.sym(['a_mtp_' num2str(k+1)], nq.mtp);
+%                 w               = {w{:}, a_mtpk};
+%                 lbw             = [lbw; bounds(p).p.a_mtp.lower'];
+%                 ubw             = [ubw; bounds(p).p.a_mtp.upper'];
+%                 w0              = [w0;  guess(p).p.a_mtp(end,:)'];
             end
             % Rescale variables to impose equality constraints
             Xk_end = (Xk_nsc_end)./scaling(p).p.QsQdots';
             FTtildek_end = (FTtildek_nsc_end)./scaling(p).p.FTtilde';
             % Add equality constraints (next interval starts with end values of 
             % states from previous interval)
+%             g   = {g{:}, Xk_end-Xk, FTtildek_end-FTtildek, ...
+%                 ak_end-ak, a_ak_end-a_ak, a_mtpk_end-a_mtpk};
+%             lbg = [lbg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];
+%             ubg = [ubg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];
             g   = {g{:}, Xk_end-Xk, FTtildek_end-FTtildek, ...
-                ak_end-ak, a_ak_end-a_ak, a_mtpk_end-a_mtpk};
-            lbg = [lbg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];
-            ubg = [ubg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms + nq.mtp,1)];    
+                ak_end-ak, a_ak_end-a_ak};
+            lbg = [lbg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms,1)];
+            ubg = [ubg; zeros(2*nq.all + NMuscle + NMuscle + nq.arms,1)];   
 
         end       
         % Periodicity pelvis_ty (Qs and Qdots)
@@ -1342,8 +1366,8 @@ if analyseResults
     %% Extract results
     % All optimized design variables are saved in a single column vector      
     % Number of design variables    
-    NControls = NMuscle+NMuscle+nq.all+nq.arms+nq.mtp;
-    NStates = NMuscle+NMuscle+2*nq.all+nq.arms+nq.mtp;
+    NControls = NMuscle+NMuscle+nq.all+nq.arms;
+    NStates = NMuscle+NMuscle+2*nq.all+nq.arms;
     NParameters = np;
     % In the loop
     Nwl = NControls+d*NStates+NStates;
@@ -1377,12 +1401,12 @@ if analyseResults
         for i = 1:nq.arms
             a_a_opt(p).p(:,i) = w_opt(NParameters+N4p+NMuscle+NMuscle+2*nq.all+i:Nwl:Nw);
         end
-        % Mtp activations
-        a_mtp_opt(p).p = zeros(N+1,nq.mtp);
-        for i = 1:nq.mtp
-            a_mtp_opt(p).p(:,i) = w_opt(NParameters+N4p+NMuscle+NMuscle+2*nq.all+...
-                nq.arms+i:Nwl:Nw);
-        end
+%         % Mtp activations
+%         a_mtp_opt(p).p = zeros(N+1,nq.mtp);
+%         for i = 1:nq.mtp
+%             a_mtp_opt(p).p(:,i) = w_opt(NParameters+N4p+NMuscle+NMuscle+2*nq.all+...
+%                 nq.arms+i:Nwl:Nw);
+%         end
         % Time derivative of muscle activations and muscle-tendon forces
         vA_opt(p).p = zeros(N,NMuscle);
         dFTtilde_opt(p).p = zeros(N,NMuscle);
@@ -1400,12 +1424,12 @@ if analyseResults
         for i = 1:nq.arms
             e_a_opt(p).p(:,i) = w_opt(NParameters+N4p+NStates+2*NMuscle+nq.all+i:Nwl:Nw); 
         end 
-        % Mtp excitations
-        e_mtp_opt(p).p = zeros(N,nq.mtp);
-        for i = 1:nq.arms
-            e_mtp_opt(p).p(:,i) = w_opt(NParameters+N4p+NStates+2*NMuscle+nq.all+...
-                nq.arms+i:Nwl:Nw); 
-        end    
+%         % Mtp excitations
+%         e_mtp_opt(p).p = zeros(N,nq.mtp);
+%         for i = 1:nq.arms
+%             e_mtp_opt(p).p(:,i) = w_opt(NParameters+N4p+NStates+2*NMuscle+nq.all+...
+%                 nq.arms+i:Nwl:Nw); 
+%         end    
         N4p = Nw - NParameters;
         Nw = Nw+NStates+N*Nwl;
 %         % Collocation points
@@ -1512,7 +1536,7 @@ if analyseResults
         % Arm activations
         a_a_opt_unsc(p).p = a_a_opt(p).p(1:end-1,:);
         % Mtp activations
-        a_mtp_opt_unsc(p).p = a_mtp_opt(p).p(1:end-1,:);
+%         a_mtp_opt_unsc(p).p = a_mtp_opt(p).p(1:end-1,:);
         % Controls at mesh points
         % Time derivative of Qdots
         qdotdot_opt_unsc(p).p.rad = ...
@@ -1535,8 +1559,8 @@ if analyseResults
         e_a_opt_unsc(p).p = e_a_opt(p).p.*repmat(scaling(p).p.e_a,size(e_a_opt(p).p,1),...
             size(e_a_opt(p).p,2));
         % Mtp excitations
-        e_mtp_opt_unsc(p).p = e_mtp_opt(p).p.*repmat(scaling(p).p.e_mtp,size(e_mtp_opt(p).p,1),...
-            size(e_mtp_opt(p).p,2));
+%         e_mtp_opt_unsc(p).p = e_mtp_opt(p).p.*repmat(scaling(p).p.e_mtp,size(e_mtp_opt(p).p,1),...
+%             size(e_mtp_opt(p).p,2));
     end
     
     %% Time grid    
@@ -1564,6 +1588,7 @@ if analyseResults
         out1_res_opt                = zeros(N,toes.TR.T.r(end));
         out2_res_opt                = zeros(N,GRMi.l(end));
         Tau_pass_opt_mtp            = zeros(N,nq.mtp);
+        Tau_pass_lin_opt_mtp            = zeros(N,nq.mtp);
         Tau_pass_opt_arm            = zeros(N,nq.arms);
         for i = 1:N
             out1_res = F1(Xk_Qs_Qdots_opt(i,:));
@@ -1791,6 +1816,12 @@ if analyseResults
             Tau_pass_opt.subt.r       = f_PassiveMoments(k_pass.subt,...
                 theta.pass.subt,Xk_Qs_Qdots_opt(i,jointi.subt.r*2-1),...
                 Xk_Qs_Qdots_opt(i,jointi.subt.r*2));
+            Tau_pass_opt.mtp.l       = f_PassiveMoments(k_pass.mtp,...
+                theta.pass.mtp,Xk_Qs_Qdots_opt(i,jointi.mtp.l*2-1),...
+                Xk_Qs_Qdots_opt(i,jointi.mtp.l*2));
+            Tau_pass_opt.mtp.r       = f_PassiveMoments(k_pass.mtp,...
+                theta.pass.mtp,Xk_Qs_Qdots_opt(i,jointi.mtp.r*2-1),...
+                Xk_Qs_Qdots_opt(i,jointi.mtp.r*2));
             Tau_pass_opt.trunk.ext     = f_PassiveMoments(k_pass.trunk.ext,...
                 theta.pass.trunk.ext,Xk_Qs_Qdots_opt(i,jointi.trunk.ext*2-1),...
                 Xk_Qs_Qdots_opt(i,jointi.trunk.ext*2));
@@ -1830,23 +1861,26 @@ if analyseResults
                 Tau_pass_opt.sh_rot.l; Tau_pass_opt.sh_flex.r; Tau_pass_opt.sh_add.r; ...
                 Tau_pass_opt.sh_rot.r; Tau_pass_opt.elb.l; Tau_pass_opt.elb.r]);    
 
-            Tau_pass_opt.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Tau_pass_lin_opt.mtp.l = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.l*2-1), ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.l*2));
-            Tau_pass_opt.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
+            Tau_pass_lin_opt.mtp.r = f_passiveTATorques(stiffnessMtp, dampingMtp, ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.r*2-1), ...
                 Xk_Qs_Qdots_opt(i,jointi.mtp.r*2));  
             
             Tau_pass_opt_mtp(i,:) = full([Tau_pass_opt.mtp.l,Tau_pass_opt.mtp.r]);
-
+            Tau_pass_lin_opt_mtp(i,:) = full([Tau_pass_lin_opt.mtp.l,Tau_pass_lin_opt.mtp.r]);
+            
             Tau_pass_opt_all(p).p(i,:) = full([Tau_pass_opt.hip.flex.l,...
                 Tau_pass_opt.hip.add.l,Tau_pass_opt.hip.rot.l,...             
                 Tau_pass_opt.hip.flex.r,Tau_pass_opt.hip.add.r,...
                 Tau_pass_opt.hip.rot.r,Tau_pass_opt.knee.l,...
                 Tau_pass_opt.knee.r,Tau_pass_opt.ankle.l,...
                 Tau_pass_opt.ankle.r,Tau_pass_opt.subt.l,...
-                Tau_pass_opt.subt.r,Tau_pass_opt.mtp.l,...
-                Tau_pass_opt.mtp.r,Tau_pass_opt.trunk.ext,...
+                Tau_pass_opt.subt.r,...
+                Tau_pass_opt.mtp.l + Tau_pass_lin_opt.mtp.l,...
+                Tau_pass_opt.mtp.r + Tau_pass_lin_opt.mtp.r,...
+                Tau_pass_opt.trunk.ext,...
                 Tau_pass_opt.trunk.ben,Tau_pass_opt.trunk.rot,...
                 Tau_pass_opt.sh_flex.l,Tau_pass_opt.sh_add.l,...
                 Tau_pass_opt.sh_rot.l,Tau_pass_opt.sh_flex.r,...
@@ -1862,7 +1896,7 @@ if analyseResults
         assertArmTmax = max(max(abs(out2_res_opt(:,armsi)/scaling(p).p.ArmTau - ...
             (a_a_opt_unsc(p).p + Tau_pass_opt_arm/scaling(p).p.ArmTau))));
         assertMtpTmax = max(max(abs(out2_res_opt(:,mtpi)/scaling(p).p.MtpTau - ...
-            (a_mtp_opt_unsc(p).p + Tau_pass_opt_mtp/scaling(p).p.MtpTau))));
+            ((Tau_pass_lin_opt_mtp + Tau_pass_opt_mtp)/scaling(p).p.MtpTau))));
         if assertArmTmax > 10^(-tol_ipopt)
             disp('error in arm torques')
         end
@@ -1928,7 +1962,7 @@ if analyseResults
         Results_tracking(ww).ww(p).GRFs_opt = GRF_opt_unsc(p).p;
         Results_tracking(ww).ww(p).GRMs_opt = GRM_opt_unsc(p).p; 
         Results_tracking(ww).ww(p).passT = Tau_pass_opt_all(p).p;      
-        Results_tracking(ww).ww(p).aMTP = a_mtp_opt_unsc(p).p;
+%         Results_tracking(ww).ww(p).aMTP = a_mtp_opt_unsc(p).p;
         Results_tracking(ww).ww(p).aArm = a_a_opt_unsc(p).p;
         Results_tracking(ww).ww(p).Qs_toTrack = Qs(p).p.allinterpfilt;
         Results_tracking(ww).ww(p).Ts_toTrack = ID(p).p.allinterp;

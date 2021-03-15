@@ -9,10 +9,10 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = 26; 
+idx_ww  = [27]; 
 mtp_pin = 1; % the mtp joint is a pin rather than a custom joint
 % Fixed settings
-subject = 'subject1';
+subject = 'subject2';
 body_mass = 62;
 body_weight = body_mass*9.81;
 pathmain = pwd;
@@ -58,7 +58,7 @@ for www = 1:length(idx_ww)
         Ts_opt(ww).ww(p).p = Results_tracking(ww).ww(p).Ts_opt;
         GRFs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).GRFs_opt;
         GRMs_opt(ww).ww(p).p = Results_tracking(ww).ww(p).GRMs_opt;
-        aMTP_opt(ww).ww(p).p = Results_tracking(ww).ww(p).aMTP; 
+%         aMTP_opt(ww).ww(p).p = Results_tracking(ww).ww(p).aMTP; 
         passT_opt(ww).ww(p).p = Results_tracking(ww).ww(p).passT; 
         Qs_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).Qs_toTrack;
         Ts_toTrack(ww).ww(p).p = Results_tracking(ww).ww(p).Ts_toTrack;
@@ -272,10 +272,10 @@ for p = 1:length(trials(ww).ww)
             % Passive torques
             plot(Ts_toTrack(ww).ww(p).p(:,1),passT_opt(ww).ww(p).p(:,idx_mtp(i)-6),...
                 'color',color_all(2,:),'linewidth',line_linewidth); 
-            % Active torques
-            plot(Ts_toTrack(ww).ww(p).p(:,1),aMTP_opt(ww).ww(p).p(:,i)*100,...
-                'color','b','linewidth',line_linewidth);
-            l = legend('ID','Passive (stiffness + damping)','Active');
+%             % Active torques
+%             plot(Ts_toTrack(ww).ww(p).p(:,1),aMTP_opt(ww).ww(p).p(:,i)*100,...
+%                 'color','b','linewidth',line_linewidth);
+            l = legend('ID','Passive (stiffness + damping)');
             set(l,'Fontsize',20);
             hold on;            
         end
@@ -428,9 +428,9 @@ for k = 1:length(idx_ww)
         if writeModel
             pathVariousFunctions = [pathRepo,'\VariousFunctions'];
             addpath(genpath(pathVariousFunctions));    
-            pathData = [pathRepo,'\OpenSimModel\',subject];    
+            pathData = [pathRepo,'\OpenSimModel\',subject, '\Models\'];    
             if mtp_pin
-                ModelSetup = xml_read([pathData,'\',subject,'_mtpPin_ContactsAsForces.osim']);
+                ModelSetup = xml_read([pathData,'\',subject,'_withMTP_scaled_contactsAsForces.osim']);
             else
                 ModelSetup = xml_read([pathData,'\',subject,'_mtp_ContactsAsForces.osim']);
             end
@@ -488,7 +488,7 @@ for k = 1:length(idx_ww)
                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).body_name = 'toes_r';
                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).body_name = 'toes_l';
             end
-            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_mtp_c',num2str(ww),'.osim'];
+            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_c',num2str(ww),'.osim'];
             xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
         end
     end

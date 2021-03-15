@@ -1,5 +1,7 @@
 # Add any directories, files, or patterns you don't want to be tracked by version control
 
+*.log
+
 **/Results/
 !/Results/PredSim_all/PredSim_all/Results_all.mat
 !/Results/PredSim_all/PredSim_prosthesis/Results_prosthesis.mat

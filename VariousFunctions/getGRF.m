@@ -5,7 +5,11 @@
 % 
 function GRF = getGRF(pathGRF)
 
-load(pathGRF,'GRFall')
+if strcmp(pathGRF(end-2:end),'mot')
+    GRFall = importdata(pathGRF);
+else
+    load(pathGRF,'GRFall')
+end
 for i = 1:length(GRFall.colheaders)
     GRFall.colheaders{i} = strtrim(GRFall.colheaders{i});
 end
