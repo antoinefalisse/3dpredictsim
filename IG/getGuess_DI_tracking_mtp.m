@@ -270,7 +270,7 @@ if (cs == 6 && csc == 2) || (cs == 6 && csc == 3)
     B_locSphere_s6_r = [0.0125, 0.0175];
     guess.params = [guess.params,B_locSphere_s6_r];
 end
-if (cs == 6 && csc == 4) || (cs == 6 && csc == 6)
+if (cs == 6 && csc == 4) || (cs == 6 && csc == 6) || (cs == 6 && csc == 7)
     B_locSphere_s1_r = [0, 0];
     guess.params = B_locSphere_s1_r;
     B_locSphere_s2_r = [0.065, 0.025];

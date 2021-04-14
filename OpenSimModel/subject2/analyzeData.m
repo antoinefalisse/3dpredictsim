@@ -7,10 +7,11 @@
 % ground that we visually extract from OpenSim.
 
 clear all
-% close all
+close all
 clc
 
 plotGRF = 1;
+plotGRM = 0;
 plotKinematics = 1;
 plotKinematicsSpeedsAcc = 0;
 plotKinetics = 1;
@@ -31,16 +32,16 @@ body_weight = body_mass*9.81;
 
 % timeICoff indicates the first initial contact after the force plate, this
 % is visually extracted from OpenSim
-trials.subject1.gait_14.icOff = 4.27;
-trials.subject1.gait_15.icOff = 3.2;
-trials.subject1.gait_23.icOff = 2.41;
-trials.subject1.gait_25.icOff = 2.2;
-trials.subject1.gait_27.icOff = 2.92;
-trials.subject1.gait_60.icOff = 2.26;
+% trials.subject1.gait_14.icOff = 4.27;
+% trials.subject1.gait_15.icOff = 3.2;
+% trials.subject1.gait_23.icOff = 2.41;
+% trials.subject1.gait_25.icOff = 2.2;
+% trials.subject1.gait_27.icOff = 2.92;
+% trials.subject1.gait_60.icOff = 2.26;
 trials.subject1.gait_61.icOff = 2.87;
-trials.subject1.gait_63.icOff = 1.86;
+% trials.subject1.gait_63.icOff = 1.86;
 trials.subject1.gait_64.icOff = 2.14;
-trials.subject1.gait_65.icOff = 2.1;
+% trials.subject1.gait_65.icOff = 2.1;
 % trials.subject1.gait_67.icOff = 2.38;
 
 pathMain = pwd;
@@ -174,20 +175,28 @@ for i = 1:length(modelNames)
         [time_IC.(subjects{i}){count},idx_IC.(subjects{i}){count},...
             leg1.(subjects{i}){count}] = getIC_1FP(GRF,threshold,trials.(subjects{i}).(c_trial).icOff);         
         if strcmp(leg1.(subjects{i}){count},'r')
-            GRFsel.(subjects{i}){count} = GRF.val.all(idx_IC.(subjects{i}){count}(1):idx_IC.(subjects{i}){count}(2),:);                
+            GRFsel.(subjects{i}){count} = GRF.val.all(idx_IC.(subjects{i}){count}(1):idx_IC.(subjects{i}){count}(2),:);
+            GRMsel.(subjects{i}){count} = GRF.MorGF.all(idx_IC.(subjects{i}){count}(1):idx_IC.(subjects{i}){count}(2),:);
         else
             % if left then we invert right and left and also take the
             % opposite for the z-axis
             GRFsel.(subjects{i}){count} = GRF.val.all(idx_IC.(subjects{i}){count}(1):idx_IC.(subjects{i}){count}(2),[1,5:7,2:4]);
-            GRFsel.(subjects{i}){count}(:,[4,7]) = -GRFsel.(subjects{i}){count}(:,[4,7]);                    
+            GRFsel.(subjects{i}){count}(:,[4,7]) = -GRFsel.(subjects{i}){count}(:,[4,7]);  
+            
+            GRMsel.(subjects{i}){count} = GRF.MorGF.all(idx_IC.(subjects{i}){count}(1):idx_IC.(subjects{i}){count}(2),[1,5:7,2:4]);
+            GRMsel.(subjects{i}){count}(:,[4,7]) = -GRMsel.(subjects{i}){count}(:,[4,7]);
         end
         % interpolation over N points
         step = (GRFsel.(subjects{i}){count}(end,1)-GRFsel.(subjects{i}){count}(1,1))/(N-1);
         interval.(subjects{i}){count} = GRFsel.(subjects{i}){count}(1,1):step:GRFsel.(subjects{i}){count}(end,1);
         GRFinterp.(subjects{i})(:,:,count) = interp1(GRFsel.(subjects{i}){count}(:,1),GRFsel.(subjects{i}){count}(:,2:end),interval.(subjects{i}){count});
+        GRMinterp.(subjects{i})(:,:,count) = interp1(GRMsel.(subjects{i}){count}(:,1),GRMsel.(subjects{i}){count}(:,2:end),interval.(subjects{i}){count});
         % Only select the right leg
         GRFinterpR.(subjects{i}) = GRFinterp.(subjects{i})(:,1:3,:);
         GRFinterpR.(subjects{i}) = GRFinterpR.(subjects{i})./(body_weight/100);
+        
+        GRMinterpR.(subjects{i}) = GRMinterp.(subjects{i})(:,1:3,:);
+        GRMinterpR.(subjects{i}) = GRMinterpR.(subjects{i})./(body_weight/100);
                 
         %% Kinematics
         % Coordinate values
@@ -282,6 +291,8 @@ for i = 1:length(modelNames)
     end 
     GRFref.(subjects{i}).mean = mean(GRFinterpR.(subjects{i}),3);
     GRFref.(subjects{i}).std = std(GRFinterpR.(subjects{i}),[],3);
+    GRMref.(subjects{i}).mean = mean(GRMinterpR.(subjects{i}),3);
+    GRMref.(subjects{i}).std = std(GRMinterpR.(subjects{i}),[],3);
     Qref.(subjects{i}).Qs.mean = mean(Qs_spline.(subjects{i}),3);
     Qref.(subjects{i}).Qs.std = std(Qs_spline.(subjects{i}),[],3);
     Qref.(subjects{i}).Qdots.mean = mean(Qdots_spline.(subjects{i}),3);
@@ -330,6 +341,26 @@ for i = 1:length(modelNames)
         plot(GRFref.(subjects{i}).mean(:,3)+GRFref.(subjects{i}).std(:,3),'m--','linewidth',2);
         plot(GRFref.(subjects{i}).mean(:,3)-GRFref.(subjects{i}).std(:,3),'m--','linewidth',2)
         title('GRFs','Fontsize',20);        
+    end
+    
+    if plotGRM
+        figure()
+        for c = 1:size(GRMinterpR.(subjects{i}),3)
+            plot(GRMinterpR.(subjects{i})(:,1,c),'b','linewidth',0.5);
+            hold on;
+            plot(GRMinterpR.(subjects{i})(:,2,c),'r','linewidth',0.5);
+            plot(GRMinterpR.(subjects{i})(:,3,c),'m','linewidth',0.5);        
+        end
+        plot(GRMref.(subjects{i}).mean(:,1),'b','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,1)+GRMref.(subjects{i}).std(:,1),'b--','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,1)-GRMref.(subjects{i}).std(:,1),'b--','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,2),'r','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,2)+GRMref.(subjects{i}).std(:,2),'r--','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,2)-GRMref.(subjects{i}).std(:,2),'r--','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,3),'m','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,3)+GRMref.(subjects{i}).std(:,3),'m--','linewidth',2);
+        plot(GRMref.(subjects{i}).mean(:,3)-GRMref.(subjects{i}).std(:,3),'m--','linewidth',2)
+        title('GRMs','Fontsize',20);        
     end
 
     if plotKinematics

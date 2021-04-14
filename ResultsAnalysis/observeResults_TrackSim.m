@@ -9,7 +9,7 @@ clc
 %% Settings
 % Selected trial
 % 1: nominal cost function
-idx_ww  = [27]; 
+idx_ww  = [30]; 
 mtp_pin = 1; % the mtp joint is a pin rather than a custom joint
 % Fixed settings
 subject = 'subject2';
@@ -429,67 +429,89 @@ for k = 1:length(idx_ww)
             pathVariousFunctions = [pathRepo,'\VariousFunctions'];
             addpath(genpath(pathVariousFunctions));    
             pathData = [pathRepo,'\OpenSimModel\',subject, '\Models\'];    
-            if mtp_pin
-                ModelSetup = xml_read([pathData,'\',subject,'_withMTP_scaled_contactsAsForces.osim']);
-            else
-                ModelSetup = xml_read([pathData,'\',subject,'_mtp_ContactsAsForces.osim']);
-            end
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(1) = ParamsCM_opt(ww).ww(p).p(1);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(3) = ParamsCM_opt(ww).ww(p).p(2);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(1) = ParamsCM_opt(ww).ww(p).p(3);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(3) = ParamsCM_opt(ww).ww(p).p(4);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(1) = ParamsCM_opt(ww).ww(p).p(5);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(3) = ParamsCM_opt(ww).ww(p).p(6);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(1) = ParamsCM_opt(ww).ww(p).p(7);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(3) = ParamsCM_opt(ww).ww(p).p(8);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(1) = ParamsCM_opt(ww).ww(p).p(9);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(3) = ParamsCM_opt(ww).ww(p).p(10);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(1) = ParamsCM_opt(ww).ww(p).p(11);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(3) = ParamsCM_opt(ww).ww(p).p(12);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(1) = ParamsCM_opt(ww).ww(p).p(1);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(3) = -ParamsCM_opt(ww).ww(p).p(2);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(1) = ParamsCM_opt(ww).ww(p).p(3);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(3) = -ParamsCM_opt(ww).ww(p).p(4);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(1) = ParamsCM_opt(ww).ww(p).p(5);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(3) = -ParamsCM_opt(ww).ww(p).p(6);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(1) = ParamsCM_opt(ww).ww(p).p(7);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(3) = -ParamsCM_opt(ww).ww(p).p(8);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(1) = ParamsCM_opt(ww).ww(p).p(9);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(3) = -ParamsCM_opt(ww).ww(p).p(10);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(1) = ParamsCM_opt(ww).ww(p).p(11);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(3) = -ParamsCM_opt(ww).ww(p).p(12);            
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).radius = ParamsCM_opt(ww).ww(p).p(13);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).radius = ParamsCM_opt(ww).ww(p).p(14);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).radius = ParamsCM_opt(ww).ww(p).p(15);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).radius = ParamsCM_opt(ww).ww(p).p(16);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).radius = ParamsCM_opt(ww).ww(p).p(17);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).radius = ParamsCM_opt(ww).ww(p).p(18);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).radius = ParamsCM_opt(ww).ww(p).p(13);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).radius = ParamsCM_opt(ww).ww(p).p(14);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(15);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(16);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(17);
-            ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).radius = ParamsCM_opt(ww).ww(p).p(18);
-            if settings(ww,11) == 4 || settings(ww,11) == 5 || settings(ww,11) == 6
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(2) = -0.01;
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).body_name = 'calcn_r';
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).body_name = 'calcn_l';
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).body_name = 'toes_r';
-                ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).body_name = 'toes_l';
-            end
-            PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_c',num2str(ww),'.osim'];
-            xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
+%             if mtp_pin
+%                 ModelSetup = xml_read([pathData,'\',subject,'_withMTP_weldRadius_scaled_FK_contactsAsForces.osim']);
+%             else
+%                 ModelSetup = xml_read([pathData,'\',subject,'_mtp_ContactsAsForces.osim']);
+%             end
+            
+            import org.opensim.modeling.*
+            model = Model([pathData,'\',subject,'_withMTP_weldRadius_scaled_FK_contactsAsForces.osim']);
+            
+            contactGeometrySet = model.getContactGeometrySet();
+            
+            
+            for c_s = 1:contactGeometrySet.getSize()-1
+                c_sphere = contactGeometrySet.get(c_s);
+                cObj = ContactSphere.safeDownCast(c_sphere);
+                if c_s > 6
+                    c_sphere.set_location(Vec3(ParamsCM_opt(ww).ww(p).p((c_s-6-1)*2+1), -0.01, -ParamsCM_opt(ww).ww(p).p((c_s-6-1)*2+2)))
+                    cObj.setRadius(ParamsCM_opt(ww).ww(p).p(c_s-6+12))
+                else
+                    c_sphere.set_location(Vec3(ParamsCM_opt(ww).ww(p).p((c_s-1)*2+1), -0.01, ParamsCM_opt(ww).ww(p).p((c_s-1)*2+2)))
+                    cObj.setRadius(ParamsCM_opt(ww).ww(p).p(c_s+12))
+                end
+            end         
+            model.finalizeConnections
+            model.initSystem()
+            model.print([pathresults,'\',ocp_path,'\',subject,'_c',num2str(ww),'.osim'])           
+            
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(1) = ParamsCM_opt(ww).ww(p).p(1);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(3) = ParamsCM_opt(ww).ww(p).p(2);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(1) = ParamsCM_opt(ww).ww(p).p(3);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(3) = ParamsCM_opt(ww).ww(p).p(4);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(1) = ParamsCM_opt(ww).ww(p).p(5);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(3) = ParamsCM_opt(ww).ww(p).p(6);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(1) = ParamsCM_opt(ww).ww(p).p(7);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(3) = ParamsCM_opt(ww).ww(p).p(8);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(1) = ParamsCM_opt(ww).ww(p).p(9);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(3) = ParamsCM_opt(ww).ww(p).p(10);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(1) = ParamsCM_opt(ww).ww(p).p(11);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(3) = ParamsCM_opt(ww).ww(p).p(12);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(1) = ParamsCM_opt(ww).ww(p).p(1);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(3) = -ParamsCM_opt(ww).ww(p).p(2);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(1) = ParamsCM_opt(ww).ww(p).p(3);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(3) = -ParamsCM_opt(ww).ww(p).p(4);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(1) = ParamsCM_opt(ww).ww(p).p(5);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(3) = -ParamsCM_opt(ww).ww(p).p(6);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(1) = ParamsCM_opt(ww).ww(p).p(7);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(3) = -ParamsCM_opt(ww).ww(p).p(8);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(1) = ParamsCM_opt(ww).ww(p).p(9);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(3) = -ParamsCM_opt(ww).ww(p).p(10);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(1) = ParamsCM_opt(ww).ww(p).p(11);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(3) = -ParamsCM_opt(ww).ww(p).p(12);            
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).radius = ParamsCM_opt(ww).ww(p).p(13);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).radius = ParamsCM_opt(ww).ww(p).p(14);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).radius = ParamsCM_opt(ww).ww(p).p(15);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).radius = ParamsCM_opt(ww).ww(p).p(16);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).radius = ParamsCM_opt(ww).ww(p).p(17);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).radius = ParamsCM_opt(ww).ww(p).p(18);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).radius = ParamsCM_opt(ww).ww(p).p(13);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).radius = ParamsCM_opt(ww).ww(p).p(14);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).radius = ParamsCM_opt(ww).ww(p).p(15);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).radius = ParamsCM_opt(ww).ww(p).p(16);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).radius = ParamsCM_opt(ww).ww(p).p(17);
+%             ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).radius = ParamsCM_opt(ww).ww(p).p(18);
+% %             if settings(ww,11) == 4 || settings(ww,11) == 5 || settings(ww,11) == 6
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(1).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(2).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(3).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(6).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(7).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(8).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(9).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(12).location(2) = -0.01;
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(4).body_name = 'calcn_r';
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(10).body_name = 'calcn_l';
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(5).body_name = 'toes_r';
+% %                 ModelSetup.Model.ContactGeometrySet.objects.ContactSphere(11).body_name = 'toes_l';
+% %             end
+%             PathNewModel = [pathresults,'\',ocp_path,'\',subject,'_c',num2str(ww),'.osim'];
+%             xml_writeOSIM(PathNewModel,ModelSetup,'OpenSimDocument');
         end
     end
 end

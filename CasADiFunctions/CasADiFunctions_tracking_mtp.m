@@ -75,6 +75,14 @@ for i=1:length(etemp23)
 end
 Jtemp23 = Jtemp23/23;
 f_J23 = Function('f_J23',{etemp23},{Jtemp23});
+% Function for 21 elements
+etemp21 = SX.sym('etemp21',21);
+Jtemp21 = 0;
+for i=1:length(etemp21)
+    Jtemp21 = Jtemp21 + etemp21(i).^2;
+end
+Jtemp21 = Jtemp21/21;
+f_J21 = Function('f_J21',{etemp21},{Jtemp21});
 % Function for 31 elements
 etemp31 = SX.sym('etemp31',31);
 Jtemp31 = 0;
