@@ -451,7 +451,7 @@ elseif IGsel == 2 % Data-informed initial guess
             scaling,v_tgt,d);   
     elseif IGm == 2 % Data from average runing motion    
         time_IC = [Qs_run.time(1),Qs_run.time(end)];
-        guess = getGuess_DI_opti_int(Qs_run,nq,N,time_IC,NMuscle,jointi,...
+        guess = getGuess_DI_v2(Qs_run,nq,N,time_IC,NMuscle,jointi,...
             scaling,v_tgt,d);
     elseif IGm == 3 % Data from selected motion
         time_IC = [Qs_ig_sel.time(1),Qs_ig_sel.time(end)];
